@@ -3,7 +3,7 @@
  * Celular: chips de quadra + lista de horários. Desktop (≥1024px): quadras lado a lado.
  */
 import { useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, ClipboardCheck, Plus } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, ClipboardCheck, Plus, Printer } from 'lucide-react';
 import { db } from '../../db/database';
 import { useSettings } from '../../db/hooks';
 import type { Block, ISODate, Minutes, Reservation } from '../../domain/types';
@@ -21,6 +21,7 @@ import { ReservationDetail } from './ReservationDetail';
 import { OccurrenceDetail } from './OccurrenceDetail';
 import { BlockSheet } from '../mais/BlockSheet';
 import { DaySummarySheet } from './DaySummarySheet';
+import { PrintDay } from './PrintDay';
 
 type Overlay =
   | { type: 'form'; init: ReservationSheetInit; title?: string }
@@ -126,7 +127,8 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
         )}
       </header>
 
-      <div className="p-4">
+      {data && <PrintDay data={data} date={date} slotMinutes={settings.slotMinutes} venue={settings.courtName} />}
+      <div className="no-print p-4">
         {!data ? (
           <p className="py-10 text-center text-slate-500">Carregando agenda…</p>
         ) : courts.length === 0 ? (
@@ -149,14 +151,23 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             ))}
           </div>
         )}
-        {data && courts.length > 0 && date <= today && (
+        {data && courts.length > 0 && (
           <div className="no-print mt-4 flex flex-wrap gap-2">
+            {date <= today && (
             <button
               type="button"
               onClick={() => setOverlay({ type: 'closeDay' })}
               className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
               <ClipboardCheck className="size-4 text-brand" aria-hidden /> Encerrar o dia
+            </button>
+            )}
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <Printer className="size-4 text-brand" aria-hidden /> Imprimir agenda do dia
             </button>
           </div>
         )}

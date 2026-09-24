@@ -77,11 +77,26 @@ body {
   }
 }
 
+.print-only {
+  display: none;
+}
+
 @media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
   .no-print {
     display: none !important;
   }
+  .print-only {
+    display: block !important;
+  }
   body {
     background: white;
+  }
+  main {
+    padding: 0 !important;
+    max-width: none !important;
   }
 }

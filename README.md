@@ -2,7 +2,7 @@
 
 PWA de agendamento para quadras esportivas (futsal, basquete, society…), **100% local**: sem backend, sem login, funciona offline depois do primeiro acesso. Os dados ficam no IndexedDB do aparelho, com backup em arquivo.
 
-> Status: **marco 4 concluído**: Agenda, reservas, pagamentos, clientes, WhatsApp e mensalistas completos (criar pela agenda ou pela tela Mensalistas, conflitos nas próximas 12 semanas, pular/desfazer data, remarcar, pausar/retomar/encerrar, mensalidade e receita fixa prevista). Próximo: Resumo, CSV e impressão (marco 5).
+> Status: **marco 5 concluído**: além de agenda, reservas, pagamentos, clientes, WhatsApp e mensalistas, o Resumo (recebido, a receber, ocupação, faltas, horas vazias em R$, mapa de calor com sugestão de promoção, melhores clientes, cobrança), exportação CSV e impressão da agenda do dia. Próximo: backup, restauração, Lixeira, Configurações e onboarding (marco 6).
 
 ## Requisitos
 
@@ -98,6 +98,16 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 8. **Mensalidade vence** quando o primeiro jogo do mês chega (um mensalista criado hoje para a semana que vem não aparece devendo).
 9. **Receita fixa prevista** = mensalidades dos ativos + (preço × jogos do mês) dos ativos por jogo.
 10. Novo modelo de mensagem **"Cobrar mensalidade"** (variável `{mes}`), que entra automaticamente também em bancos criados antes.
+
+## Decisões técnicas (marco 5)
+
+1. **Períodos**: mês atual (do dia 1 ao último dia), últimos 30 dias (hoje incluso) e mês anterior.
+2. **Recebido** conta pagamentos pela data em que foram lançados; **a receber** = jogos já realizados com saldo + mensalidades vencidas do período.
+3. **Ocupação, mapa de calor e horas vazias** usam só horários que já passaram; bloqueios não contam como vazio. Horas vazias são valoradas pela tabela de preços, então batem com o "Livre · R$ X" da agenda.
+4. **Sugestão de promoção**: os 3 horários com menor ocupação (mínimo de 2 amostras) e um preço 25% menor que a média das quadras, arredondado para R$ 5.
+5. **Mapa de calor** em CSS grid (sem biblioteca de gráficos), escala de uma só cor (a da quadra), valor exato ao tocar ou passar o mouse.
+6. **CSV**: separador `;`, UTF-8 com BOM, vírgula decimal e datas dd/MM/aaaa (abre certo no Excel brasileiro). Dois arquivos: reservas (inclui jogos de mensalistas) e pagamentos.
+7. **Impressão**: versão própria para papel (A4, uma página, tabela por quadra), acionada pelo botão "Imprimir agenda do dia".
 
 ## Limitações conhecidas
 
