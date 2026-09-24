@@ -2,7 +2,7 @@
 
 PWA de agendamento para quadras esportivas (futsal, basquete, society…), **100% local**: sem backend, sem login, funciona offline depois do primeiro acesso. Os dados ficam no IndexedDB do aparelho, com backup em arquivo.
 
-> Status: **marco 2 concluído**: Agenda completa (dia, semana, quadras lado a lado no desktop), criar/editar/cancelar/excluir reservas com checagem de conflito e sugestão de horários, preço automático e bloqueios. Próximos: pagamentos, clientes e WhatsApp (marco 3).
+> Status: **marco 3 concluído**: além da Agenda (marco 2), pagamentos (registrar, quitar, remover lançamento errado), falta, mensagens de WhatsApp, Clientes (lista, busca, débito, histórico) e "Encerrar o dia". Próximo: mensalistas completos (marco 4).
 
 ## Requisitos
 
@@ -75,6 +75,16 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 4. **Bloqueio sobre reservas existentes**: o app avisa quais reservas caem no período, mas não cancela nenhuma sozinho (o dono decide e remarca).
 5. **Durações**: chips de 1h, 1h30 e 2h (só os múltiplos do slot configurado) e ajuste fino com − / + no tamanho do slot.
 6. **Ocorrências de mensalista**: nesta etapa só abrem para consulta. Pagamento, falta e "pular data" entram no marco 4.
+
+## Decisões técnicas (marco 3)
+
+1. **Pagamento é sempre um lançamento** (tabela `payments`); pago, sinal e saldo são calculados, nunca gravados. "Quitar" cria um lançamento com o saldo exato, dentro de uma transação.
+2. **Remover pagamento** existe só para corrigir lançamento errado, com confirmação.
+3. **Falta** mantém o horário ocupado e o saldo em aberto (o dono decide se cobra).
+4. **Débito do cliente** = jogos já realizados com saldo + jogos de mensalista por jogo não pagos + mensalidades em aberto até o mês atual.
+5. **Jogos do cliente** incluem as datas já passadas dos mensalistas (ocorrências que não precisaram ser registradas).
+6. **WhatsApp**: a mensagem usa o primeiro nome do cliente; sem telefone válido, o link abre o WhatsApp para escolher o contato. A edição dos textos entra em Configurações (marco 6).
+7. **Encerrar o dia**: recebido = pagamentos lançados na data (por forma de pagamento); pendências = saldos dos jogos daquele dia. O botão "Salvar backup agora" entra no marco 6.
 
 ## Limitações conhecidas
 

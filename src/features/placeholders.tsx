@@ -8,12 +8,3 @@ export function MensalistasPage() {
     </>
   );
 }
-
-export function ClientesPage() {
-  return (
-    <>
-      <PageHeader title="Clientes" />
-      <ComingSoon milestone={3} />
-    </>
-  );
-}

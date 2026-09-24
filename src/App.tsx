@@ -5,7 +5,9 @@ import { ToastProvider } from './components/ui/Toast';
 import { UpdatePrompt } from './pwa/UpdatePrompt';
 import { matchPath, navigate, useHashPath } from './utils/router';
 import AgendaPage from './features/agenda/AgendaPage';
-import { ClientesPage, MensalistasPage } from './features/placeholders';
+import { MensalistasPage } from './features/placeholders';
+import ClientesPage from './features/clientes/ClientesPage';
+import ClienteDetailPage from './features/clientes/ClienteDetailPage';
 
 // Rotas pesadas carregadas sob demanda
 const ResumoPage = lazy(() => import('./features/resumo/ResumoPage'));
@@ -16,6 +18,8 @@ function Routes({ path }: { path: string }) {
   const agenda = matchPath('/agenda/:date', path);
   if (agenda) return <AgendaPage date={agenda.date} />;
   if (path.startsWith('/mensalistas')) return <MensalistasPage />;
+  const cliente = matchPath('/clientes/:id', path);
+  if (cliente?.id) return <ClienteDetailPage id={cliente.id} />;
   if (path.startsWith('/clientes')) return <ClientesPage />;
   if (path.startsWith('/resumo')) return <ResumoPage />;
   if (path === '/mais/bloqueios') return <BlocksPage />;
