@@ -185,7 +185,7 @@ export function receivables(
   const months = monthRange(monthOf(period.from), monthOf(period.to)).filter((m) => m <= currentMonth);
   for (const rec of prep.data.recurrences) {
     if (rec.billingMode !== 'mensal') continue;
-    const billable = new Set(billableMonths(rec, currentMonth));
+    const billable = new Set(billableMonths(rec, currentMonth, today));
     for (const m of months) {
       if (!billable.has(m)) continue;
       const st = monthStatus(rec, payments, m);

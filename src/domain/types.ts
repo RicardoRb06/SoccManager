@@ -130,6 +130,8 @@ export interface WhatsAppTemplates {
   confirmar: string;
   lembrar: string;
   cobrar: string;
+  /** Cobrança de mensalidade (mensalistas com cobrança mensal) */
+  mensalidade: string;
 }
 
 /** Configurações do estabelecimento guardadas no banco (editáveis no app). */

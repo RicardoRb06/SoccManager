@@ -66,15 +66,18 @@ export function paidForMonth(payments: Payment[], recurrenceId: string, month: I
 /**
  * Meses em que a mensalidade é devida: meses (até `untilMonth`) com pelo menos uma
  * data da regra (ignorando pular datas, pois pular um jogo não abate a mensalidade).
+ * Se `today` for informado, o mês só conta depois que o primeiro jogo dele chegou
+ * (um mensalista criado hoje para jogar semana que vem ainda não deve nada).
  */
-export function billableMonths(rec: Recurrence, untilMonth: ISOMonth): ISOMonth[] {
+export function billableMonths(rec: Recurrence, untilMonth: ISOMonth, today?: ISODate): ISOMonth[] {
   if (rec.billingMode !== 'mensal') return [];
   const startMonth = monthOf(rec.startDate);
   if (startMonth > untilMonth) return [];
   const probe: Recurrence = { ...rec, skipDates: [] };
-  return monthRange(startMonth, untilMonth).filter(
-    (m) => occurrenceDates(probe, firstDayOfMonth(m), lastDayOfMonth(m)).length > 0,
-  );
+  return monthRange(startMonth, untilMonth).filter((m) => {
+    const first = occurrenceDates(probe, firstDayOfMonth(m), lastDayOfMonth(m))[0];
+    return first !== undefined && (!today || first <= today);
+  });
 }
 
 export function monthStatus(rec: Recurrence, payments: Payment[], month: ISOMonth): MonthStatus {
@@ -85,8 +88,8 @@ export function monthStatus(rec: Recurrence, payments: Payment[], month: ISOMont
 }
 
 /** Débito acumulado de mensalidades até o mês `untilMonth` (inclusive). */
-export function monthlyDebt(rec: Recurrence, payments: Payment[], untilMonth: ISOMonth): { total: Cents; months: MonthStatus[] } {
-  const months = billableMonths(rec, untilMonth)
+export function monthlyDebt(rec: Recurrence, payments: Payment[], untilMonth: ISOMonth, today?: ISODate): { total: Cents; months: MonthStatus[] } {
+  const months = billableMonths(rec, untilMonth, today)
     .map((m) => monthStatus(rec, payments, m))
     .filter((s) => s.balance > 0);
   return { total: months.reduce((a, s) => a + s.balance, 0), months };

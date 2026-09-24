@@ -1,6 +1,6 @@
 /** Links e mensagens de WhatsApp (wa.me). */
 import type { WhatsAppTemplates } from './types';
-import { formatDateBR, WEEKDAY_LONG, weekdayOf } from './dates';
+import { formatDateBR, formatMonthBR, WEEKDAY_LONG, weekdayOf } from './dates';
 import { formatDuration, minToHHMM } from './time';
 import { formatBRL } from './money';
 
@@ -9,10 +9,12 @@ export const DEFAULT_TEMPLATES: WhatsAppTemplates = {
     'Olá, {cliente}! Confirmando seu horário na {quadra} da {nomeQuadra}: {diaSemana}, {data} às {hora} ({duracao}). Valor: {valor}. Pode confirmar?',
   lembrar: 'Olá, {cliente}! Lembrete: hoje tem jogo na {quadra} da {nomeQuadra}, às {hora}. Até mais tarde!',
   cobrar: 'Olá, {cliente}! Passando para lembrar do saldo de {saldo} referente ao jogo de {data}. Pix: {chavePix}. Obrigado!',
+  mensalidade:
+    'Olá, {cliente}! Passando para lembrar da mensalidade de {mes} do seu horário de {diaSemana} às {hora} na {nomeQuadra}: {saldo}. Pix: {chavePix}. Obrigado!',
 };
 
 export const TEMPLATE_VARIABLES = [
-  'cliente', 'quadra', 'nomeQuadra', 'diaSemana', 'data', 'hora', 'duracao', 'valor', 'saldo', 'chavePix',
+  'cliente', 'quadra', 'nomeQuadra', 'diaSemana', 'data', 'hora', 'duracao', 'valor', 'saldo', 'chavePix', 'mes',
 ] as const;
 
 export type TemplateVariable = (typeof TEMPLATE_VARIABLES)[number];
@@ -63,6 +65,8 @@ export interface MessageContext {
   price: number; // centavos
   balance: number; // centavos
   pixKey: string;
+  /** "YYYY-MM" (mensalidade) */
+  month?: string;
 }
 
 /** Monta os valores das variáveis a partir de uma reserva/ocorrência. */
@@ -78,5 +82,6 @@ export function templateValues(ctx: MessageContext): TemplateValues {
     valor: formatBRL(ctx.price),
     saldo: formatBRL(ctx.balance),
     chavePix: ctx.pixKey || '(peça a chave Pix no balcão)',
+    mes: ctx.month ? formatMonthBR(ctx.month) : '',
   };
 }

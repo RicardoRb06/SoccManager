@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_TEMPLATES, fillTemplate, formatPhone, normalizePhone, waLink } from './whatsapp';
+import { DEFAULT_TEMPLATES, fillTemplate, formatPhone, normalizePhone, templateValues, waLink } from './whatsapp';
 
 describe('WhatsApp', () => {
   it('normaliza telefone e prefixa 55 com 10/11 dígitos', () => {
@@ -24,5 +24,14 @@ describe('WhatsApp', () => {
   it('formata telefone para exibição', () => {
     expect(formatPhone('5511987654321')).toBe('(11) 98765-4321');
     expect(formatPhone('1134567890')).toBe('(11) 3456-7890');
+  });
+});
+
+describe('mensagem de mensalidade', () => {
+  it('usa o mês por extenso', () => {
+    const v = templateValues({ customerName: 'Pedro Almeida', courtName: 'Q1', venueName: 'Arena', date: '2026-09-24', startMin: 1260, endMin: 1320, price: 44000, balance: 44000, pixKey: 'pix', month: '2026-09' });
+    expect(fillTemplate(DEFAULT_TEMPLATES.mensalidade, v).replace(/ /g, ' ')).toBe(
+      'Olá, Pedro! Passando para lembrar da mensalidade de setembro de 2026 do seu horário de quinta-feira às 21:00 na Arena: R$ 440,00. Pix: pix. Obrigado!',
+    );
   });
 });

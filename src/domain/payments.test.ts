@@ -74,3 +74,12 @@ describe('mensalidade', () => {
     expect(total).toBe(40000 + 4 * 10000);
   });
 });
+
+describe('mensalidade só vence quando o primeiro jogo do mês chega', () => {
+  it('mensalista criado hoje para jogar semana que vem não deve nada ainda', () => {
+    const m = rec({ id: 'n', weekday: 2, startMin: 1200, endMin: 1260, startDate: '2026-09-29', billingMode: 'mensal', monthlyPrice: 48000 });
+    expect(billableMonths(m, '2026-09', '2026-09-24')).toEqual([]);
+    expect(billableMonths(m, '2026-09', '2026-09-29')).toEqual(['2026-09']);
+    expect(monthlyDebt(m, [], '2026-09', '2026-09-24').total).toBe(0);
+  });
+});

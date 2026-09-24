@@ -44,6 +44,8 @@ export function rowsToSettings(rows: SettingRow[], defaults: AppSettings): AppSe
   for (const row of rows) {
     if (row.key in out) (out as unknown as Record<string, unknown>)[row.key] = row.value;
   }
+  // templates novos (adicionados em versões posteriores) herdam o texto padrão
+  out.whatsappTemplates = { ...defaults.whatsappTemplates, ...out.whatsappTemplates };
   return out;
 }
 
