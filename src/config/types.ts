@@ -33,15 +33,6 @@ export interface TenantPriceRule {
   pricePerHour: number;
 }
 
-export interface TenantConditions {
-  /** Preço do sistema em reais */
-  price: number;
-  trialDays: number;
-  included: string[];
-  support: string;
-  limitations: string[];
-}
-
 export interface TenantConfig {
   /** Identificador estável. Define o nome do banco (agenda-quadra-<tenantId>). NUNCA mude depois de publicar. */
   tenantId: string;
@@ -62,6 +53,5 @@ export interface TenantConfig {
   /** Telefone da própria quadra (opcional, só exibição). */
   courtPhone?: string;
   backupReminderDays: number;
-  conditions: TenantConditions;
   demo: boolean;
 }

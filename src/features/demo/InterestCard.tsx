@@ -46,9 +46,6 @@ export function InterestCard() {
           >
             <Copy className="size-4" aria-hidden /> Copiar número
           </Button>
-          <a href="#/mais/condicoes" onClick={() => setOpen(false)} className="mt-3 block text-center text-sm font-semibold text-brand underline-offset-2 hover:underline">
-            Ver condições e valor
-          </a>
         </Sheet>
       )}
     </>

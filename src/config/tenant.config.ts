@@ -51,24 +51,6 @@ const tenant: TenantConfig = {
   // Telefone do vendedor mostrado na demonstração (fictício: troque pelo seu).
   contactPhone: '11999999999',
   backupReminderDays: 7,
-  conditions: {
-    price: 1000,
-    trialDays: 15,
-    included: [
-      'Agenda de todas as quadras com bloqueio de horário duplicado',
-      'Mensalistas com cobrança por jogo ou mensalidade',
-      'Controle de pagamentos, sinal e saldo devedor',
-      'Relatórios de faturamento, ocupação e horas vazias',
-      'Backup em arquivo e funcionamento sem internet',
-      'Personalização com nome, logo e cores da sua quadra',
-    ],
-    support: 'Instalação e treinamento inicial inclusos, com 30 dias de suporte.',
-    limitations: [
-      'Os dados ficam guardados no aparelho do estabelecimento (faça backups regulares).',
-      'Não há agendamento online feito pelo próprio cliente final.',
-      'Pensado para um aparelho principal de uso.',
-    ],
-  },
   demo: true,
 };
 

@@ -2,7 +2,7 @@
 
 PWA de agendamento para quadras esportivas (futsal, basquete, society…), **100% local**: sem backend, sem login, funciona offline depois do primeiro acesso. Os dados ficam no IndexedDB do aparelho, com backup em arquivo.
 
-> Status: **marco 7 concluído (todos os marcos)**: agenda, reservas, pagamentos, clientes, mensalistas, Resumo, backup e restauração, Configurações e assistente inicial, mais os recursos da demonstração (faixa, tour, Condições, "Tenho interesse", restaurar exemplos), instalação do app e publicação automática no GitHub Pages.
+> Status: **marco 7 concluído (todos os marcos)**: agenda, reservas, pagamentos, clientes, mensalistas, Resumo, backup e restauração, Configurações e assistente inicial, mais os recursos da demonstração (faixa, tour, "Tenho interesse", restaurar exemplos), instalação do app e publicação automática no GitHub Pages.
 
 ## Requisitos
 
@@ -44,7 +44,7 @@ public/          favicon e ícones do PWA
 Edite somente `src/config/tenant.config.ts`:
 
 - `tenantId`: identificador fixo do cliente. **Define o nome do banco no aparelho (`agenda-quadra-<tenantId>`). Nunca altere depois de publicar**, senão o app abre um banco vazio.
-- nome, nome curto, logo, cores, quadras, horário de funcionamento, tabela de preços, telefone de contato do vendedor (`contactPhone`, exibido como texto na demonstração), telefone da quadra (opcional), textos das Condições e `demo: true/false`.
+- nome, nome curto, logo, cores, quadras, horário de funcionamento, tabela de preços, telefone de contato do vendedor (`contactPhone`, exibido como texto na demonstração), telefone da quadra (opcional) e `demo: true/false`.
 - O manifest do PWA (nome, cor, ícones) e o título da página são gerados a partir desse arquivo no `build`.
 - Para trocar os ícones, substitua os PNGs em `public/icons/` (192, 512 e maskable 512) mantendo os nomes, ou aponte outros caminhos em `icons`.
 
@@ -73,10 +73,9 @@ O repositório já traz o workflow `.github/workflows/deploy.yml`. A cada `git p
 
 ## Demonstração (`demo: true`)
 
-- **Faixa "Versão de demonstração"** no topo de todas as telas, com os botões **Como funciona?** e **Condições**.
+- **Faixa "Versão de demonstração"** no topo de todas as telas, com o botão **Como funciona?**.
 - **Tour guiado**: 4 balões apontando para Agenda, Mensalistas, Resumo e Mais. Só abre pelo botão "Como funciona?"; dá para pular (botão, Esc ou toque fora) e rever quando quiser.
 - **Tenho interesse**: cartão no fim do Resumo. Mostra o telefone do vendedor (`contactPhone`) como texto e um botão que só **copia** o número. Nada é enviado e nenhum app externo é aberto. **Troque o número fictício pelo seu antes de publicar.**
-- **Condições** (Mais › Condições): valor, dias de teste, o que está incluído, suporte e limitações, tudo lido de `conditions` no `tenant.config.ts`.
 - **Restaurar dados de exemplo** (Mais): volta a demonstração ao estado inicial, com datas a partir de hoje. Pede confirmação, guarda uma cópia interna antes e oferece "Desfazer".
 - **Licença**: `src/license/LicenseService.ts` é um esboço. Hoje devolve "demonstração" ou "licenciado para <quadra>" conforme o `demo` do tenant; o nome licenciado aparece na barra lateral do desktop e no rodapé de Mais. Não há verificação online nem chave.
 

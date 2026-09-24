@@ -1,5 +1,5 @@
 // Mais: backup, configurações, bloqueios, lixeira e informações do app. Carregada sob demanda.
-import { BadgeCheck, ChevronRight, Database, FileText, Lock, Phone, Settings, ShieldAlert, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react';
+import { BadgeCheck, ChevronRight, Database, Lock, Phone, Settings, ShieldAlert, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react';
 import { PageHeader } from '../../components/AppShell';
 import { DB_NAME } from '../../db/database';
 import { useCounts, useSettings } from '../../db/hooks';
@@ -48,7 +48,6 @@ export default function MaisPage() {
 
         {license.mode === 'demo' && (
           <nav aria-label="Demonstração" className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <Item href="#/mais/condicoes" icon={FileText} title="Condições" subtitle="Valor, o que está incluído e suporte" />
             <RestoreDemoItem />
           </nav>
         )}
