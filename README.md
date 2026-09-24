@@ -54,7 +54,7 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 
 ## Decisões técnicas (marco 1)
 
-1. **pnpm** como gerenciador (pedido do projeto). `pnpm.onlyBuiltDependencies` libera o script de instalação do esbuild.
+1. **pnpm** como gerenciador (pedido do projeto). A liberação do script de instalação do esbuild fica em `pnpm-workspace.yaml` (`allowBuilds`).
 2. **Datas como `YYYY-MM-DD` e horários em minutos** (`20:00` = 1200, `24:00` = 1440). As funções de data em `domain/dates.ts` são próprias e usam `Date.UTC` internamente, então fuso e horário de verão nunca deslocam um dia. O `date-fns` continua disponível para a interface, mas o domínio não depende dele.
 3. **Dinheiro em centavos** (inteiros), formatado com `Intl.NumberFormat('pt-BR', BRL)`.
 4. **Roteador por hash próprio** (`utils/router.ts`, ~40 linhas) em vez de react-router: mesmo efeito do HashRouter, sem dependência extra.
