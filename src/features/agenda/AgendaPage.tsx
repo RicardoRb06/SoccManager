@@ -3,7 +3,7 @@
  * Celular: chips de quadra + lista de horários. Desktop (≥1024px): quadras lado a lado.
  */
 import { useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, ClipboardCheck, Plus } from 'lucide-react';
 import { db } from '../../db/database';
 import { useSettings } from '../../db/hooks';
 import type { Block, ISODate, Minutes, Reservation } from '../../domain/types';
@@ -20,12 +20,14 @@ import { ReservationSheet, type ReservationSheetInit } from './ReservationSheet'
 import { ReservationDetail } from './ReservationDetail';
 import { OccurrenceDetail } from './OccurrenceDetail';
 import { BlockSheet } from '../mais/BlockSheet';
+import { DaySummarySheet } from './DaySummarySheet';
 
 type Overlay =
   | { type: 'form'; init: ReservationSheetInit }
   | { type: 'detail'; id: string }
   | { type: 'occurrence'; recurrenceId: string; date: ISODate }
-  | { type: 'block'; block: Block };
+  | { type: 'block'; block: Block }
+  | { type: 'closeDay' };
 
 function relativeLabel(date: ISODate, today: ISODate): string | null {
   const d = diffDays(today, date);
@@ -147,6 +149,17 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             ))}
           </div>
         )}
+        {data && courts.length > 0 && date <= today && (
+          <div className="no-print mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setOverlay({ type: 'closeDay' })}
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <ClipboardCheck className="size-4 text-brand" aria-hidden /> Encerrar o dia
+            </button>
+          </div>
+        )}
       </div>
 
       <button
@@ -167,6 +180,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
       )}
       {overlay?.type === 'occurrence' && <OccurrenceDetail recurrenceId={overlay.recurrenceId} date={overlay.date} onClose={() => setOverlay(null)} />}
       {overlay?.type === 'block' && <BlockSheet block={overlay.block} onClose={() => setOverlay(null)} />}
+      {overlay?.type === 'closeDay' && <DaySummarySheet date={date} onClose={() => setOverlay(null)} />}
     </>
   );
 }

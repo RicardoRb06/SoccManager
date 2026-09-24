@@ -19,22 +19,12 @@ import { Button, Chip, Field, Input, Select, Switch, Textarea } from '../../comp
 import { useToast } from '../../components/ui/Toast';
 import { errorMessage } from '../../utils/text';
 import { CustomerPicker, type CustomerChoice } from './CustomerPicker';
+import { centsToInput, PAYMENT_METHODS } from '../../components/PaymentSheets';
 import { occupantText } from './occupantText';
 
 export type ReservationSheetInit =
   | { mode: 'new'; courtId: string; date: ISODate; startMin?: Minutes }
   | { mode: 'edit'; reservation: Reservation };
-
-export const PAYMENT_METHODS: Array<{ value: PaymentMethod; label: string }> = [
-  { value: 'pix', label: 'Pix' },
-  { value: 'dinheiro', label: 'Dinheiro' },
-  { value: 'cartao', label: 'Cartão' },
-  { value: 'outro', label: 'Outro' },
-];
-
-function centsToInput(c: number): string {
-  return (c / 100).toFixed(2).replace('.', ',');
-}
 
 export function ReservationSheet({ init, onClose, onSaved }: { init: ReservationSheetInit; onClose: () => void; onSaved?: (r: Reservation) => void }) {
   const settings = useSettings();
