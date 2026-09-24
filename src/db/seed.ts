@@ -236,10 +236,12 @@ export function generateSeed(opts: SeedOptions): DataSet {
         mark(cid, date, s, e);
         const cust = pick(regulars);
         const created = addDays(date, -1 - Math.floor(rand() * 6));
+        // nunca "no futuro": reservas de exemplo são sempre anteriores à geração dos dados
+        const createdAt = [localDateTime(created, 14 * 60), nowISO].sort()[0]!;
         const res: Reservation = {
           id: idFn(), courtId: cid, customerId: cust.id, date, startMin: s, endMin: e,
           price: priceFor(priceRules, cid, date, s, e), status: 'ativa',
-          createdAt: localDateTime(created, 14 * 60), updatedAt: localDateTime(created, 14 * 60),
+          createdAt, updatedAt: createdAt,
         };
         avulsas.push(res);
       }

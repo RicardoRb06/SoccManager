@@ -13,7 +13,7 @@ import type { Block, Court, Customer, DataSet, Payment, PriceRule, Recurrence, R
 export interface Snapshot {
   id: string;
   createdAt: string;
-  reason: 'diario' | 'antes-de-importar' | 'antes-de-restaurar-exemplo' | 'manual';
+  reason: 'diario' | 'antes-de-importar' | 'antes-de-restaurar' | 'antes-de-restaurar-exemplo' | 'manual';
   schemaVersion: number;
   counts: Record<string, number>;
   data: DataSet;

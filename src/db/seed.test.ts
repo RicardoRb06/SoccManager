@@ -81,6 +81,11 @@ describe('dados de exemplo (seed)', () => {
     expect(occ).toBeGreaterThan(0.6);
   });
 
+  it('nenhum registro de exemplo com data de criação no futuro', () => {
+    const seededAt = NOW.toISOString();
+    expect(data.reservations.every((r) => r.createdAt <= seededAt)).toBe(true);
+  });
+
   it('mistura status de pagamento no futuro (sinal e pendente)', () => {
     const paid = new Set(data.payments.map((p) => p.reservationId));
     const future = data.reservations.filter((r) => r.date > TODAY && r.status === 'ativa');

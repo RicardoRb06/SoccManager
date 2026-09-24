@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 import App from './App';
 import { bootstrapDatabase } from './db/bootstrap';
+import { dailySnapshot } from './db/backup';
+import { requestPersistence } from './db/storage';
+import { db } from './db/database';
+import { todayISO } from './domain/dates';
 
 const rootEl = document.getElementById('root')!;
 const root = createRoot(rootEl);
@@ -22,8 +26,24 @@ function Fatal({ message }: { message: string }) {
   );
 }
 
+/** Tarefas de proteção de dados que não podem atrasar a abertura do app. */
+async function protectData() {
+  try {
+    await dailySnapshot(todayISO());
+  } catch (err) {
+    console.warn('Não foi possível criar a cópia interna do dia', err);
+  }
+  // Primeiro uso relevante: pede para o navegador não apagar os dados sozinho
+  const asked = await db.settings.get('persistRequested');
+  if (!asked?.value) {
+    await requestPersistence();
+    await db.settings.put({ key: 'persistRequested', value: true });
+  }
+}
+
 bootstrapDatabase()
   .then(() => {
+    void protectData();
     root.render(
       <StrictMode>
         <App />
