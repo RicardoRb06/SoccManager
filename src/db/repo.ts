@@ -4,10 +4,12 @@
  * desatualizada, é impossível gravar uma reserva sobreposta.
  */
 import tenant from '../config/tenant.config';
-import type { Block, Cents, Customer, ISODate, Minutes, Payment, PaymentMethod, Reservation } from '../domain/types';
+import type { BillingMode, Block, Cents, Customer, ISODate, Minutes, Payment, PaymentMethod, Recurrence, Reservation } from '../domain/types';
 import { isValidRange } from '../domain/time';
-import { isISODate } from '../domain/dates';
-import { occupantsAt, prepareSchedule, type IgnoreOptions, type Occupant } from '../domain/schedule';
+import { isISODate, weekdayOf } from '../domain/dates';
+import { checkRecurrenceConflicts, occupantsAt, prepareSchedule, type IgnoreOptions, type Occupant, type RecurrenceConflict } from '../domain/schedule';
+import { materializeOccurrence, occursOn, skipDate, unskipDate } from '../domain/recurrence';
+import { endRecurrence, pauseRecurrence, resumeRecurrence } from '../domain/recurrenceSummary';
 import { newId } from '../utils/id';
 import { db, type AgendaDB } from './database';
 import { defaultSettings, rowsToSettings } from './fromTenant';
@@ -329,4 +331,208 @@ export async function deleteCustomer(id: string, database: AgendaDB = db): Promi
 
 export async function restoreCustomer(id: string, database: AgendaDB = db): Promise<void> {
   await database.customers.update(id, { deletedAt: undefined });
+}
+
+// ------------------------------------------------------------------ mensalistas
+
+export interface RecurrenceInput {
+  courtId: string;
+  customerId?: string;
+  newCustomer?: NewCustomerInput;
+  /** Data da primeira ocorrência (define o dia da semana) */
+  startDate: ISODate;
+  startMin: Minutes;
+  endMin: Minutes;
+  endDate?: ISODate;
+  billingMode: BillingMode;
+  /** por_jogo: preço fixo por jogo (ausente = tabela de preços) */
+  pricePerGame?: Cents;
+  /** mensal */
+  monthlyPrice?: Cents;
+  /** Nome do time / observação */
+  notes?: string;
+  /** Datas já decididas como exceção (ex.: conflitos que o usuário escolheu pular) */
+  skipDates?: ISODate[];
+}
+
+export class RecurrenceConflictError extends Error {
+  constructor(public conflicts: RecurrenceConflict[]) {
+    super(`Há ${conflicts.length} data(s) em conflito.`);
+    this.name = 'RecurrenceConflictError';
+  }
+}
+
+const RECURRENCE_TABLES = (d: AgendaDB) => [d.recurrences, d.reservations, d.customers, d.blocks, d.courts, d.settings, d.payments];
+
+/** Checa conflitos em todas as datas futuras (12 semanas ou até o fim) de uma regra. */
+export async function recurrenceConflicts(
+  draft: Pick<Recurrence, 'courtId' | 'weekday' | 'startMin' | 'endMin' | 'startDate' | 'endDate' | 'skipDates'>,
+  fromDate: ISODate,
+  opts: { ignoreRecurrenceId?: string } = {},
+  database: AgendaDB = db,
+): Promise<RecurrenceConflict[]> {
+  const from = fromDate > draft.startDate ? fromDate : draft.startDate;
+  const [courts, reservations, recurrences, blocks, settingsRows] = await Promise.all([
+    database.courts.toArray(),
+    database.reservations.where('date').aboveOrEqual(from).toArray(),
+    database.recurrences.toArray(),
+    database.blocks.toArray(),
+    database.settings.toArray(),
+  ]);
+  const settings = rowsToSettings(settingsRows, defaultSettings(tenant));
+  const prep = prepareSchedule({ courts, reservations, recurrences, blocks, openingHours: settings.openingHours });
+  return checkRecurrenceConflicts(prep, draft, from, opts);
+}
+
+export async function createRecurrence(input: RecurrenceInput, database: AgendaDB = db): Promise<Recurrence> {
+  if (!isISODate(input.startDate)) throw new ValidationError('Data inválida.');
+  if (input.endDate && (!isISODate(input.endDate) || input.endDate < input.startDate)) throw new ValidationError('A data final deve ser depois do início.');
+  if (!isValidRange(input.startMin, input.endMin)) throw new ValidationError('Horário inválido.');
+  if (!input.customerId && !input.newCustomer) throw new ValidationError('Escolha ou cadastre o cliente.');
+  if (input.billingMode === 'mensal' && !(input.monthlyPrice && input.monthlyPrice > 0)) throw new ValidationError('Informe o valor da mensalidade.');
+
+  return database.transaction('rw', RECURRENCE_TABLES(database), async () => {
+    const now = nowISO();
+    const draft = {
+      courtId: input.courtId,
+      weekday: weekdayOf(input.startDate),
+      startMin: input.startMin,
+      endMin: input.endMin,
+      startDate: input.startDate,
+      endDate: input.endDate,
+      skipDates: [...(input.skipDates ?? [])].sort(),
+    };
+    const conflicts = await recurrenceConflicts(draft, input.startDate, {}, database);
+    if (conflicts.length) throw new RecurrenceConflictError(conflicts);
+
+    let customerId = input.customerId;
+    if (input.newCustomer) {
+      const c = buildCustomer(input.newCustomer);
+      await database.customers.add(c);
+      customerId = c.id;
+    } else if (!(await database.customers.get(customerId!))) {
+      throw new ValidationError('Cliente não encontrado.');
+    }
+
+    const rec: Recurrence = {
+      id: newId(),
+      ...draft,
+      customerId: customerId!,
+      status: 'ativo',
+      billingMode: input.billingMode,
+      ...(input.billingMode === 'mensal' ? { monthlyPrice: input.monthlyPrice } : input.pricePerGame !== undefined ? { pricePerGame: input.pricePerGame } : {}),
+      ...(input.notes?.trim() ? { notes: input.notes.trim() } : {}),
+      createdAt: now,
+      updatedAt: now,
+    };
+    if (!rec.endDate) delete rec.endDate;
+    await database.recurrences.add(rec);
+    return rec;
+  });
+}
+
+/** Edita dados que não mudam a ocupação: nome do time, cobrança, valores e data final. */
+export async function updateRecurrenceTerms(
+  id: string,
+  terms: { notes?: string; billingMode: BillingMode; pricePerGame?: Cents; monthlyPrice?: Cents; endDate?: ISODate },
+  database: AgendaDB = db,
+): Promise<void> {
+  const rec = await database.recurrences.get(id);
+  if (!rec) throw new ValidationError('Mensalista não encontrado.');
+  if (terms.billingMode === 'mensal' && !(terms.monthlyPrice && terms.monthlyPrice > 0)) throw new ValidationError('Informe o valor da mensalidade.');
+  if (terms.endDate && terms.endDate < rec.startDate) throw new ValidationError('A data final deve ser depois do início.');
+  await database.recurrences.update(id, {
+    notes: terms.notes?.trim() || undefined,
+    billingMode: terms.billingMode,
+    pricePerGame: terms.billingMode === 'por_jogo' ? terms.pricePerGame : undefined,
+    monthlyPrice: terms.billingMode === 'mensal' ? terms.monthlyPrice : undefined,
+    endDate: terms.endDate || undefined,
+    updatedAt: nowISO(),
+  });
+}
+
+export async function pauseRecurrenceRepo(id: string, fromDate: ISODate, database: AgendaDB = db): Promise<void> {
+  const rec = await database.recurrences.get(id);
+  if (!rec) throw new ValidationError('Mensalista não encontrado.');
+  if (rec.status !== 'ativo') throw new ValidationError('Só é possível pausar um mensalista ativo.');
+  await database.recurrences.put(pauseRecurrence(rec, fromDate, nowISO()));
+}
+
+/** Retoma a partir de `fromDate`, checando conflitos nas próximas semanas. */
+export async function resumeRecurrenceRepo(id: string, fromDate: ISODate, database: AgendaDB = db): Promise<void> {
+  await database.transaction('rw', RECURRENCE_TABLES(database), async () => {
+    const rec = await database.recurrences.get(id);
+    if (!rec) throw new ValidationError('Mensalista não encontrado.');
+    const resumed = resumeRecurrence(rec, fromDate, nowISO());
+    const conflicts = await recurrenceConflicts(resumed, fromDate, { ignoreRecurrenceId: rec.id }, database);
+    if (conflicts.length) throw new RecurrenceConflictError(conflicts);
+    await database.recurrences.put(resumed);
+  });
+}
+
+export async function endRecurrenceRepo(id: string, lastDate: ISODate, database: AgendaDB = db): Promise<void> {
+  const rec = await database.recurrences.get(id);
+  if (!rec) throw new ValidationError('Mensalista não encontrado.');
+  await database.recurrences.put(endRecurrence(rec, lastDate, nowISO()));
+}
+
+/**
+ * Pula uma data. Se a ocorrência já tinha sido materializada (ex.: com sinal),
+ * a reserva correspondente é cancelada para liberar o horário.
+ */
+export async function skipRecurrenceDate(id: string, date: ISODate, database: AgendaDB = db): Promise<void> {
+  await database.transaction('rw', [database.recurrences, database.reservations], async () => {
+    const rec = await database.recurrences.get(id);
+    if (!rec) throw new ValidationError('Mensalista não encontrado.');
+    await database.recurrences.put(skipDate(rec, date, nowISO()));
+    const mat = await database.reservations.where('[recurrenceId+date]').equals([id, date]).toArray();
+    for (const r of mat) {
+      if (r.status === 'ativa' && !r.deletedAt) await database.reservations.update(r.id, { status: 'cancelada', cancelReason: 'Data pulada do mensalista', updatedAt: nowISO() });
+    }
+  });
+}
+
+/** Desfaz "pular data" (checa se o horário continua livre). */
+export async function unskipRecurrenceDate(id: string, date: ISODate, database: AgendaDB = db): Promise<void> {
+  await database.transaction('rw', RECURRENCE_TABLES(database), async () => {
+    const rec = await database.recurrences.get(id);
+    if (!rec) throw new ValidationError('Mensalista não encontrado.');
+    await assertFree(database, rec.courtId, date, rec.startMin, rec.endMin, { ignoreRecurrenceId: rec.id });
+    await database.recurrences.put(unskipDate(rec, date, nowISO()));
+  });
+}
+
+/**
+ * Materializa a ocorrência (vira uma Reservation com recurrenceId) para registrar
+ * pagamento, falta ou cancelamento só daquela data. Idempotente.
+ */
+export async function materializeRecurrenceDate(id: string, date: ISODate, database: AgendaDB = db): Promise<Reservation> {
+  return database.transaction('rw', [database.recurrences, database.reservations, database.priceRules], async () => {
+    const existing = await database.reservations.where('[recurrenceId+date]').equals([id, date]).first();
+    if (existing) return existing;
+    const rec = await database.recurrences.get(id);
+    if (!rec) throw new ValidationError('Mensalista não encontrado.');
+    if (!occursOn(rec, date)) throw new ValidationError('O mensalista não joga nesta data.');
+    const rules = await database.priceRules.toArray();
+    const r = materializeOccurrence(rec, date, rules, newId(), nowISO());
+    await database.reservations.add(r);
+    return r;
+  });
+}
+
+/**
+ * Remarcar um jogo de mensalista: pula a data original e cria a reserva avulsa
+ * no novo horário, tudo na mesma transação (se o novo horário estiver ocupado, nada muda).
+ */
+export async function rescheduleOccurrence(
+  recurrenceId: string,
+  originalDate: ISODate,
+  input: ReservationInput,
+  database: AgendaDB = db,
+): Promise<Reservation> {
+  const tables = [database.reservations, database.customers, database.payments, database.recurrences, database.blocks, database.courts, database.settings];
+  return database.transaction('rw', tables, async () => {
+    await skipRecurrenceDate(recurrenceId, originalDate, database);
+    return saveReservation(input, database);
+  });
 }

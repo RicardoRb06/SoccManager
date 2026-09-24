@@ -3,6 +3,8 @@ import { AgendaDB } from './database';
 import {
   addPayment, cancelReservation, ConflictError, deleteCustomer, deleteReservation, payBalance, reactivateReservation,
   restoreCustomer, restoreReservation, saveBlock, saveReservation, setFalta, updateCustomer, ValidationError,
+  createRecurrence, endRecurrenceRepo, materializeRecurrenceDate, pauseRecurrenceRepo, RecurrenceConflictError,
+  rescheduleOccurrence, resumeRecurrenceRepo, skipRecurrenceDate, unskipRecurrenceDate,
 } from './repo';
 import { settingsToRows, defaultSettings } from './fromTenant';
 import tenant from '../config/tenant.config';
@@ -120,5 +122,76 @@ describe('pagamentos, falta e clientes', () => {
     expect((await d.customers.get('cust1'))?.deletedAt).toBeTruthy();
     await restoreCustomer('cust1', d);
     expect((await d.customers.get('cust1'))?.deletedAt).toBeUndefined();
+  });
+});
+
+describe('mensalistas no banco', () => {
+  const recBase = { courtId: 'c1', customerId: 'cust1', startDate: TUE, startMin: 1200, endMin: 1260, billingMode: 'por_jogo' as const };
+
+  it('cria e passa a ocupar todas as semanas', async () => {
+    const r = await createRecurrence(recBase, d);
+    expect(r.weekday).toBe(2);
+    await expect(saveReservation({ ...base, date: '2026-10-13' }, d)).rejects.toBeInstanceOf(ConflictError);
+  });
+
+  it('lista as datas em conflito e aceita pular essas datas', async () => {
+    await saveReservation({ ...base, date: '2026-10-06' }, d);
+    const err = await createRecurrence(recBase, d).catch((e) => e);
+    expect(err).toBeInstanceOf(RecurrenceConflictError);
+    expect((err as RecurrenceConflictError).conflicts.map((c) => c.date)).toEqual(['2026-10-06']);
+    const r = await createRecurrence({ ...recBase, skipDates: ['2026-10-06'] }, d);
+    expect(r.skipDates).toEqual(['2026-10-06']);
+  });
+
+  it('mensal exige valor', async () => {
+    await expect(createRecurrence({ ...recBase, billingMode: 'mensal' }, d)).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it('pular data cancela a ocorrência materializada e libera o horário', async () => {
+    const r = await createRecurrence(recBase, d);
+    const m = await materializeRecurrenceDate(r.id, '2026-09-29', d);
+    expect(await materializeRecurrenceDate(r.id, '2026-09-29', d)).toMatchObject({ id: m.id }); // idempotente
+    await skipRecurrenceDate(r.id, '2026-09-29', d);
+    expect((await d.reservations.get(m.id))?.status).toBe('cancelada');
+    const avulsa = await saveReservation({ ...base, date: '2026-09-29' }, d);
+    expect(avulsa.id).toBeTruthy();
+    await expect(unskipRecurrenceDate(r.id, '2026-09-29', d)).rejects.toBeInstanceOf(ConflictError);
+  });
+
+  it('pausar, retomar (com checagem) e encerrar', async () => {
+    const r = await createRecurrence(recBase, d);
+    await pauseRecurrenceRepo(r.id, '2026-09-29', d);
+    await saveReservation({ ...base, date: '2026-10-13' }, d); // horário vago durante a pausa
+    await expect(resumeRecurrenceRepo(r.id, '2026-10-06', d)).rejects.toBeInstanceOf(RecurrenceConflictError);
+    await resumeRecurrenceRepo(r.id, '2026-10-20', d);
+    const after = await d.recurrences.get(r.id);
+    expect(after?.status).toBe('ativo');
+    expect(after?.skipDates).toEqual(['2026-09-29', '2026-10-06', '2026-10-13']);
+    await endRecurrenceRepo(r.id, '2026-10-31', d);
+    expect(await d.recurrences.get(r.id)).toMatchObject({ status: 'encerrado', endDate: '2026-10-31' });
+  });
+
+  it('registra mensalidade', async () => {
+    const r = await createRecurrence({ ...recBase, billingMode: 'mensal', monthlyPrice: 40000 }, d);
+    await addPayment({ recurrenceId: r.id, referenceMonth: '2026-09', amount: 40000, method: 'pix' }, d);
+    expect(await d.payments.where('[recurrenceId+referenceMonth]').equals([r.id, '2026-09']).count()).toBe(1);
+  });
+});
+
+describe('remarcar jogo de mensalista', () => {
+  const recBase = { courtId: 'c1', customerId: 'cust1', startDate: TUE, startMin: 1200, endMin: 1260, billingMode: 'por_jogo' as const };
+
+  it('pula a data e cria a avulsa no novo horário (mesmo dia)', async () => {
+    const r = await createRecurrence(recBase, d);
+    const moved = await rescheduleOccurrence(r.id, '2026-09-29', { ...base, date: '2026-09-29', startMin: 1260, endMin: 1320 }, d);
+    expect(moved.startMin).toBe(1260);
+    expect((await d.recurrences.get(r.id))?.skipDates).toEqual(['2026-09-29']);
+  });
+
+  it('se o novo horário estiver ocupado, nada muda', async () => {
+    const r = await createRecurrence(recBase, d);
+    await saveReservation({ ...base, date: '2026-09-29', startMin: 1260, endMin: 1320 }, d);
+    await expect(rescheduleOccurrence(r.id, '2026-09-29', { ...base, date: '2026-09-29', startMin: 1260, endMin: 1320 }, d)).rejects.toBeInstanceOf(ConflictError);
+    expect((await d.recurrences.get(r.id))?.skipDates).toEqual([]);
   });
 });
