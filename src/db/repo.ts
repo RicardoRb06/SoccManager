@@ -4,7 +4,7 @@
  * desatualizada, é impossível gravar uma reserva sobreposta.
  */
 import tenant from '../config/tenant.config';
-import type { Block, Cents, Customer, ISODate, Minutes, PaymentMethod, Reservation } from '../domain/types';
+import type { Block, Cents, Customer, ISODate, Minutes, Payment, PaymentMethod, Reservation } from '../domain/types';
 import { isValidRange } from '../domain/time';
 import { isISODate } from '../domain/dates';
 import { occupantsAt, prepareSchedule, type IgnoreOptions, type Occupant } from '../domain/schedule';
@@ -256,4 +256,77 @@ export async function saveBlock(input: BlockInput, database: AgendaDB = db): Pro
 
 export async function deleteBlock(id: string, database: AgendaDB = db): Promise<void> {
   await database.blocks.delete(id);
+}
+
+// ------------------------------------------------------------------ pagamentos
+
+export interface PaymentInput {
+  reservationId?: string;
+  recurrenceId?: string;
+  referenceMonth?: string;
+  amount: Cents;
+  method: PaymentMethod;
+  note?: string;
+}
+
+export async function addPayment(input: PaymentInput, database: AgendaDB = db): Promise<Payment> {
+  if (!Number.isInteger(input.amount) || input.amount <= 0) throw new ValidationError('Informe um valor maior que zero.');
+  if (!input.reservationId && !(input.recurrenceId && input.referenceMonth)) throw new ValidationError('Pagamento sem referência.');
+  if (input.reservationId && !(await database.reservations.get(input.reservationId))) throw new ValidationError('Reserva não encontrada.');
+  const p: Payment = {
+    id: newId(),
+    ...(input.reservationId ? { reservationId: input.reservationId } : {}),
+    ...(input.recurrenceId ? { recurrenceId: input.recurrenceId, referenceMonth: input.referenceMonth } : {}),
+    amount: input.amount,
+    method: input.method,
+    paidAt: nowISO(),
+    ...(input.note?.trim() ? { note: input.note.trim() } : {}),
+  };
+  await database.payments.add(p);
+  return p;
+}
+
+/** Quita o saldo da reserva (registra um pagamento com o valor restante). */
+export async function payBalance(reservationId: string, method: PaymentMethod, database: AgendaDB = db): Promise<Cents> {
+  return database.transaction('rw', [database.reservations, database.payments], async () => {
+    const r = await database.reservations.get(reservationId);
+    if (!r) throw new ValidationError('Reserva não encontrada.');
+    const paid = (await database.payments.where('reservationId').equals(reservationId).toArray()).reduce((a, p) => a + p.amount, 0);
+    const balance = r.status === 'cancelada' ? 0 : Math.max(0, r.price - paid);
+    if (balance <= 0) throw new ValidationError('Esta reserva não tem saldo a pagar.');
+    await database.payments.add({ id: newId(), reservationId, amount: balance, method, paidAt: nowISO() });
+    return balance;
+  });
+}
+
+/** Remove um pagamento lançado por engano. */
+export async function deletePayment(id: string, database: AgendaDB = db): Promise<void> {
+  await database.payments.delete(id);
+}
+
+/** Marca (ou desmarca) falta. A falta continua ocupando o horário. */
+export async function setFalta(reservationId: string, falta: boolean, database: AgendaDB = db): Promise<void> {
+  const r = await database.reservations.get(reservationId);
+  if (!r) throw new ValidationError('Reserva não encontrada.');
+  if (r.status === 'cancelada') throw new ValidationError('Reserva cancelada não pode receber falta.');
+  await database.reservations.update(reservationId, { status: falta ? 'falta' : 'ativa', updatedAt: nowISO() });
+}
+
+// ------------------------------------------------------------------ clientes (edição e lixeira)
+
+export async function updateCustomer(id: string, input: NewCustomerInput, database: AgendaDB = db): Promise<void> {
+  const name = input.name.trim();
+  if (!name) throw new ValidationError('Informe o nome do cliente.');
+  const n = await database.customers.update(id, { name, phone: input.phone.trim(), notes: input.notes?.trim() || undefined });
+  if (!n) throw new ValidationError('Cliente não encontrado.');
+}
+
+/** Exclusão lógica: vai para a Lixeira. Reservas e histórico são mantidos. */
+export async function deleteCustomer(id: string, database: AgendaDB = db): Promise<void> {
+  const n = await database.customers.update(id, { deletedAt: nowISO() });
+  if (!n) throw new ValidationError('Cliente não encontrado.');
+}
+
+export async function restoreCustomer(id: string, database: AgendaDB = db): Promise<void> {
+  await database.customers.update(id, { deletedAt: undefined });
 }

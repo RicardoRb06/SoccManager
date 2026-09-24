@@ -25,3 +25,19 @@ export function useCounts() {
     payments: await db.payments.count(),
   }), []);
 }
+
+/** Todos os dados (para telas de clientes e relatórios). */
+export function useAllData() {
+  return useLiveQuery(async () => {
+    const [courts, customers, reservations, payments, recurrences, blocks, priceRules] = await Promise.all([
+      db.courts.orderBy('order').toArray(),
+      db.customers.toArray(),
+      db.reservations.toArray(),
+      db.payments.toArray(),
+      db.recurrences.toArray(),
+      db.blocks.toArray(),
+      db.priceRules.toArray(),
+    ]);
+    return { courts, customers, reservations, payments, recurrences, blocks, priceRules };
+  }, []);
+}

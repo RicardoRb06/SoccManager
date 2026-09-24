@@ -1,5 +1,8 @@
 /** Links e mensagens de WhatsApp (wa.me). */
 import type { WhatsAppTemplates } from './types';
+import { formatDateBR, WEEKDAY_LONG, weekdayOf } from './dates';
+import { formatDuration, minToHHMM } from './time';
+import { formatBRL } from './money';
 
 export const DEFAULT_TEMPLATES: WhatsAppTemplates = {
   confirmar:
@@ -48,4 +51,32 @@ export function formatPhone(phone: string): string {
   if (local.length === 11) return `(${local.slice(0, 2)}) ${local.slice(2, 7)}-${local.slice(7)}`;
   if (local.length === 10) return `(${local.slice(0, 2)}) ${local.slice(2, 6)}-${local.slice(6)}`;
   return phone;
+}
+
+export interface MessageContext {
+  customerName: string;
+  courtName: string;
+  venueName: string;
+  date: string; // ISODate
+  startMin: number;
+  endMin: number;
+  price: number; // centavos
+  balance: number; // centavos
+  pixKey: string;
+}
+
+/** Monta os valores das variáveis a partir de uma reserva/ocorrência. */
+export function templateValues(ctx: MessageContext): TemplateValues {
+  return {
+    cliente: ctx.customerName.split(/\s+/)[0] ?? ctx.customerName,
+    quadra: ctx.courtName,
+    nomeQuadra: ctx.venueName,
+    diaSemana: WEEKDAY_LONG[weekdayOf(ctx.date)],
+    data: formatDateBR(ctx.date),
+    hora: minToHHMM(ctx.startMin),
+    duracao: formatDuration(ctx.endMin - ctx.startMin),
+    valor: formatBRL(ctx.price),
+    saldo: formatBRL(ctx.balance),
+    chavePix: ctx.pixKey || '(peça a chave Pix no balcão)',
+  };
 }

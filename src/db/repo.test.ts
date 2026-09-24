@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { AgendaDB } from './database';
 import {
-  cancelReservation, ConflictError, deleteReservation, reactivateReservation, restoreReservation,
-  saveBlock, saveReservation, ValidationError,
+  addPayment, cancelReservation, ConflictError, deleteCustomer, deleteReservation, payBalance, reactivateReservation,
+  restoreCustomer, restoreReservation, saveBlock, saveReservation, setFalta, updateCustomer, ValidationError,
 } from './repo';
 import { settingsToRows, defaultSettings } from './fromTenant';
 import tenant from '../config/tenant.config';
@@ -86,5 +86,39 @@ describe('repositório de reservas', () => {
     await expect(saveReservation({ ...base, endMin: 1200 }, d)).rejects.toBeInstanceOf(ValidationError);
     await expect(saveReservation({ ...base, customerId: undefined }, d)).rejects.toBeInstanceOf(ValidationError);
     await expect(saveBlock({ courtIds: [], dateStart: TUE, dateEnd: TUE, reason: 'x' }, d)).rejects.toBeInstanceOf(ValidationError);
+  });
+});
+
+describe('pagamentos, falta e clientes', () => {
+  it('registra pagamento parcial e quita o saldo', async () => {
+    const r = await saveReservation(base, d);
+    await addPayment({ reservationId: r.id, amount: 5000, method: 'pix' }, d);
+    expect(await payBalance(r.id, 'dinheiro', d)).toBe(7000);
+    await expect(payBalance(r.id, 'pix', d)).rejects.toBeInstanceOf(ValidationError);
+    const total = (await d.payments.where('reservationId').equals(r.id).toArray()).reduce((a, p) => a + p.amount, 0);
+    expect(total).toBe(12000);
+  });
+
+  it('recusa pagamento zerado ou sem referência', async () => {
+    await expect(addPayment({ amount: 0, method: 'pix', reservationId: 'x' }, d)).rejects.toBeInstanceOf(ValidationError);
+    await expect(addPayment({ amount: 100, method: 'pix' }, d)).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it('marca e desmarca falta (falta continua ocupando)', async () => {
+    const r = await saveReservation(base, d);
+    await setFalta(r.id, true, d);
+    expect((await d.reservations.get(r.id))?.status).toBe('falta');
+    await expect(saveReservation(base, d)).rejects.toBeInstanceOf(ConflictError);
+    await setFalta(r.id, false, d);
+    expect((await d.reservations.get(r.id))?.status).toBe('ativa');
+  });
+
+  it('edita, exclui (lixeira) e restaura cliente', async () => {
+    await updateCustomer('cust1', { name: 'Ana Paula', phone: '11 3333-4444', notes: ' VIP ' }, d);
+    expect(await d.customers.get('cust1')).toMatchObject({ name: 'Ana Paula', notes: 'VIP' });
+    await deleteCustomer('cust1', d);
+    expect((await d.customers.get('cust1'))?.deletedAt).toBeTruthy();
+    await restoreCustomer('cust1', d);
+    expect((await d.customers.get('cust1'))?.deletedAt).toBeUndefined();
   });
 });
