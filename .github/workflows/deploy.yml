@@ -1,0 +1,60 @@
+# Publica o app no GitHub Pages a cada push na branch main.
+# Uma vez só: no GitHub, Settings › Pages › Build and deployment › Source: "GitHub Actions".
+# Não usa nenhum segredo: só o token temporário que o próprio GitHub cria para cada execução.
+name: Publicar no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Testes
+        run: pnpm test
+        env:
+          TZ: America/Sao_Paulo
+
+      - name: Build
+        run: pnpm build
+        env:
+          # O site fica em https://<usuario>.github.io/<repositorio>/
+          VITE_BASE: /${{ github.event.repository.name }}/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
