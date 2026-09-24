@@ -1,0 +1,87 @@
+@import 'tailwindcss';
+
+/* Cores da marca vêm da configuração da quadra (aplicadas em runtime em :root). */
+:root {
+  --brand-primary: #15803d;
+  --brand-accent: #f59e0b;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --nav-height: 64px;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-brand: var(--brand-primary);
+  --color-brand-strong: color-mix(in oklab, var(--brand-primary) 80%, black);
+  --color-brand-soft: color-mix(in oklab, var(--brand-primary) 12%, white);
+  --color-accent: var(--brand-accent);
+  --color-accent-soft: color-mix(in oklab, var(--brand-accent) 15%, white);
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* Foco sempre visível para teclado */
+:focus-visible {
+  outline: 3px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Hachurado para "falta" e "bloqueado" (estado nunca só por cor: também há ícone e texto) */
+.hatch-red {
+  background-image: repeating-linear-gradient(135deg, rgb(254 226 226) 0 8px, rgb(254 242 242) 8px 16px);
+}
+.hatch-gray {
+  background-image: repeating-linear-gradient(135deg, rgb(226 232 240) 0 8px, rgb(241 245 249) 8px 16px);
+}
+
+.pt-safe {
+  padding-top: var(--safe-top);
+}
+.pb-safe {
+  padding-bottom: var(--safe-bottom);
+}
+.pb-nav {
+  padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
+}
+@media (min-width: 1024px) {
+  .pb-nav {
+    padding-bottom: 24px;
+  }
+}
+
+.above-nav {
+  bottom: calc(var(--nav-height) + var(--safe-bottom) + 12px);
+}
+.fab-bottom {
+  bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
+}
+@media (min-width: 1024px) {
+  .above-nav {
+    bottom: 24px;
+  }
+  .fab-bottom {
+    bottom: 32px;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}
