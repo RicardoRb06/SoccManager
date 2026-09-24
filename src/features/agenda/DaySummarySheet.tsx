@@ -1,7 +1,9 @@
 /** "Encerrar o dia": recebido, pendências e faltas do dia. */
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { MessageCircle } from 'lucide-react';
+import { Download, MessageCircle, Share2 } from 'lucide-react';
+import { Button } from '../../components/ui/controls';
+import { useBackupActions } from '../mais/useBackup';
 import { db } from '../../db/database';
 import { scheduleForDate } from '../../db/repo';
 import type { ISODate } from '../../domain/types';
@@ -16,6 +18,7 @@ import { WhatsAppSheet } from '../../components/WhatsAppSheet';
 
 export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () => void }) {
   const [charge, setCharge] = useState<ReceivableItem | null>(null);
+  const backup = useBackupActions();
   const data = useLiveQuery(async () => {
     const [prep, payments, rules, customers, courts] = await Promise.all([
       scheduleForDate(date),
@@ -106,6 +109,20 @@ export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () 
               )}
             </div>
             <p className="text-xs text-slate-500">Para receber uma pendência, toque no horário na agenda e use “Quitar”.</p>
+
+            <div className="rounded-2xl border border-brand/40 bg-brand-soft p-3">
+              <p className="mb-2 text-sm font-semibold text-brand-strong">Fim do dia: salve um backup</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button onClick={() => void backup.save()}>
+                  <Download className="size-4" aria-hidden /> Salvar backup agora
+                </Button>
+                {backup.canShare && (
+                  <Button variant="secondary" onClick={() => void backup.share()}>
+                    <Share2 className="size-4" aria-hidden /> Compartilhar backup
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </Sheet>
