@@ -41,3 +41,10 @@ export function matchPath(pattern: string, path: string): Record<string, string>
   }
   return params;
 }
+
+/** Parâmetros de busca do hash (ex.: #/mensalistas?id=abc → { id: 'abc' }). */
+export function useHashQuery(): URLSearchParams {
+  const full = useSyncExternalStore(subscribe, currentPath, () => '/');
+  const q = full.split('?')[1] ?? '';
+  return new URLSearchParams(q);
+}

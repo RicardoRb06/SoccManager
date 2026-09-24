@@ -5,7 +5,7 @@ import { ToastProvider } from './components/ui/Toast';
 import { UpdatePrompt } from './pwa/UpdatePrompt';
 import { matchPath, navigate, useHashPath } from './utils/router';
 import AgendaPage from './features/agenda/AgendaPage';
-import { MensalistasPage } from './features/placeholders';
+import MensalistasPage from './features/mensalistas/MensalistasPage';
 import ClientesPage from './features/clientes/ClientesPage';
 import ClienteDetailPage from './features/clientes/ClienteDetailPage';
 

@@ -1,5 +1,5 @@
 /** Registrar pagamento e quitar saldo. */
-import { useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { Cents, PaymentMethod } from '../domain/types';
 import { formatBRL, parseBRL } from '../domain/money';
 import { addPayment, payBalance, type PaymentInput } from '../db/repo';
@@ -26,17 +26,23 @@ export function PaymentSheet({
   target,
   suggested,
   onClose,
+  header,
 }: {
   title?: string;
   target: Omit<PaymentInput, 'amount' | 'method' | 'note'>;
   suggested: Cents;
   onClose: () => void;
+  /** Conteúdo extra no topo (ex.: escolha do mês) */
+  header?: ReactNode;
 }) {
   const toast = useToast();
   const [amountText, setAmountText] = useState(suggested > 0 ? centsToInput(suggested) : '');
   const [method, setMethod] = useState<PaymentMethod>('pix');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    setAmountText(suggested > 0 ? centsToInput(suggested) : '');
+  }, [suggested]);
   const amount = parseBRL(amountText);
   const invalid = amount === null || amount <= 0;
 
@@ -66,6 +72,7 @@ export function PaymentSheet({
       }
     >
       <div className="flex flex-col gap-4">
+        {header}
         <Field label="Valor recebido" htmlFor="pay-amount" error={amountText && invalid ? 'Valor inválido.' : undefined} hint={suggested > 0 ? `Saldo atual: ${formatBRL(suggested)}` : undefined}>
           <Input id="pay-amount" inputMode="decimal" value={amountText} onChange={(e) => setAmountText(e.target.value)} autoFocus />
         </Field>

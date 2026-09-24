@@ -2,7 +2,7 @@
 
 PWA de agendamento para quadras esportivas (futsal, basquete, society…), **100% local**: sem backend, sem login, funciona offline depois do primeiro acesso. Os dados ficam no IndexedDB do aparelho, com backup em arquivo.
 
-> Status: **marco 3 concluído**: além da Agenda (marco 2), pagamentos (registrar, quitar, remover lançamento errado), falta, mensagens de WhatsApp, Clientes (lista, busca, débito, histórico) e "Encerrar o dia". Próximo: mensalistas completos (marco 4).
+> Status: **marco 4 concluído**: Agenda, reservas, pagamentos, clientes, WhatsApp e mensalistas completos (criar pela agenda ou pela tela Mensalistas, conflitos nas próximas 12 semanas, pular/desfazer data, remarcar, pausar/retomar/encerrar, mensalidade e receita fixa prevista). Próximo: Resumo, CSV e impressão (marco 5).
 
 ## Requisitos
 
@@ -85,6 +85,19 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 5. **Jogos do cliente** incluem as datas já passadas dos mensalistas (ocorrências que não precisaram ser registradas).
 6. **WhatsApp**: a mensagem usa o primeiro nome do cliente; sem telefone válido, o link abre o WhatsApp para escolher o contato. A edição dos textos entra em Configurações (marco 6).
 7. **Encerrar o dia**: recebido = pagamentos lançados na data (por forma de pagamento); pendências = saldos dos jogos daquele dia. O botão "Salvar backup agora" entra no marco 6.
+
+## Decisões técnicas (marco 4)
+
+1. **Criar mensalista** é o mesmo formulário da reserva com "Repetir toda semana". As próximas 12 semanas (ou até a data final) são checadas; havendo conflitos, o app lista as datas e oferece "Pular essas datas e criar". A checagem é repetida dentro da transação.
+2. **Pausar** para de gerar jogos a partir de hoje e mantém o histórico. **Retomar** transforma as semanas pausadas em exceções (para não "reaparecerem") e checa conflitos antes de voltar.
+3. **Encerrar** define a data do último jogo; o histórico e os pagamentos continuam.
+4. **Pular data** libera o horário (se o jogo já tinha sido registrado, a reserva dele é cancelada). "Desfazer" só funciona se o horário ainda estiver livre.
+5. **Remarcar** pula a data original e cria a reserva avulsa no novo horário na mesma transação: se o novo horário estiver ocupado, nada muda.
+6. **Pagamento e falta** de um jogo de mensalista "materializam" a ocorrência (vira reserva com `recurrenceId`), sem duplicar na agenda.
+7. **Editar mensalista** muda nome do time, forma de cobrança, valores e data final. Para mudar dia, horário ou quadra, encerra-se e cria-se outro, para não reescrever o histórico.
+8. **Mensalidade vence** quando o primeiro jogo do mês chega (um mensalista criado hoje para a semana que vem não aparece devendo).
+9. **Receita fixa prevista** = mensalidades dos ativos + (preço × jogos do mês) dos ativos por jogo.
+10. Novo modelo de mensagem **"Cobrar mensalidade"** (variável `{mes}`), que entra automaticamente também em bancos criados antes.
 
 ## Limitações conhecidas
 

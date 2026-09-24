@@ -1,15 +1,16 @@
 /**
- * Nova reserva / Editar reserva.
+ * Nova reserva / Editar reserva / Novo mensalista ("Repetir toda semana").
  * Validação de conflito ao vivo: mostra quem ocupa e sugere os 3 horários livres mais próximos.
+ * Mensalista: checa as próximas 12 semanas (ou até a data final) e lista as datas em conflito.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { AlertTriangle, Minus, Plus, Sparkles } from 'lucide-react';
+import { AlertTriangle, Minus, Plus, Repeat, Sparkles } from 'lucide-react';
 import { db } from '../../db/database';
 import { useSettings } from '../../db/hooks';
-import { ConflictError, saveReservation, scheduleForDate } from '../../db/repo';
-import type { ISODate, Minutes, PaymentMethod, Reservation } from '../../domain/types';
-import { formatLongDate, isISODate, todayISO, nowMinutes } from '../../domain/dates';
+import { ConflictError, createRecurrence, recurrenceConflicts, RecurrenceConflictError, rescheduleOccurrence, saveReservation, scheduleForDate } from '../../db/repo';
+import type { BillingMode, ISODate, Minutes, PaymentMethod, Reservation } from '../../domain/types';
+import { formatDateBR, formatLongDate, isISODate, todayISO, nowMinutes, WEEKDAY_LONG, weekdayOf } from '../../domain/dates';
 import { formatDuration, minToHHMM } from '../../domain/time';
 import { formatBRL, parseBRL } from '../../domain/money';
 import { priceBreakdown } from '../../domain/pricing';
@@ -23,20 +24,52 @@ import { centsToInput, PAYMENT_METHODS } from '../../components/PaymentSheets';
 import { occupantText } from './occupantText';
 
 export type ReservationSheetInit =
-  | { mode: 'new'; courtId: string; date: ISODate; startMin?: Minutes }
+  | {
+      mode: 'new';
+      courtId: string;
+      date: ISODate;
+      startMin?: Minutes;
+      customerId?: string;
+      repeat?: boolean;
+      duration?: Minutes;
+      /** Remarcar jogo de mensalista: a data original é pulada ao salvar */
+      rescheduleFrom?: { recurrenceId: string; date: ISODate };
+    }
   | { mode: 'edit'; reservation: Reservation };
 
-export function ReservationSheet({ init, onClose, onSaved }: { init: ReservationSheetInit; onClose: () => void; onSaved?: (r: Reservation) => void }) {
+export function ReservationSheet({
+  init,
+  onClose,
+  onSaved,
+  title,
+}: {
+  init: ReservationSheetInit;
+  onClose: () => void;
+  /** Chamado após salvar uma reserva avulsa (não é chamado ao criar mensalista). */
+  onSaved?: (r: Reservation) => void | Promise<void>;
+  title?: string;
+}) {
   const settings = useSettings();
   const toast = useToast();
   const slot = settings.slotMinutes;
   const editing = init.mode === 'edit' ? init.reservation : undefined;
+  const reschedule = init.mode === 'new' ? init.rescheduleFrom : undefined;
 
   const [courtId, setCourtId] = useState(editing?.courtId ?? (init.mode === 'new' ? init.courtId : ''));
   const [date, setDate] = useState<ISODate>(editing?.date ?? (init.mode === 'new' ? init.date : todayISO()));
   const [startMin, setStartMin] = useState<Minutes | undefined>(editing?.startMin ?? (init.mode === 'new' ? init.startMin : undefined));
-  const [duration, setDuration] = useState<Minutes>(editing ? editing.endMin - editing.startMin : 60);
-  const [customer, setCustomer] = useState<CustomerChoice>(editing ? { kind: 'existing', id: editing.customerId } : { kind: 'none' });
+  const [duration, setDuration] = useState<Minutes>(editing ? editing.endMin - editing.startMin : (init.mode === 'new' && init.duration) || 60);
+  const [customer, setCustomer] = useState<CustomerChoice>(
+    editing ? { kind: 'existing', id: editing.customerId } : init.mode === 'new' && init.customerId ? { kind: 'existing', id: init.customerId } : { kind: 'none' },
+  );
+  // Mensalista
+  const [repeat, setRepeat] = useState(init.mode === 'new' && !!init.repeat);
+  const [team, setTeam] = useState('');
+  const [hasEnd, setHasEnd] = useState(false);
+  const [endDate, setEndDate] = useState<ISODate>('');
+  const [billing, setBilling] = useState<BillingMode>('por_jogo');
+  const [monthlyText, setMonthlyText] = useState('');
+  const [skipConflicts, setSkipConflicts] = useState(false);
   const [priceManual, setPriceManual] = useState(editing?.priceManual ?? false);
   const [priceText, setPriceText] = useState(editing ? centsToInput(editing.price) : '');
   const [depositOn, setDepositOn] = useState(false);
@@ -88,7 +121,9 @@ export function ReservationSheet({ init, onClose, onSaved }: { init: Reservation
 
   const ignore = editing
     ? { ignoreReservationId: editing.id, ...(editing.recurrenceId ? { ignoreOccurrence: { recurrenceId: editing.recurrenceId, date } } : {}) }
-    : {};
+    : reschedule && reschedule.date === date
+      ? { ignoreOccurrence: reschedule }
+      : {};
   const occupants = prep && startMin !== undefined && endMin !== undefined ? occupantsAt(prep, courtId, date, startMin, endMin, ignore) : [];
   const suggestions =
     prep && occupants.length && startMin !== undefined ? suggestFreeSlots(prep, courtId, date, duration, startMin, slot, { ...ignore, count: 3 }) : [];
@@ -108,15 +143,59 @@ export function ReservationSheet({ init, onClose, onSaved }: { init: Reservation
     submitted && (customer.kind === 'none' ? 'Escolha ou cadastre o cliente.' : customer.kind === 'new' && !customer.name.trim() ? 'Informe o nome.' : undefined);
   const priceError = price === null ? 'Valor inválido.' : undefined;
   const depositError = depositOn && (deposit === null || deposit <= 0) ? 'Informe o valor do sinal.' : undefined;
-  const canSave = !saving && occupants.length === 0 && startMin !== undefined && price !== null && !depositError;
+  // Conflitos do mensalista nas próximas semanas (a 1ª data já é checada acima)
+  const recConflicts = useLiveQuery(
+    () =>
+      repeat && startMin !== undefined && endMin !== undefined && isISODate(date)
+        ? recurrenceConflicts(
+            { courtId, weekday: weekdayOf(date), startMin, endMin, startDate: date, endDate: hasEnd && isISODate(endDate) ? endDate : undefined, skipDates: [] },
+            date,
+          )
+        : Promise.resolve([]),
+    [repeat, courtId, date, startMin, endMin, hasEnd, endDate],
+  );
+  const futureConflicts = (recConflicts ?? []).filter((c) => c.date !== date);
+  const monthly = repeat && billing === 'mensal' ? parseBRL(monthlyText) : null;
+  const monthlyError = repeat && billing === 'mensal' && (monthly === null || monthly <= 0) ? 'Informe o valor da mensalidade.' : undefined;
+  const endError = repeat && hasEnd && (!isISODate(endDate) || endDate < date) ? 'Escolha uma data depois do início.' : undefined;
+
+  const canSave =
+    !saving &&
+    occupants.length === 0 &&
+    startMin !== undefined &&
+    price !== null &&
+    (repeat ? !monthlyError && !endError && (futureConflicts.length === 0 || skipConflicts) : !depositError);
 
   async function handleSave() {
     setSubmitted(true);
     if (customer.kind === 'none' || (customer.kind === 'new' && !customer.name.trim())) return;
     if (!canSave || startMin === undefined || endMin === undefined || price === null) return;
     setSaving(true);
+    if (repeat) {
+      try {
+        await createRecurrence({
+          courtId,
+          ...(customer.kind === 'existing' ? { customerId: customer.id } : { newCustomer: { name: customer.name, phone: customer.phone } }),
+          startDate: date,
+          startMin,
+          endMin,
+          endDate: hasEnd ? endDate : undefined,
+          billingMode: billing,
+          ...(billing === 'mensal' ? { monthlyPrice: monthly ?? 0 } : priceManual ? { pricePerGame: price } : {}),
+          notes: team,
+          skipDates: skipConflicts ? futureConflicts.map((c) => c.date) : [],
+        });
+        toast.success(`Mensalista criado: toda ${WEEKDAY_LONG[weekdayOf(date)]} às ${minToHHMM(startMin)}.`);
+        onClose();
+      } catch (err) {
+        toast.error(err instanceof RecurrenceConflictError || err instanceof ConflictError ? 'Surgiu um conflito nas próximas semanas. Confira as datas.' : errorMessage(err));
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
     try {
-      const r = await saveReservation({
+      const input = {
         id: editing?.id,
         courtId,
         ...(customer.kind === 'existing' ? { customerId: customer.id } : { newCustomer: { name: customer.name, phone: customer.phone } }),
@@ -127,9 +206,10 @@ export function ReservationSheet({ init, onClose, onSaved }: { init: Reservation
         priceManual,
         notes,
         ...(depositOn && deposit ? { deposit: { amount: deposit, method: depositMethod } } : {}),
-      });
-      toast.success(editing ? 'Reserva atualizada.' : 'Reserva criada.');
-      onSaved?.(r);
+      };
+      const r = reschedule ? await rescheduleOccurrence(reschedule.recurrenceId, reschedule.date, input) : await saveReservation(input);
+      toast.success(editing ? 'Reserva atualizada.' : reschedule ? 'Jogo remarcado. A data original ficou livre.' : 'Reserva criada.');
+      await onSaved?.(r);
       onClose();
     } catch (err) {
       toast.error(err instanceof ConflictError ? 'Esse horário acabou de ser ocupado. Escolha outro.' : errorMessage(err));
@@ -142,15 +222,17 @@ export function ReservationSheet({ init, onClose, onSaved }: { init: Reservation
     <Sheet
       open
       onClose={onClose}
-      title={editing ? 'Editar reserva' : 'Nova reserva'}
+      title={title ?? (editing ? 'Editar reserva' : repeat ? 'Novo mensalista' : 'Nova reserva')}
       footer={
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-slate-500">Total</p>
-            <p className="text-lg font-bold tabular-nums">{price !== null ? formatBRL(price) : '—'}</p>
+            <p className="text-xs text-slate-500">{repeat ? (billing === 'mensal' ? 'Mensalidade' : 'Por jogo') : 'Total'}</p>
+            <p className="text-lg font-bold tabular-nums">
+              {repeat && billing === 'mensal' ? (monthly !== null ? formatBRL(monthly) : '—') : price !== null ? formatBRL(price) : '—'}
+            </p>
           </div>
           <Button onClick={handleSave} disabled={!canSave} className="min-w-40">
-            {saving ? 'Salvando…' : editing ? 'Salvar alterações' : 'Confirmar reserva'}
+            {saving ? 'Salvando…' : editing ? 'Salvar alterações' : repeat ? 'Criar mensalista' : 'Confirmar reserva'}
           </Button>
         </div>
       }
@@ -234,6 +316,7 @@ export function ReservationSheet({ init, onClose, onSaved }: { init: Reservation
           {lookups ? <CustomerPicker customers={lookups.customers} value={customer} onChange={setCustomer} error={customerError || undefined} /> : <Input disabled placeholder="Carregando…" />}
         </Field>
 
+        {!(repeat && billing === 'mensal') && (
         <Field
           label="Valor"
           htmlFor="res-price"
@@ -268,8 +351,89 @@ export function ReservationSheet({ init, onClose, onSaved }: { init: Reservation
             {priceManual ? 'Alterado manualmente' : 'Preço automático pela tabela'}
           </p>
         </Field>
+        )}
 
-        {!editing && (
+        {!editing && !reschedule && (
+          <div className={`rounded-2xl border p-3 ${repeat ? 'border-brand/50 bg-brand-soft/40' : 'border-slate-200'}`}>
+            <Switch
+              id="res-repeat"
+              label={
+                <span className="inline-flex items-center gap-2">
+                  <Repeat className="size-4 text-brand" aria-hidden /> Repetir toda semana (mensalista)
+                </span>
+              }
+              checked={repeat}
+              onChange={(v) => {
+                setRepeat(v);
+                if (v && !monthlyText && price) setMonthlyText(centsToInput(price * 4));
+              }}
+            />
+            {repeat && (
+              <div className="mt-3 flex flex-col gap-3">
+                <p className="text-sm text-slate-600">
+                  Toda <strong>{isISODate(date) ? WEEKDAY_LONG[weekdayOf(date)] : '—'}</strong>
+                  {startMin !== undefined && endMin !== undefined ? ` das ${minToHHMM(startMin)} às ${minToHHMM(endMin)}` : ''}, a partir de{' '}
+                  {isISODate(date) ? formatDateBR(date) : '—'}.
+                </p>
+                <Field label="Nome do time (opcional)" htmlFor="rec-team">
+                  <Input id="rec-team" value={team} placeholder="Ex.: Time do João" onChange={(e) => setTeam(e.target.value)} />
+                </Field>
+                <Field label="Até quando" error={endError}>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Chip selected={!hasEnd} onClick={() => setHasEnd(false)}>
+                      Sem data final
+                    </Chip>
+                    <Chip selected={hasEnd} onClick={() => setHasEnd(true)}>
+                      Até uma data
+                    </Chip>
+                    {hasEnd && <Input type="date" aria-label="Data final" min={date} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-auto" />}
+                  </div>
+                </Field>
+                <Field label="Cobrança">
+                  <div className="flex flex-wrap gap-2">
+                    <Chip selected={billing === 'por_jogo'} onClick={() => setBilling('por_jogo')}>
+                      Por jogo
+                    </Chip>
+                    <Chip selected={billing === 'mensal'} onClick={() => setBilling('mensal')}>
+                      Mensalidade
+                    </Chip>
+                  </div>
+                </Field>
+                {billing === 'mensal' && (
+                  <Field label="Valor da mensalidade" htmlFor="rec-monthly" error={monthlyError} hint="Cobrada uma vez por mês, independente de quantos jogos o mês tiver.">
+                    <Input id="rec-monthly" inputMode="decimal" value={monthlyText} onChange={(e) => setMonthlyText(e.target.value)} />
+                  </Field>
+                )}
+                {billing === 'por_jogo' && <p className="text-xs text-slate-500">Cada jogo usa o valor acima {priceManual ? '(fixo)' : '(tabela de preços)'}.</p>}
+
+                {recConflicts === undefined ? (
+                  <p className="text-sm text-slate-500">Verificando as próximas semanas…</p>
+                ) : futureConflicts.length > 0 ? (
+                  <div role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+                    <p className="flex items-center gap-2 font-semibold">
+                      <AlertTriangle className="size-4" aria-hidden /> {futureConflicts.length} data(s) já ocupada(s) nas próximas semanas
+                    </p>
+                    <ul className="mt-1 list-disc pl-5">
+                      {futureConflicts.slice(0, 6).map((c) => (
+                        <li key={c.date}>
+                          {formatDateBR(c.date)}: {maps ? occupantText(c.occupants[0]!, maps, courtId) : ''}
+                        </li>
+                      ))}
+                    </ul>
+                    <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 font-medium">
+                      <input type="checkbox" className="size-5 accent-[var(--brand-primary)]" checked={skipConflicts} onChange={(e) => setSkipConflicts(e.target.checked)} />
+                      Pular essas datas e criar o mensalista
+                    </label>
+                  </div>
+                ) : (
+                  <p className="text-sm text-green-800">Nenhum conflito nas próximas 12 semanas.</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {!editing && !repeat && (
           <div className="rounded-2xl border border-slate-200 p-3">
             <Switch
               id="res-deposit"

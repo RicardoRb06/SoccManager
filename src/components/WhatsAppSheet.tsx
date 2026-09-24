@@ -11,6 +11,7 @@ const LABELS: Record<MessageKind, string> = {
   confirmar: 'Confirmar horário',
   lembrar: 'Lembrar do jogo',
   cobrar: 'Cobrar saldo',
+  mensalidade: 'Cobrar mensalidade',
 };
 
 export function WhatsAppSheet({

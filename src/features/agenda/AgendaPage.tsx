@@ -23,8 +23,8 @@ import { BlockSheet } from '../mais/BlockSheet';
 import { DaySummarySheet } from './DaySummarySheet';
 
 type Overlay =
-  | { type: 'form'; init: ReservationSheetInit }
-  | { type: 'detail'; id: string }
+  | { type: 'form'; init: ReservationSheetInit; title?: string }
+  | { type: 'detail'; id: string; initial?: 'pay' }
   | { type: 'occurrence'; recurrenceId: string; date: ISODate }
   | { type: 'block'; block: Block }
   | { type: 'closeDay' };
@@ -170,15 +170,30 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
         <Plus className="size-5" aria-hidden /> Nova reserva
       </button>
 
-      {overlay?.type === 'form' && <ReservationSheet init={overlay.init} onClose={() => setOverlay(null)} />}
+      {overlay?.type === 'form' && <ReservationSheet init={overlay.init} title={overlay.title} onClose={() => setOverlay(null)} />}
       {overlay?.type === 'detail' && (
         <ReservationDetail
           reservationId={overlay.id}
+          initial={overlay.initial}
           onClose={() => setOverlay(null)}
           onEdit={() => void editReservation(overlay.id, setOverlay)}
         />
       )}
-      {overlay?.type === 'occurrence' && <OccurrenceDetail recurrenceId={overlay.recurrenceId} date={overlay.date} onClose={() => setOverlay(null)} />}
+      {overlay?.type === 'occurrence' && (
+        <OccurrenceDetail
+          recurrenceId={overlay.recurrenceId}
+          date={overlay.date}
+          onClose={() => setOverlay(null)}
+          onOpenReservation={(id, then) => setOverlay({ type: 'detail', id, initial: then })}
+          onReschedule={(rec, d) =>
+            setOverlay({
+              type: 'form',
+              title: 'Remarcar jogo do mensalista',
+              init: { mode: 'new', courtId: rec.courtId, date: d, customerId: rec.customerId, duration: rec.endMin - rec.startMin, rescheduleFrom: { recurrenceId: rec.id, date: d } },
+            })
+          }
+        />
+      )}
       {overlay?.type === 'block' && <BlockSheet block={overlay.block} onClose={() => setOverlay(null)} />}
       {overlay?.type === 'closeDay' && <DaySummarySheet date={date} onClose={() => setOverlay(null)} />}
     </>

@@ -26,9 +26,20 @@ import { errorMessage } from '../../utils/text';
 
 type Sub = 'cancel' | 'delete' | 'pay' | 'quitar' | 'whatsapp' | { removePayment: Payment } | null;
 
-export function ReservationDetail({ reservationId, onClose, onEdit }: { reservationId: string; onClose: () => void; onEdit: () => void }) {
+export function ReservationDetail({
+  reservationId,
+  onClose,
+  onEdit,
+  initial,
+}: {
+  reservationId: string;
+  onClose: () => void;
+  onEdit: () => void;
+  /** Abre direto o registro de pagamento */
+  initial?: 'pay';
+}) {
   const toast = useToast();
-  const [sub, setSub] = useState<Sub>(null);
+  const [sub, setSub] = useState<Sub>(initial ?? null);
   const [reason, setReason] = useState('');
 
   const data = useLiveQuery(async () => {
