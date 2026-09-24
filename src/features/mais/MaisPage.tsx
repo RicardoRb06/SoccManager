@@ -1,10 +1,13 @@
 // Mais: backup, configurações, bloqueios, lixeira e informações do app. Carregada sob demanda.
-import { ChevronRight, Database, Lock, Phone, Settings, ShieldAlert, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react';
+import { BadgeCheck, ChevronRight, Database, FileText, Lock, Phone, Settings, ShieldAlert, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react';
 import { PageHeader } from '../../components/AppShell';
 import { DB_NAME } from '../../db/database';
 import { useCounts, useSettings } from '../../db/hooks';
 import { useBackupReminder } from './useBackup';
 import { formatPhone } from '../../domain/phone';
+import { licenseService } from '../../license/LicenseService';
+import { InstallItem } from './InstallItem';
+import { RestoreDemoItem } from './RestoreDemoItem';
 
 function Item({ href, icon: Icon, title, subtitle, warn }: { href: string; icon: LucideIcon; title: string; subtitle: string; warn?: string }) {
   return (
@@ -24,6 +27,7 @@ export default function MaisPage() {
   const counts = useCounts();
   const s = useSettings();
   const reminder = useBackupReminder();
+  const license = licenseService.getStatus();
   return (
     <>
       <PageHeader title="Mais" />
@@ -39,7 +43,15 @@ export default function MaisPage() {
           <Item href="#/mais/configuracoes" icon={Settings} title="Configurações" subtitle="Estabelecimento, quadras, horários e preços" />
           <Item href="#/mais/bloqueios" icon={Lock} title="Bloqueios de horário" subtitle="Manutenção, eventos e feriados" />
           <Item href="#/mais/lixeira" icon={Trash2} title="Lixeira" subtitle="Restaurar reservas e clientes excluídos" />
+          <InstallItem />
         </nav>
+
+        {license.mode === 'demo' && (
+          <nav aria-label="Demonstração" className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <Item href="#/mais/condicoes" icon={FileText} title="Condições" subtitle="Valor, o que está incluído e suporte" />
+            <RestoreDemoItem />
+          </nav>
+        )}
 
         <section className="rounded-2xl border border-slate-200 bg-white p-4">
           <h2 className="mb-3 flex items-center gap-2 font-semibold">
@@ -64,8 +76,9 @@ export default function MaisPage() {
             Banco: <code>{DB_NAME}</code> · formato {s.schemaVersion}
           </p>
         </section>
-        <p className="text-center text-xs text-slate-400">
-          {s.courtName} · Agenda da Quadra · versão {__APP_VERSION__}
+        <p className="flex items-center justify-center gap-1 text-center text-xs text-slate-400">
+          {license.mode === 'licensed' && <BadgeCheck className="size-4" aria-hidden />}
+          {license.mode === 'licensed' ? `Licenciado para ${license.licensedTo}` : 'Versão de demonstração'} · Agenda da Quadra · versão {__APP_VERSION__}
         </p>
       </div>
     </>

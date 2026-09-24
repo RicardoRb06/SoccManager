@@ -3,6 +3,8 @@
  * mapa de calor com sugestões, ranking de clientes, lista "A receber" e exportação CSV.
  * Carregada sob demanda (lazy).
  */
+import { InterestCard } from '../demo/InterestCard';
+import { licenseService } from '../../license/LicenseService';
 import { useMemo, useState } from 'react';
 import { Download, Hourglass, Lightbulb, Trophy } from 'lucide-react';
 import { PageHeader } from '../../components/AppShell';
@@ -210,6 +212,7 @@ export default function ResumoPage() {
                 </ul>
               )}
             </section>
+            {licenseService.isDemo() && <InterestCard />}
           </>
         )}
       </div>

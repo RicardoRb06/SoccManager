@@ -7,6 +7,10 @@ import { dailySnapshot } from './db/backup';
 import { requestPersistence } from './db/storage';
 import { db } from './db/database';
 import { todayISO } from './domain/dates';
+import { listenForInstall } from './pwa/install';
+
+// O navegador avisa cedo que o app pode ser instalado: guarda o aviso para o item "Instalar app"
+listenForInstall();
 
 const rootEl = document.getElementById('root')!;
 const root = createRoot(rootEl);

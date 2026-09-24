@@ -4,6 +4,7 @@
 import type { ReactNode } from 'react';
 import { BarChart3, CalendarDays, Menu, Repeat, Users } from 'lucide-react';
 import { useSettings } from '../db/hooks';
+import { licenseService } from '../license/LicenseService';
 
 export const TABS = [
   { path: '/agenda', label: 'Agenda', icon: CalendarDays },
@@ -35,6 +36,7 @@ export function CourtBadge({ size = 36 }: { size?: number }) {
 
 export function AppShell({ path, children, banner }: { path: string; children: ReactNode; banner?: ReactNode }) {
   const s = useSettings();
+  const license = licenseService.getStatus();
   return (
     <div className="min-h-dvh lg:flex">
       {/* Sidebar (desktop) */}
@@ -43,7 +45,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
           <CourtBadge size={40} />
           <div className="min-w-0">
             <p className="truncate font-bold leading-tight">{s.courtName}</p>
-            <p className="text-xs text-slate-500">Agenda da Quadra</p>
+            <p className="text-xs text-slate-500">{license.mode === 'demo' ? 'Versão de demonstração' : `Licenciado para ${license.licensedTo}`}</p>
           </div>
         </div>
         <nav aria-label="Principal" className="flex flex-col gap-1">
@@ -53,6 +55,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
               <a
                 key={p}
                 href={`#${p}`}
+                data-tour={`tab-${p.slice(1)}`}
                 aria-current={active ? 'page' : undefined}
                 className={`flex min-h-11 items-center gap-3 rounded-xl px-3 font-medium ${active ? 'bg-brand-soft text-brand-strong' : 'text-slate-600 hover:bg-slate-100'}`}
               >
@@ -83,6 +86,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
               <li key={p}>
                 <a
                   href={`#${p}`}
+                  data-tour={`tab-${p.slice(1)}`}
                   aria-current={active ? 'page' : undefined}
                   className={`flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${active ? 'text-brand' : 'text-slate-500'}`}
                 >

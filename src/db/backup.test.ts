@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { AgendaDB } from './database';
 import { bootstrapDatabase, readAllData } from './bootstrap';
 import {
-  backupFileName, buildBackup, createSnapshot, dailySnapshot, importBackup, listSnapshots, MAX_SNAPSHOTS, parseBackup, restoreSnapshot,
+  backupFileName, buildBackup, createSnapshot, dailySnapshot, importBackup, listSnapshots, MAX_SNAPSHOTS, parseBackup, restoreSnapshot, restoreDemoData,
 } from './backup';
 import { saveReservation } from './repo';
 import tenant from '../config/tenant.config';
@@ -110,5 +110,27 @@ describe('backup e restauração (testes obrigatórios)', () => {
   it('nome do arquivo', () => {
     expect(backupFileName('arena-modelo', new Date(2026, 8, 4, 7, 5))).toBe('backup-arena-modelo-2026-09-04-0705.json');
     expect(tenant.tenantId).toBeTruthy();
+  });
+});
+
+describe('restaurar dados de exemplo (demonstração)', () => {
+  it('volta ao estado de exemplo, guarda cópia antes e mantém as chaves do aparelho', async () => {
+    const a = freshDb();
+    await bootstrapDatabase(a);
+    const seedCount = await a.reservations.count();
+    await a.customers.clear();
+    await a.reservations.clear();
+    await a.settings.put({ key: 'persistRequested', value: true });
+
+    const before = await restoreDemoData(a);
+    expect(before.reason).toBe('antes-de-restaurar-exemplo');
+    expect(before.counts.reservas).toBe(0);
+    expect(await a.reservations.count()).toBe(seedCount);
+    expect((await a.customers.count()) > 0).toBe(true);
+    expect((await a.settings.get('persistRequested'))?.value).toBe(true);
+
+    // dá para desfazer pela cópia interna
+    await restoreSnapshot(before.id, a);
+    expect(await a.reservations.count()).toBe(0);
   });
 });

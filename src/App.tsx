@@ -4,6 +4,9 @@ import { ThemeSync } from './components/ThemeSync';
 import { ToastProvider } from './components/ui/Toast';
 import { UpdatePrompt } from './pwa/UpdatePrompt';
 import { BackupBanner } from './features/mais/BackupBanner';
+import { DemoBanner } from './features/demo/DemoBanner';
+import { Tour } from './features/demo/Tour';
+import { licenseService } from './license/LicenseService';
 import { useSettingsState } from './db/hooks';
 import tenant from './config/tenant.config';
 import { matchPath, navigate, useHashPath } from './utils/router';
@@ -20,6 +23,7 @@ const BackupPage = lazy(() => import('./features/mais/BackupPage'));
 const TrashPage = lazy(() => import('./features/mais/TrashPage'));
 const SettingsPage = lazy(() => import('./features/mais/settings/SettingsPage'));
 const OnboardingPage = lazy(() => import('./features/onboarding/OnboardingPage'));
+const ConditionsPage = lazy(() => import('./features/demo/ConditionsPage'));
 
 function Routes({ path }: { path: string }) {
   const agenda = matchPath('/agenda/:date', path);
@@ -33,6 +37,7 @@ function Routes({ path }: { path: string }) {
   if (path === '/mais/backup') return <BackupPage />;
   if (path === '/mais/lixeira') return <TrashPage />;
   if (path.startsWith('/mais/configuracoes')) return <SettingsPage />;
+  if (path === '/mais/condicoes' && licenseService.isDemo()) return <ConditionsPage />;
   if (path.startsWith('/mais')) return <MaisPage />;
   return <AgendaPage />;
 }
@@ -56,12 +61,21 @@ export default function App() {
           <OnboardingPage />
         </Suspense>
       ) : (
-        <AppShell path={path} banner={<BackupBanner />}>
+        <AppShell
+          path={path}
+          banner={
+            <>
+              {licenseService.isDemo() && <DemoBanner />}
+              <BackupBanner />
+            </>
+          }
+        >
           <Suspense fallback={<p className="p-6 text-center text-slate-500">Carregando…</p>}>
             <Routes path={path} />
           </Suspense>
         </AppShell>
       )}
+      {licenseService.isDemo() && <Tour />}
       <UpdatePrompt />
     </ToastProvider>
   );

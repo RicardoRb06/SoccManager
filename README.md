@@ -2,12 +2,12 @@
 
 PWA de agendamento para quadras esportivas (futsal, basquete, society…), **100% local**: sem backend, sem login, funciona offline depois do primeiro acesso. Os dados ficam no IndexedDB do aparelho, com backup em arquivo.
 
-> Status: **marco 6 concluído**: além de agenda, reservas, pagamentos, clientes, mensalistas e Resumo, o app tem backup em arquivo, restauração segura, cópias internas automáticas, armazenamento protegido, Lixeira, Configurações completas e assistente inicial. Próximo: recursos da demonstração, polimento e publicação (marco 7).
+> Status: **marco 7 concluído (todos os marcos)**: agenda, reservas, pagamentos, clientes, mensalistas, Resumo, backup e restauração, Configurações e assistente inicial, mais os recursos da demonstração (faixa, tour, Condições, "Tenho interesse", restaurar exemplos), instalação do app e publicação automática no GitHub Pages.
 
 ## Requisitos
 
-- Node.js 20 ou mais novo
-- pnpm 9 ou 10 (`corepack enable` já disponibiliza o pnpm)
+- Node.js 22 ou mais novo
+- pnpm 11 (o projeto usa o `pnpm-workspace.yaml` para liberar o build do esbuild)
 
 ## Comandos
 
@@ -29,12 +29,14 @@ src/
   config/        tenant.config.ts (o ÚNICO arquivo a editar por cliente) e tipos
   domain/        regras de negócio puras + testes (datas, horários, preço, conflito, recorrência, pagamentos, métricas, telefone)
   db/            Dexie (IndexedDB), migrações, bootstrap, seed (dados de exemplo)
-  features/      telas: agenda, mensalistas, clientes, resumo, mais
+  features/      telas: agenda, mensalistas, clientes, resumo, mais, onboarding, demo
   components/    layout e componentes compartilhados
-  pwa/           aviso de nova versão
-  utils/         ids, roteador por hash
+  license/       LicenseService (esboço: demonstração ou licenciado)
+  pwa/           aviso de nova versão e "Instalar app"
+  utils/         ids, roteador por hash, download, área de transferência
   test/          fixtures e setup dos testes
 public/          favicon e ícones do PWA
+.github/         workflow de publicação no GitHub Pages
 ```
 
 ## Personalizar para um cliente (tenant)
@@ -46,11 +48,37 @@ Edite somente `src/config/tenant.config.ts`:
 - O manifest do PWA (nome, cor, ícones) e o título da página são gerados a partir desse arquivo no `build`.
 - Para trocar os ícones, substitua os PNGs em `public/icons/` (192, 512 e maskable 512) mantendo os nomes, ou aponte outros caminhos em `icons`.
 
-Com `demo: true`, o primeiro acesso já vem com dados de exemplo gerados a partir da data atual. Com `demo: false`, o app grava só a configuração e as quadras/preços do tenant (o assistente de configuração inicial chega no marco 6).
+Com `demo: true`, o primeiro acesso já vem com dados de exemplo gerados a partir da data atual. Com `demo: false`, o app grava só a configuração e as quadras/preços do tenant e abre o assistente de configuração inicial.
 
-## Publicar (resumo; o passo a passo completo vem no marco 7)
+## Publicar no GitHub Pages
 
-O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio próprio, subdomínio ou subcaminho (ex.: GitHub Pages em `/nome-do-repo/`). Se preferir um caminho absoluto: `VITE_BASE=/nome-do-repo/ pnpm build`.
+O repositório já traz o workflow `.github/workflows/deploy.yml`. A cada `git push` na branch `main`, o GitHub instala as dependências, roda os testes, gera o `dist/` e publica o site. Não há segredo nem chave: o workflow usa só o token temporário que o GitHub cria em cada execução.
+
+**Configuração (uma vez só):**
+
+1. No GitHub, abra o repositório › **Settings** › **Pages**.
+2. Em **Build and deployment › Source**, escolha **GitHub Actions**.
+3. Faça `git push`. Acompanhe na aba **Actions** (leva 1 a 2 minutos).
+4. O endereço aparece em Settings › Pages, no formato `https://<usuario>.github.io/<repositorio>/` (aqui: `https://ricardorb06.github.io/SoccManager/`).
+
+**Para mostrar no celular:** abra o endereço no navegador, confira a faixa "Versão de demonstração" e, se quiser, instale pelo item **Mais › Instalar app**. Depois do primeiro acesso o app funciona sem internet.
+
+**Observações:**
+
+- Se o repositório for privado, o GitHub Pages exige um plano pago; com o plano gratuito, o repositório precisa ser público. Nesse caso, lembre que o código (e o e-mail dos commits) fica visível.
+- O caminho do site (`/SoccManager/`) é passado ao build pela variável `VITE_BASE` dentro do workflow; não é preciso editar nada.
+- Nova versão publicada: quem já tem o app aberto vê o aviso "Nova versão disponível" e atualiza com um toque. Os dados continuam no aparelho.
+- Para testar a versão de produção no seu computador antes de publicar: `pnpm build` e depois `pnpm preview`.
+- Para gerar a versão de um cliente real, crie uma cópia do repositório, edite o `tenant.config.ts` (com `demo: false` e um `tenantId` próprio) e publique do mesmo jeito.
+
+## Demonstração (`demo: true`)
+
+- **Faixa "Versão de demonstração"** no topo de todas as telas, com os botões **Como funciona?** e **Condições**.
+- **Tour guiado**: 4 balões apontando para Agenda, Mensalistas, Resumo e Mais. Só abre pelo botão "Como funciona?"; dá para pular (botão, Esc ou toque fora) e rever quando quiser.
+- **Tenho interesse**: cartão no fim do Resumo. Mostra o telefone do vendedor (`contactPhone`) como texto e um botão que só **copia** o número. Nada é enviado e nenhum app externo é aberto. **Troque o número fictício pelo seu antes de publicar.**
+- **Condições** (Mais › Condições): valor, dias de teste, o que está incluído, suporte e limitações, tudo lido de `conditions` no `tenant.config.ts`.
+- **Restaurar dados de exemplo** (Mais): volta a demonstração ao estado inicial, com datas a partir de hoje. Pede confirmação, guarda uma cópia interna antes e oferece "Desfazer".
+- **Licença**: `src/license/LicenseService.ts` é um esboço. Hoje devolve "demonstração" ou "licenciado para <quadra>" conforme o `demo` do tenant; o nome licenciado aparece na barra lateral do desktop e no rodapé de Mais. Não há verificação online nem chave.
 
 ## Decisões técnicas (marco 1)
 
@@ -126,11 +154,18 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 6. **Logo** é reduzida para no máximo 256 px e guardada no banco (vai junto no backup).
 7. **Assistente inicial** só aparece com `demo: false` e reaproveita as telas de Configurações (estabelecimento → quadras → horários → preços), partindo dos valores do `tenant.config.ts`.
 
+## Decisões técnicas (marco 7)
+
+1. **Tour sem biblioteca**: os balões procuram o alvo por `data-tour` e escolhem sozinhos a posição (acima da barra inferior no celular, à direita da barra lateral no desktop). O tour navega para cada aba enquanto explica.
+2. **"Instalar app" só em Mais**: o aviso `beforeinstallprompt` do navegador é guardado ao abrir o app e usado quando a pessoa toca no item. No iPhone (que não tem esse aviso) aparece o passo a passo do Safari; com o app já instalado, o item mostra "App instalado".
+3. **Restaurar exemplos** reaproveita as cópias internas do marco 6 (motivo "antes de restaurar exemplo") e preserva só as chaves do aparelho (`persistRequested`, `lastSnapshotDate`).
+4. **Publicação por GitHub Actions** com `pnpm install --frozen-lockfile`, testes antes do build e `VITE_BASE=/<repositorio>/`.
+
 ## Sem integrações externas
 
-O app não envia nem recebe dados de nenhum serviço. As integrações de WhatsApp (mensagens prontas, cobrança e modelos editáveis) e a chave Pix foram removidas; os telefones continuam guardados e exibidos, e o link `tel:` só abre o discador do próprio aparelho quando alguém toca no número. O que sai do aparelho só sai por ação da pessoa: baixar/compartilhar o backup, exportar CSV e imprimir.
+O app não envia nem recebe dados de nenhum serviço. As integrações de WhatsApp (mensagens prontas, cobrança e modelos editáveis) e a chave Pix foram removidas; os telefones continuam guardados e exibidos, e o link `tel:` só abre o discador do próprio aparelho quando alguém toca no número. O que sai do aparelho só sai por ação da pessoa: baixar/compartilhar o backup, exportar CSV, imprimir e copiar o telefone do vendedor para a área de transferência (demonstração).
 
 ## Limitações conhecidas
 
-- Os dados ficam no aparelho: limpar os dados do navegador apaga tudo. Por isso o app terá backup em arquivo, lembretes e cópias internas (marco 6).
+- Os dados ficam no aparelho: limpar os dados do navegador apaga tudo. Por isso o app tem backup em arquivo, lembretes e cópias internas.
 - Não há sincronização entre aparelhos nem agendamento feito pelo cliente final.

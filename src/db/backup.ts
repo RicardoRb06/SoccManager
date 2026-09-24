@@ -10,10 +10,10 @@
  */
 import { z } from 'zod';
 import tenant from '../config/tenant.config';
-import type { DataSet } from '../domain/types';
+import type { AppSettings, DataSet } from '../domain/types';
 import { newId } from '../utils/id';
 import { db, type AgendaDB, type Snapshot } from './database';
-import { readAllData, replaceAllData } from './bootstrap';
+import { buildDemoData, readAllData, replaceAllData } from './bootstrap';
 import { SCHEMA_VERSION } from './fromTenant';
 import { migrateData } from './migrations';
 
@@ -196,4 +196,19 @@ export async function restoreSnapshot(id: string, database: AgendaDB = db): Prom
   const data = migrateData(snap.data as unknown as Record<string, unknown>, snap.schemaVersion) as unknown as DataSet;
   await createSnapshot('antes-de-restaurar', database);
   await replaceAllData(data, database);
+}
+
+/** Chaves de configuração do aparelho que continuam valendo depois de trocar os dados. */
+const DEVICE_KEYS: (keyof AppSettings)[] = ['persistRequested', 'lastSnapshotDate'];
+
+/**
+ * Demonstração: volta aos dados de exemplo (gerados a partir de hoje),
+ * guardando antes uma cópia interna do estado atual para poder desfazer.
+ */
+export async function restoreDemoData(database: AgendaDB = db, now = new Date()): Promise<Snapshot> {
+  const before = await createSnapshot('antes-de-restaurar-exemplo', database, now);
+  const keep = (await database.settings.bulkGet(DEVICE_KEYS)).filter((r): r is NonNullable<typeof r> => !!r);
+  const data = buildDemoData(now);
+  await replaceAllData({ ...data, settings: [...data.settings.filter((r) => !DEVICE_KEYS.includes(r.key)), ...keep] }, database);
+  return before;
 }
