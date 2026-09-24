@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { CalendarDays, CalendarX2, Clock, HandCoins, MapPin, MessageCircle, MoveRight, Repeat, UserX } from 'lucide-react';
+import { CalendarDays, CalendarX2, Clock, HandCoins, MapPin, MoveRight, Repeat, UserX } from 'lucide-react';
 import { db } from '../../db/database';
 import { materializeRecurrenceDate, setFalta, skipRecurrenceDate } from '../../db/repo';
 import type { ISODate, Recurrence } from '../../domain/types';
@@ -17,11 +17,10 @@ import { Sheet } from '../../components/ui/Sheet';
 import { Button } from '../../components/ui/controls';
 import { ConfirmSheet } from '../../components/ui/ConfirmSheet';
 import { PaymentSheet } from '../../components/PaymentSheets';
-import { WhatsAppSheet } from '../../components/WhatsAppSheet';
 import { useToast } from '../../components/ui/Toast';
 import { errorMessage } from '../../utils/text';
 
-type Sub = null | 'skip' | 'monthPay' | 'whatsapp';
+type Sub = null | 'skip' | 'monthPay';
 
 export function OccurrenceDetail({
   recurrenceId,
@@ -83,7 +82,7 @@ export function OccurrenceDetail({
         title={customer?.name ?? 'Mensalista'}
         footer={
           <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               {mensal ? (
                 <Button variant={ms?.emDia ? 'secondary' : 'primary'} className="px-3" onClick={() => setSub('monthPay')}>
                   <HandCoins className="size-4" aria-hidden /> Mensalidade
@@ -101,9 +100,6 @@ export function OccurrenceDetail({
                   <HandCoins className="size-4" aria-hidden /> Pagamento
                 </Button>
               )}
-              <Button variant="secondary" className="px-3 text-green-800" onClick={() => setSub('whatsapp')}>
-                <MessageCircle className="size-4" aria-hidden /> WhatsApp
-              </Button>
             </div>
             <div className="grid grid-cols-3 gap-2">
               <Button
@@ -180,23 +176,6 @@ export function OccurrenceDetail({
           title={`Mensalidade de ${month.slice(5)}/${month.slice(0, 4)}`}
           target={{ recurrenceId: rec.id, referenceMonth: month }}
           suggested={ms.balance}
-          onClose={() => setSub(null)}
-        />
-      )}
-      {sub === 'whatsapp' && (
-        <WhatsAppSheet
-          phone={customer?.phone ?? ''}
-          kinds={mensal ? (ms && !ms.emDia ? ['confirmar', 'lembrar', 'mensalidade'] : ['confirmar', 'lembrar']) : ['confirmar', 'lembrar']}
-          context={{
-            customerName: customer?.name ?? '',
-            courtName: court?.name ?? '',
-            date,
-            startMin: rec.startMin,
-            endMin: rec.endMin,
-            price: mensal ? rec.monthlyPrice ?? 0 : price,
-            balance: ms?.balance ?? price,
-            month,
-          }}
           onClose={() => setSub(null)}
         />
       )}

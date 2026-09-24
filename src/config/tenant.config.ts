@@ -48,8 +48,8 @@ const tenant: TenantConfig = {
     { court: 'q2', weekdays: [1, 2, 3, 4, 5], start: '18:00', end: '24:00', pricePerHour: 80 },
     { court: 'q2', weekdays: [0, 6], start: '00:00', end: '24:00', pricePerHour: 90 },
   ],
-  contactWhatsApp: '11999999999',
-  pixKey: 'pix@arenamodelo.com.br',
+  // Telefone do vendedor mostrado na demonstração (fictício: troque pelo seu).
+  contactPhone: '11999999999',
   backupReminderDays: 7,
   conditions: {
     price: 1000,
@@ -59,11 +59,10 @@ const tenant: TenantConfig = {
       'Mensalistas com cobrança por jogo ou mensalidade',
       'Controle de pagamentos, sinal e saldo devedor',
       'Relatórios de faturamento, ocupação e horas vazias',
-      'Mensagens prontas de WhatsApp para confirmar e cobrar',
       'Backup em arquivo e funcionamento sem internet',
       'Personalização com nome, logo e cores da sua quadra',
     ],
-    support: 'Instalação e treinamento inicial inclusos, com 30 dias de suporte por WhatsApp.',
+    support: 'Instalação e treinamento inicial inclusos, com 30 dias de suporte.',
     limitations: [
       'Os dados ficam guardados no aparelho do estabelecimento (faça backups regulares).',
       'Não há agendamento online feito pelo próprio cliente final.',

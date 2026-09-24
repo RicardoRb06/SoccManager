@@ -7,14 +7,12 @@ import { VenueSection } from './VenueSection';
 import { CourtsSection } from './CourtsSection';
 import { HoursSection } from './HoursSection';
 import { PricesSection } from './PricesSection';
-import { TemplatesSection } from './TemplatesSection';
 
 const TABS = [
   { key: 'quadra', label: 'Estabelecimento' },
   { key: 'quadras', label: 'Quadras' },
   { key: 'horarios', label: 'Horários' },
   { key: 'precos', label: 'Preços' },
-  { key: 'mensagens', label: 'Mensagens' },
 ] as const;
 
 type TabKey = (typeof TABS)[number]['key'];
@@ -46,7 +44,6 @@ export default function SettingsPage() {
         {tab === 'quadras' && <CourtsSection />}
         {tab === 'horarios' && <HoursSection />}
         {tab === 'precos' && <PricesSection />}
-        {tab === 'mensagens' && <TemplatesSection />}
       </div>
     </>
   );

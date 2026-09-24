@@ -4,11 +4,10 @@
  * Carregada sob demanda (lazy).
  */
 import { useMemo, useState } from 'react';
-import { Download, Hourglass, Lightbulb, MessageCircle, Trophy } from 'lucide-react';
+import { Download, Hourglass, Lightbulb, Trophy } from 'lucide-react';
 import { PageHeader } from '../../components/AppShell';
 import { Button, Chip } from '../../components/ui/controls';
 import { Sheet } from '../../components/ui/Sheet';
-import { WhatsAppSheet } from '../../components/WhatsAppSheet';
 import { useToast } from '../../components/ui/Toast';
 import { useAllData, useSettings } from '../../db/hooks';
 import { formatDateBR, formatMonthBR, nowMinutes, todayISO } from '../../domain/dates';
@@ -37,7 +36,6 @@ export default function ResumoPage() {
   const settings = useSettings();
   const toast = useToast();
   const [kind, setKind] = useState<PeriodKind>('mes_atual');
-  const [charge, setCharge] = useState<ReceivableItem | null>(null);
   const [exporting, setExporting] = useState(false);
   const today = todayISO();
 
@@ -206,14 +204,6 @@ export default function ResumoPage() {
                           <span className="block truncate text-xs text-slate-500">{what}</span>
                         </a>
                         <span className="font-semibold tabular-nums text-amber-800">{formatBRL(i.amount)}</span>
-                        <button
-                          type="button"
-                          aria-label={`Cobrar ${c?.name ?? ''} pelo WhatsApp`}
-                          className="grid size-11 place-items-center rounded-full text-green-700 hover:bg-green-50"
-                          onClick={() => setCharge(i)}
-                        >
-                          <MessageCircle className="size-5" aria-hidden />
-                        </button>
                       </li>
                     );
                   })}
@@ -240,23 +230,6 @@ export default function ResumoPage() {
         </Sheet>
       )}
 
-      {charge && view && (
-        <WhatsAppSheet
-          phone={view.lookups.customers.get(charge.customerId)?.phone ?? ''}
-          kinds={charge.kind === 'mensalidade' ? ['mensalidade'] : ['cobrar']}
-          context={{
-            customerName: view.lookups.customers.get(charge.customerId)?.name ?? '',
-            courtName: view.lookups.courts.get(chargeInfo(charge).courtId)?.name ?? '',
-            date: chargeInfo(charge).date,
-            startMin: chargeInfo(charge).startMin,
-            endMin: chargeInfo(charge).endMin,
-            price: charge.amount,
-            balance: charge.amount,
-            month: charge.kind === 'mensalidade' ? charge.month : undefined,
-          }}
-          onClose={() => setCharge(null)}
-        />
-      )}
     </>
   );
 }

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { customerStats } from './customers';
-import { templateValues, fillTemplate, DEFAULT_TEMPLATES } from './whatsapp';
 import { daySummary } from './daySummary';
 import type { Payment } from './types';
 import { C1, RULES, rec, res, schedule } from '../test/fixtures';
@@ -27,14 +26,6 @@ describe('estatísticas do cliente', () => {
     expect(customerStats('cust1', reservations, payments, recurrences, '2026-09-24')).toEqual({
       games: 2 + 3, faltas: 1, cancelamentos: 1, totalPaid: 52000, lastGame: '2026-09-21', nextGame: '2026-09-28',
     });
-  });
-});
-
-describe('mensagens de WhatsApp com dados da reserva', () => {
-  it('preenche o template de confirmação', () => {
-    const v = templateValues({ customerName: 'João Ribeiro', courtName: 'Quadra 1', venueName: 'Arena', date: '2026-09-22', startMin: 1200, endMin: 1290, price: 16500, balance: 0, pixKey: 'pix@a' });
-    const msg = fillTemplate(DEFAULT_TEMPLATES.confirmar, v).replace(/ /g, ' ');
-    expect(msg).toBe('Olá, João! Confirmando seu horário na Quadra 1 da Arena: terça-feira, 22/09/2026 às 20:00 (1h30). Valor: R$ 165,00. Pode confirmar?');
   });
 });
 

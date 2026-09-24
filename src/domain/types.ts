@@ -126,14 +126,6 @@ export interface PriceRule {
   price: Cents;
 }
 
-export interface WhatsAppTemplates {
-  confirmar: string;
-  lembrar: string;
-  cobrar: string;
-  /** Cobrança de mensalidade (mensalistas com cobrança mensal) */
-  mensalidade: string;
-}
-
 /** Configurações do estabelecimento guardadas no banco (editáveis no app). */
 export interface AppSettings {
   courtName: string;
@@ -141,12 +133,11 @@ export interface AppSettings {
   logo: string;
   primaryColor: string;
   accentColor: string;
-  courtWhatsApp: string;
-  pixKey: string;
+  /** Telefone da quadra (só exibição) */
+  courtPhone: string;
   openingHours: OpeningHours;
   slotMinutes: 30 | 60;
   weekStartsOn: 0 | 1;
-  whatsappTemplates: WhatsAppTemplates;
   backupReminderDays: number;
   lastBackupAt: ISODateTime | null;
   onboardingDone: boolean;

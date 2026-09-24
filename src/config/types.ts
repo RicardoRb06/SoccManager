@@ -57,11 +57,10 @@ export interface TenantConfig {
   openingHours: OpeningHours;
   courts: TenantCourt[];
   priceRules: TenantPriceRule[];
-  /** WhatsApp do vendedor (botão "Tenho interesse"). Somente dígitos ou formatado. */
-  contactWhatsApp: string;
-  pixKey: string;
-  /** WhatsApp da própria quadra (aparece nas mensagens, opcional). */
-  courtWhatsApp?: string;
+  /** Telefone de contato do vendedor (exibido como texto na demonstração). */
+  contactPhone: string;
+  /** Telefone da própria quadra (opcional, só exibição). */
+  courtPhone?: string;
   backupReminderDays: number;
   conditions: TenantConditions;
   demo: boolean;

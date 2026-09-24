@@ -106,7 +106,7 @@ export default function BackupPage() {
             </strong>
           </p>
           <p className="mt-1 text-sm text-slate-600">
-            Gera um arquivo com tudo (reservas, clientes, mensalistas, pagamentos e configurações). Guarde fora do aparelho: Google Drive, e-mail ou WhatsApp.
+            Gera um arquivo com tudo (reservas, clientes, mensalistas, pagamentos e configurações). Guarde fora do aparelho: Google Drive, e-mail ou pendrive.
             Recomendado a cada {s.backupReminderDays} dias.
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -115,7 +115,7 @@ export default function BackupPage() {
             </Button>
             {canShare && (
               <Button variant="secondary" onClick={() => void share()}>
-                <Share2 className="size-4" aria-hidden /> Compartilhar (Drive, WhatsApp…)
+                <Share2 className="size-4" aria-hidden /> Compartilhar (Drive, e-mail…)
               </Button>
             )}
           </div>

@@ -1,6 +1,6 @@
 /** Detalhe e ações de um mensalista. */
 import { useState } from 'react';
-import { CalendarX2, HandCoins, MessageCircle, Pause, Pencil, Play, Square, Undo2, User } from 'lucide-react';
+import { CalendarX2, HandCoins, Pause, Pencil, Play, Square, Undo2, User } from 'lucide-react';
 import type { Court, Customer, ISODate, ISOMonth, Recurrence } from '../../domain/types';
 import { addMonths, formatDateBR, formatMonthBR, monthOf, WEEKDAY_LONG } from '../../domain/dates';
 import { nextOccurrenceDates } from '../../domain/recurrence';
@@ -14,12 +14,11 @@ import { Sheet } from '../../components/ui/Sheet';
 import { Button, Chip, Field, Input } from '../../components/ui/controls';
 import { ConfirmSheet } from '../../components/ui/ConfirmSheet';
 import { PaymentSheet } from '../../components/PaymentSheets';
-import { WhatsAppSheet } from '../../components/WhatsAppSheet';
 import { useToast } from '../../components/ui/Toast';
 import { errorMessage } from '../../utils/text';
 import { TermsSheet } from './TermsSheet';
 
-type Sub = null | 'pay' | 'whatsapp' | 'pause' | 'resume' | 'end' | 'terms' | { skip: ISODate };
+type Sub = null | 'pay' | 'pause' | 'resume' | 'end' | 'terms' | { skip: ISODate };
 
 export function RecurrenceSheet({
   rec,
@@ -59,11 +58,6 @@ export function RecurrenceSheet({
     }
   }
 
-  const oldestPending = [...summary.pending].sort((a, b) => {
-    const ka = a.kind === 'mensalidade' ? a.month : a.date;
-    const kb = b.kind === 'mensalidade' ? b.month : b.date;
-    return ka < kb ? -1 : 1;
-  })[0];
   const statusText =
     rec.status === 'encerrado'
       ? `Encerrado${rec.endDate ? ` em ${formatDateBR(rec.endDate)}` : ''}`
@@ -82,7 +76,7 @@ export function RecurrenceSheet({
         size="lg"
         footer={
           <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               {mensal ? (
                 <Button className="px-3" onClick={() => setSub('pay')}>
                   <HandCoins className="size-4" aria-hidden /> Mensalidade
@@ -96,9 +90,6 @@ export function RecurrenceSheet({
                   Ver na agenda
                 </a>
               )}
-              <Button variant="secondary" className="px-3 text-green-800" disabled={summary.debt <= 0} onClick={() => setSub('whatsapp')}>
-                <MessageCircle className="size-4" aria-hidden /> Cobrar
-              </Button>
             </div>
             <div className="grid grid-cols-3 gap-2">
               <Button variant="secondary" className="px-2" onClick={() => setSub('terms')}>
@@ -272,23 +263,6 @@ export function RecurrenceSheet({
         />
       )}
 
-      {sub === 'whatsapp' && (
-        <WhatsAppSheet
-          phone={customer?.phone ?? ''}
-          kinds={mensal ? ['mensalidade'] : ['cobrar']}
-          context={{
-            customerName: customer?.name ?? '',
-            courtName: court?.name ?? '',
-            date: oldestPending && oldestPending.kind !== 'mensalidade' ? oldestPending.date : (summary.nextDates[0] ?? today),
-            startMin: rec.startMin,
-            endMin: rec.endMin,
-            price: summary.debt,
-            balance: summary.debt,
-            month: oldestPending && oldestPending.kind === 'mensalidade' ? oldestPending.month : currentMonth,
-          }}
-          onClose={() => setSub(null)}
-        />
-      )}
 
       {sub === 'terms' && <TermsSheet rec={rec} onClose={() => setSub(null)} />}
     </>

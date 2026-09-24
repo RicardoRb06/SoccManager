@@ -2,7 +2,7 @@
 import { useId, useMemo, useState } from 'react';
 import { UserPlus, X } from 'lucide-react';
 import type { Customer } from '../../domain/types';
-import { formatPhone } from '../../domain/whatsapp';
+import { formatPhone } from '../../domain/phone';
 import { matchesCustomer } from '../../utils/text';
 import { Input } from '../../components/ui/controls';
 
@@ -57,8 +57,8 @@ export function CustomerPicker({
         </div>
         <Input aria-label="Nome do cliente" placeholder="Nome" value={value.name} autoComplete="off" onChange={(e) => onChange({ ...value, name: e.target.value })} />
         <Input
-          aria-label="Telefone (WhatsApp)"
-          placeholder="Telefone (WhatsApp)"
+          aria-label="Telefone"
+          placeholder="Telefone"
           inputMode="tel"
           autoComplete="off"
           value={value.phone}

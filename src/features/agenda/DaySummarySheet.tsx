@@ -1,7 +1,6 @@
 /** "Encerrar o dia": recebido, pendências e faltas do dia. */
-import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Download, MessageCircle, Share2 } from 'lucide-react';
+import { Download, Share2 } from 'lucide-react';
 import { Button } from '../../components/ui/controls';
 import { useBackupActions } from '../mais/useBackup';
 import { db } from '../../db/database';
@@ -14,10 +13,8 @@ import { daySummary } from '../../domain/daySummary';
 import type { ReceivableItem } from '../../domain/metrics';
 import { Sheet } from '../../components/ui/Sheet';
 import { METHOD_LABEL } from '../../components/PaymentSheets';
-import { WhatsAppSheet } from '../../components/WhatsAppSheet';
 
 export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () => void }) {
-  const [charge, setCharge] = useState<ReceivableItem | null>(null);
   const backup = useBackupActions();
   const data = useLiveQuery(async () => {
     const [prep, payments, rules, customers, courts] = await Promise.all([
@@ -42,7 +39,7 @@ export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () 
 
   return (
     <>
-      <Sheet open={!charge} onClose={onClose} title="Encerrar o dia">
+      <Sheet open onClose={onClose} title="Encerrar o dia">
         <p className="mb-3 text-sm text-slate-500 first-letter:uppercase">{formatLongDate(date)}</p>
         {!sum || !data ? (
           <p className="py-6 text-center text-slate-500">Carregando…</p>
@@ -86,7 +83,7 @@ export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () 
                   {sum.pending.map((i, idx) => {
                     const info = itemInfo(i);
                     return (
-                      <li key={idx} className="flex items-center gap-2 py-2 pl-3 pr-2">
+                      <li key={idx} className="flex items-center gap-2 px-3 py-2">
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-medium">{data.customers.get(i.customerId)?.name ?? 'Cliente'}</span>
                           <span className="block text-xs text-slate-500">
@@ -94,14 +91,6 @@ export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () 
                           </span>
                         </span>
                         <span className="font-semibold tabular-nums text-amber-800">{formatBRL(i.amount)}</span>
-                        <button
-                          type="button"
-                          aria-label={`Cobrar ${data.customers.get(i.customerId)?.name ?? ''} pelo WhatsApp`}
-                          className="grid size-11 place-items-center rounded-full text-green-700 hover:bg-green-50"
-                          onClick={() => setCharge(i)}
-                        >
-                          <MessageCircle className="size-5" aria-hidden />
-                        </button>
                       </li>
                     );
                   })}
@@ -126,22 +115,6 @@ export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () 
           </div>
         )}
       </Sheet>
-      {charge && data && (
-        <WhatsAppSheet
-          phone={data.customers.get(charge.customerId)?.phone ?? ''}
-          kinds={['cobrar']}
-          context={{
-            customerName: data.customers.get(charge.customerId)?.name ?? '',
-            courtName: data.courts.get(itemInfo(charge).courtId)?.name ?? '',
-            date,
-            startMin: itemInfo(charge).startMin,
-            endMin: itemInfo(charge).endMin,
-            price: charge.amount,
-            balance: charge.amount,
-          }}
-          onClose={() => setCharge(null)}
-        />
-      )}
     </>
   );
 }

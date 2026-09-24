@@ -2,7 +2,7 @@
 
 PWA de agendamento para quadras esportivas (futsal, basquete, society…), **100% local**: sem backend, sem login, funciona offline depois do primeiro acesso. Os dados ficam no IndexedDB do aparelho, com backup em arquivo.
 
-> Status: **marco 6 concluído**: além de agenda, reservas, pagamentos, clientes, WhatsApp, mensalistas e Resumo, o app tem backup em arquivo, restauração segura, cópias internas automáticas, armazenamento protegido, Lixeira, Configurações completas e assistente inicial. Próximo: recursos da demonstração, polimento e publicação (marco 7).
+> Status: **marco 6 concluído**: além de agenda, reservas, pagamentos, clientes, mensalistas e Resumo, o app tem backup em arquivo, restauração segura, cópias internas automáticas, armazenamento protegido, Lixeira, Configurações completas e assistente inicial. Próximo: recursos da demonstração, polimento e publicação (marco 7).
 
 ## Requisitos
 
@@ -27,7 +27,7 @@ O service worker só é ativado no `build` + `preview` (ou publicado). No `dev` 
 ```
 src/
   config/        tenant.config.ts (o ÚNICO arquivo a editar por cliente) e tipos
-  domain/        regras de negócio puras + testes (datas, horários, preço, conflito, recorrência, pagamentos, métricas, WhatsApp)
+  domain/        regras de negócio puras + testes (datas, horários, preço, conflito, recorrência, pagamentos, métricas, telefone)
   db/            Dexie (IndexedDB), migrações, bootstrap, seed (dados de exemplo)
   features/      telas: agenda, mensalistas, clientes, resumo, mais
   components/    layout e componentes compartilhados
@@ -42,7 +42,7 @@ public/          favicon e ícones do PWA
 Edite somente `src/config/tenant.config.ts`:
 
 - `tenantId`: identificador fixo do cliente. **Define o nome do banco no aparelho (`agenda-quadra-<tenantId>`). Nunca altere depois de publicar**, senão o app abre um banco vazio.
-- nome, nome curto, logo, cores, quadras, horário de funcionamento, tabela de preços, WhatsApp de contato (vendedor), chave Pix, textos das Condições e `demo: true/false`.
+- nome, nome curto, logo, cores, quadras, horário de funcionamento, tabela de preços, telefone de contato do vendedor (`contactPhone`, exibido como texto na demonstração), telefone da quadra (opcional), textos das Condições e `demo: true/false`.
 - O manifest do PWA (nome, cor, ícones) e o título da página são gerados a partir desse arquivo no `build`.
 - Para trocar os ícones, substitua os PNGs em `public/icons/` (192, 512 e maskable 512) mantendo os nomes, ou aponte outros caminhos em `icons`.
 
@@ -83,7 +83,7 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 3. **Falta** mantém o horário ocupado e o saldo em aberto (o dono decide se cobra).
 4. **Débito do cliente** = jogos já realizados com saldo + jogos de mensalista por jogo não pagos + mensalidades em aberto até o mês atual.
 5. **Jogos do cliente** incluem as datas já passadas dos mensalistas (ocorrências que não precisaram ser registradas).
-6. **WhatsApp**: a mensagem usa o primeiro nome do cliente; sem telefone válido, o link abre o WhatsApp para escolher o contato. A edição dos textos entra em Configurações (marco 6).
+6. ~~WhatsApp~~: removido depois do marco 6 (ver "Sem integrações externas").
 7. **Encerrar o dia**: recebido = pagamentos lançados na data (por forma de pagamento); pendências = saldos dos jogos daquele dia. O botão "Salvar backup agora" entra no marco 6.
 
 ## Decisões técnicas (marco 4)
@@ -97,7 +97,7 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 7. **Editar mensalista** muda nome do time, forma de cobrança, valores e data final. Para mudar dia, horário ou quadra, encerra-se e cria-se outro, para não reescrever o histórico.
 8. **Mensalidade vence** quando o primeiro jogo do mês chega (um mensalista criado hoje para a semana que vem não aparece devendo).
 9. **Receita fixa prevista** = mensalidades dos ativos + (preço × jogos do mês) dos ativos por jogo.
-10. Novo modelo de mensagem **"Cobrar mensalidade"** (variável `{mes}`), que entra automaticamente também em bancos criados antes.
+10. ~~Mensagem "Cobrar mensalidade"~~: removida junto com o WhatsApp.
 
 ## Decisões técnicas (marco 5)
 
@@ -111,7 +111,7 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 
 ## Backup e restauração (como usar)
 
-- **Fazer backup:** Mais › Backup e segurança › "Salvar arquivo" (ou "Compartilhar" para mandar direto ao Drive/WhatsApp). O arquivo se chama `backup-<quadra>-AAAA-MM-DD-HHmm.json` e contém tudo. O botão também aparece em "Encerrar o dia" e num aviso no topo quando o último backup está velho.
+- **Fazer backup:** Mais › Backup e segurança › "Salvar arquivo" (ou "Compartilhar", que abre o menu de compartilhamento do próprio aparelho). O arquivo se chama `backup-<quadra>-AAAA-MM-DD-HHmm.json` e contém tudo. O botão também aparece em "Encerrar o dia" e num aviso no topo quando o último backup está velho.
 - **Restaurar / trocar de aparelho:** Mais › Backup e segurança › "Escolher arquivo de backup". O app valida o arquivo, mostra o que tem nele (reservas, clientes, data), pede confirmação, guarda uma cópia do estado atual e só então substitui. Logo depois aparece "Desfazer".
 - **Cópias internas:** uma por dia, automática, as 5 mais recentes, para desfazer erros. Ficam no próprio aparelho: não substituem o backup em arquivo.
 - **Arquivo inválido** (ou de uma versão mais nova do app) é recusado sem alterar nada. Backups de versões anteriores são convertidos automaticamente.
@@ -125,6 +125,10 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 5. **Quadras com histórico não podem ser excluídas**, só desativadas; a regra de preço de uma quadra excluída sai junto.
 6. **Logo** é reduzida para no máximo 256 px e guardada no banco (vai junto no backup).
 7. **Assistente inicial** só aparece com `demo: false` e reaproveita as telas de Configurações (estabelecimento → quadras → horários → preços), partindo dos valores do `tenant.config.ts`.
+
+## Sem integrações externas
+
+O app não envia nem recebe dados de nenhum serviço. As integrações de WhatsApp (mensagens prontas, cobrança e modelos editáveis) e a chave Pix foram removidas; os telefones continuam guardados e exibidos, e o link `tel:` só abre o discador do próprio aparelho quando alguém toca no número. O que sai do aparelho só sai por ação da pessoa: baixar/compartilhar o backup, exportar CSV e imprimir.
 
 ## Limitações conhecidas
 

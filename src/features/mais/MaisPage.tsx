@@ -1,9 +1,10 @@
 // Mais: backup, configurações, bloqueios, lixeira e informações do app. Carregada sob demanda.
-import { ChevronRight, Database, Lock, Settings, ShieldAlert, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react';
+import { ChevronRight, Database, Lock, Phone, Settings, ShieldAlert, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react';
 import { PageHeader } from '../../components/AppShell';
 import { DB_NAME } from '../../db/database';
 import { useCounts, useSettings } from '../../db/hooks';
 import { useBackupReminder } from './useBackup';
+import { formatPhone } from '../../domain/phone';
 
 function Item({ href, icon: Icon, title, subtitle, warn }: { href: string; icon: LucideIcon; title: string; subtitle: string; warn?: string }) {
   return (
@@ -35,7 +36,7 @@ export default function MaisPage() {
             subtitle="Salvar e restaurar dados, cópias automáticas"
             warn={reminder.due ? 'Fazer backup' : undefined}
           />
-          <Item href="#/mais/configuracoes" icon={Settings} title="Configurações" subtitle="Quadra, quadras, horários, preços e mensagens" />
+          <Item href="#/mais/configuracoes" icon={Settings} title="Configurações" subtitle="Estabelecimento, quadras, horários e preços" />
           <Item href="#/mais/bloqueios" icon={Lock} title="Bloqueios de horário" subtitle="Manutenção, eventos e feriados" />
           <Item href="#/mais/lixeira" icon={Trash2} title="Lixeira" subtitle="Restaurar reservas e clientes excluídos" />
         </nav>
@@ -54,6 +55,11 @@ export default function MaisPage() {
             <dt className="text-slate-500">Pagamentos</dt>
             <dd className="text-right font-medium tabular-nums">{counts?.payments ?? '…'}</dd>
           </dl>
+          {s.courtPhone && (
+            <p className="mt-3 flex items-center gap-2 text-sm text-slate-700">
+              <Phone className="size-4 text-slate-400" aria-hidden /> Telefone da quadra: {formatPhone(s.courtPhone)}
+            </p>
+          )}
           <p className="mt-3 text-xs text-slate-500">
             Banco: <code>{DB_NAME}</code> · formato {s.schemaVersion}
           </p>

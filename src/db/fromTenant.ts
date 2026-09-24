@@ -6,7 +6,6 @@ import type { TenantConfig } from '../config/types';
 import type { AppSettings, Court, PriceRule, SettingRow } from '../domain/types';
 import { hhmmToMin } from '../domain/time';
 import { reaisToCents } from '../domain/money';
-import { DEFAULT_TEMPLATES } from '../domain/whatsapp';
 import { ALL_COURTS } from '../domain/pricing';
 
 export const SCHEMA_VERSION = 1;
@@ -18,12 +17,10 @@ export function defaultSettings(t: TenantConfig): AppSettings {
     logo: t.logo ?? '',
     primaryColor: t.colors.primary,
     accentColor: t.colors.accent,
-    courtWhatsApp: t.courtWhatsApp ?? '',
-    pixKey: t.pixKey,
+    courtPhone: t.courtPhone ?? '',
     openingHours: t.openingHours,
     slotMinutes: t.slotMinutes,
     weekStartsOn: t.weekStartsOn,
-    whatsappTemplates: { ...DEFAULT_TEMPLATES },
     backupReminderDays: t.backupReminderDays,
     lastBackupAt: null,
     onboardingDone: t.demo,
@@ -44,8 +41,9 @@ export function rowsToSettings(rows: SettingRow[], defaults: AppSettings): AppSe
   for (const row of rows) {
     if (row.key in out) (out as unknown as Record<string, unknown>)[row.key] = row.value;
   }
-  // templates novos (adicionados em versões posteriores) herdam o texto padrão
-  out.whatsappTemplates = { ...defaults.whatsappTemplates, ...out.whatsappTemplates };
+  // compatibilidade: bancos criados antes guardavam o telefone como "courtWhatsApp"
+  const legacyPhone = rows.find((r) => (r.key as string) === 'courtWhatsApp')?.value;
+  if (!out.courtPhone && typeof legacyPhone === 'string') out.courtPhone = legacyPhone;
   return out;
 }
 

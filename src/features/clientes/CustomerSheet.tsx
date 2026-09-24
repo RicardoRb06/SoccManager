@@ -51,7 +51,7 @@ export function CustomerSheet({ customer, onClose, onCreated }: { customer?: Cus
         <Field label="Nome" htmlFor="cs-name" error={touched && !name.trim() ? 'Informe o nome.' : undefined}>
           <Input id="cs-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />
         </Field>
-        <Field label="Telefone (WhatsApp)" htmlFor="cs-phone" hint="Com DDD. Ex.: (11) 98765-4321">
+        <Field label="Telefone" htmlFor="cs-phone" hint="Com DDD. Ex.: (11) 98765-4321">
           <Input id="cs-phone" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
         </Field>
         <Field label="Observações" htmlFor="cs-notes">

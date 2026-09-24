@@ -1,4 +1,4 @@
-/** Dados da quadra: nome, logo, cores, WhatsApp, Pix e preferências gerais. */
+/** Dados da quadra: nome, logo, cores, telefone e preferências gerais. */
 import { useEffect, useState } from 'react';
 import { ImagePlus, Trash2 } from 'lucide-react';
 import { useSettingsState } from '../../../db/hooks';
@@ -12,7 +12,7 @@ import { errorMessage } from '../../../utils/text';
 
 type VenueFields = Pick<
   AppSettings,
-  'courtName' | 'shortName' | 'logo' | 'primaryColor' | 'accentColor' | 'courtWhatsApp' | 'pixKey' | 'weekStartsOn' | 'slotMinutes' | 'backupReminderDays'
+  'courtName' | 'shortName' | 'logo' | 'primaryColor' | 'accentColor' | 'courtPhone' | 'weekStartsOn' | 'slotMinutes' | 'backupReminderDays'
 >;
 
 export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?: () => void }) {
@@ -23,8 +23,8 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
 
   useEffect(() => {
     if (loaded && !f) {
-      const { courtName, shortName, logo, primaryColor, accentColor, courtWhatsApp, pixKey, weekStartsOn, slotMinutes, backupReminderDays } = settings;
-      setF({ courtName, shortName, logo, primaryColor, accentColor, courtWhatsApp, pixKey, weekStartsOn, slotMinutes, backupReminderDays });
+      const { courtName, shortName, logo, primaryColor, accentColor, courtPhone, weekStartsOn, slotMinutes, backupReminderDays } = settings;
+      setF({ courtName, shortName, logo, primaryColor, accentColor, courtPhone, weekStartsOn, slotMinutes, backupReminderDays });
     }
   }, [loaded, settings, f]);
 
@@ -98,11 +98,8 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
         </Field>
       </div>
 
-      <Field label="WhatsApp da quadra" htmlFor="v-wa" hint="Opcional. Com DDD.">
-        <Input id="v-wa" inputMode="tel" value={f.courtWhatsApp} onChange={(e) => set('courtWhatsApp', e.target.value)} />
-      </Field>
-      <Field label="Chave Pix" htmlFor="v-pix" hint="Vai nas mensagens de cobrança.">
-        <Input id="v-pix" value={f.pixKey} onChange={(e) => set('pixKey', e.target.value)} />
+      <Field label="Telefone da quadra" htmlFor="v-phone" hint="Opcional. Com DDD.">
+        <Input id="v-phone" inputMode="tel" value={f.courtPhone} onChange={(e) => set('courtPhone', e.target.value)} />
       </Field>
 
       {!compact && (

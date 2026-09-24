@@ -22,10 +22,10 @@ afterEach(async () => {
 
 describe('configurações', () => {
   it('salva dados da quadra e mantém o resto', async () => {
-    await saveSettings({ courtName: 'Arena Nova', pixKey: 'x@y' }, d);
+    await saveSettings({ courtName: 'Arena Nova', courtPhone: '11 3333-4444' }, d);
     const s = await loadSettings(d);
     expect(s.courtName).toBe('Arena Nova');
-    expect(s.pixKey).toBe('x@y');
+    expect(s.courtPhone).toBe('11 3333-4444');
     expect(s.slotMinutes).toBe(tenant.slotMinutes);
   });
 

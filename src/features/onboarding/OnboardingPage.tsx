@@ -59,7 +59,7 @@ export default function OnboardingPage() {
         {step + 1}. {STEPS[step]}
       </h2>
       <p className="mb-4 text-sm text-slate-600">
-        {step === 0 && 'Nome, logo, cores e chave Pix. Tudo pode ser mudado depois em Mais › Configurações.'}
+        {step === 0 && 'Nome, logo, cores e telefone. Tudo pode ser mudado depois em Mais › Configurações.'}
         {step === 1 && 'Cadastre cada quadra que pode ser alugada separadamente.'}
         {step === 2 && 'Marque os dias e horários em que a quadra funciona.'}
         {step === 3 && 'O valor por hora de cada faixa. O app calcula o preço de cada reserva sozinho.'}

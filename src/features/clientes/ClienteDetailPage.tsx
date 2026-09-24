@@ -1,11 +1,10 @@
 /** Detalhe do cliente: contato, totais, débito, mensalista, histórico de reservas. */
 import { useMemo, useState } from 'react';
-import { ChevronLeft, MessageCircle, Pencil, Phone, Repeat, Trash2 } from 'lucide-react';
+import { ChevronLeft, Pencil, Phone, Repeat, Trash2 } from 'lucide-react';
 import { PageHeader } from '../../components/AppShell';
 import { Button } from '../../components/ui/controls';
 import { ConfirmSheet } from '../../components/ui/ConfirmSheet';
 import { StateBadge, type VisualState } from '../../components/StateBadge';
-import { WhatsAppSheet } from '../../components/WhatsAppSheet';
 import { useToast } from '../../components/ui/Toast';
 import { deleteCustomer, restoreCustomer } from '../../db/repo';
 import { db } from '../../db/database';
@@ -13,7 +12,7 @@ import type { Reservation } from '../../domain/types';
 import { formatDateBR, WEEKDAY_LONG, nowMinutes } from '../../domain/dates';
 import { formatTimeRange, minToHHMM } from '../../domain/time';
 import { formatBRL } from '../../domain/money';
-import { formatPhone, waLink } from '../../domain/whatsapp';
+import { formatPhone } from '../../domain/phone';
 import { paidByReservation, paymentStatus } from '../../domain/payments';
 import { receivables } from '../../domain/metrics';
 import { navigate } from '../../utils/router';
@@ -22,7 +21,7 @@ import { CustomerSheet } from './CustomerSheet';
 import { ReservationDetail } from '../agenda/ReservationDetail';
 import { ReservationSheet } from '../agenda/ReservationSheet';
 
-type Overlay = { type: 'edit' } | { type: 'delete' } | { type: 'cobrar' } | { type: 'res'; id: string } | { type: 'resEdit'; r: Reservation } | null;
+type Overlay = { type: 'edit' } | { type: 'delete' } | { type: 'res'; id: string } | { type: 'resEdit'; r: Reservation } | null;
 
 export default function ClienteDetailPage({ id }: { id: string }) {
   const data = useCustomerSummaries();
@@ -60,7 +59,6 @@ export default function ClienteDetailPage({ id }: { id: string }) {
 
   const { s, history, paid, recs, courts, pending, future } = view;
   const c = s.customer;
-  const oldestPending = pending.map((p) => ('date' in p ? p.date : `${p.month}-01`)).sort()[0];
   const visible = showAll ? history : history.slice(0, 20);
 
   return (
@@ -96,19 +94,9 @@ export default function ClienteDetailPage({ id }: { id: string }) {
               <p className="text-sm text-slate-500">Sem telefone cadastrado.</p>
             )}
             {c.notes && <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{c.notes}</p>}
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <a
-                href={waLink(c.phone, `Olá, ${c.name.split(/\s+/)[0]}!`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-green-600 px-4 font-semibold text-green-800 hover:bg-green-50"
-              >
-                <MessageCircle className="size-4" aria-hidden /> WhatsApp
-              </a>
-              <Button variant="secondary" onClick={() => setOverlay({ type: 'edit' })}>
-                <Pencil className="size-4" aria-hidden /> Editar
-              </Button>
-            </div>
+            <Button variant="secondary" block className="mt-4" onClick={() => setOverlay({ type: 'edit' })}>
+              <Pencil className="size-4" aria-hidden /> Editar
+            </Button>
           </section>
 
           <dl className="grid grid-cols-2 gap-2">
@@ -133,7 +121,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
           {s.debt > 0 && (
             <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
               <h2 className="mb-2 font-semibold text-amber-900">Em aberto</h2>
-              <ul className="mb-3 flex flex-col gap-1 text-sm text-amber-900">
+              <ul className="flex flex-col gap-1 text-sm text-amber-900">
                 {pending.map((p, i) => (
                   <li key={i} className="flex justify-between">
                     <span>{p.kind === 'mensalidade' ? `Mensalidade ${p.month.slice(5)}/${p.month.slice(0, 4)}` : `Jogo de ${formatDateBR(p.date)}`}</span>
@@ -141,9 +129,6 @@ export default function ClienteDetailPage({ id }: { id: string }) {
                   </li>
                 ))}
               </ul>
-              <Button block className="bg-green-700 hover:bg-green-800" onClick={() => setOverlay({ type: 'cobrar' })}>
-                <MessageCircle className="size-4" aria-hidden /> Cobrar pelo WhatsApp
-              </Button>
             </section>
           )}
 
@@ -216,14 +201,6 @@ export default function ClienteDetailPage({ id }: { id: string }) {
       </div>
 
       {overlay?.type === 'edit' && <CustomerSheet customer={c} onClose={() => setOverlay(null)} />}
-      {overlay?.type === 'cobrar' && (
-        <WhatsAppSheet
-          phone={c.phone}
-          kinds={['cobrar']}
-          context={{ customerName: c.name, courtName: '', date: oldestPending ?? view.today, startMin: 0, endMin: 60, price: s.debt, balance: s.debt }}
-          onClose={() => setOverlay(null)}
-        />
-      )}
       {overlay?.type === 'res' && (
         <ReservationDetail
           reservationId={overlay.id}

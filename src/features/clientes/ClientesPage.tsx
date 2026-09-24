@@ -5,7 +5,7 @@ import { PageHeader } from '../../components/AppShell';
 import { Chip, Input } from '../../components/ui/controls';
 import { formatBRL } from '../../domain/money';
 import { formatDateBR } from '../../domain/dates';
-import { formatPhone } from '../../domain/whatsapp';
+import { formatPhone } from '../../domain/phone';
 import { matchesCustomer } from '../../utils/text';
 import { navigate } from '../../utils/router';
 import { useCustomerSummaries, type CustomerSummary } from './useCustomerSummaries';

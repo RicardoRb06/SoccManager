@@ -37,7 +37,7 @@ export function useBackupActions() {
       const { name, text } = await makeFile();
       downloadText(name, text, 'application/json');
       await markBackupDone();
-      toast.success(`Backup salvo: ${name}. Guarde-o fora do aparelho (Drive, e-mail, WhatsApp).`);
+      toast.success(`Backup salvo: ${name}. Guarde-o fora do aparelho (Drive, e-mail).`);
       return true;
     } catch (err) {
       toast.error(`Não foi possível gerar o backup: ${err instanceof Error ? err.message : String(err)}`);

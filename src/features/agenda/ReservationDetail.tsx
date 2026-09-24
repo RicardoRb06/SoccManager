@@ -1,11 +1,11 @@
 /**
- * Detalhe da reserva: dados, pagamento (registrar/quitar/remover), falta, WhatsApp,
+ * Detalhe da reserva: dados, pagamento (registrar/quitar/remover), falta,
  * editar, cancelar, reativar e excluir.
  */
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
-  CalendarDays, CheckCheck, Clock, HandCoins, MapPin, MessageCircle, Pencil, Phone, RotateCcw, Trash2, UserCheck, UserX, XCircle,
+  CalendarDays, CheckCheck, Clock, HandCoins, MapPin, Pencil, Phone, RotateCcw, Trash2, UserCheck, UserX, XCircle,
 } from 'lucide-react';
 import { db } from '../../db/database';
 import { cancelReservation, ConflictError, deletePayment, deleteReservation, reactivateReservation, setFalta } from '../../db/repo';
@@ -14,17 +14,16 @@ import { formatLongDate } from '../../domain/dates';
 import { formatDuration, formatTimeRange } from '../../domain/time';
 import { formatBRL } from '../../domain/money';
 import { paymentStatus, reservationBalance } from '../../domain/payments';
-import { formatPhone } from '../../domain/whatsapp';
+import { formatPhone } from '../../domain/phone';
 import { Sheet } from '../../components/ui/Sheet';
 import { ConfirmSheet } from '../../components/ui/ConfirmSheet';
 import { Button, Textarea } from '../../components/ui/controls';
 import { StateBadge, type VisualState } from '../../components/StateBadge';
 import { useToast } from '../../components/ui/Toast';
 import { METHOD_LABEL, PayBalanceSheet, PaymentSheet } from '../../components/PaymentSheets';
-import { WhatsAppSheet } from '../../components/WhatsAppSheet';
 import { errorMessage } from '../../utils/text';
 
-type Sub = 'cancel' | 'delete' | 'pay' | 'quitar' | 'whatsapp' | { removePayment: Payment } | null;
+type Sub = 'cancel' | 'delete' | 'pay' | 'quitar' | { removePayment: Payment } | null;
 
 export function ReservationDetail({
   reservationId,
@@ -102,10 +101,7 @@ export function ReservationDetail({
                   </Button>
                 </div>
               )}
-              <div className="grid grid-cols-3 gap-2">
-                <Button variant="secondary" className="px-2 text-green-800" onClick={() => setSub('whatsapp')}>
-                  <MessageCircle className="size-4" aria-hidden /> WhatsApp
-                </Button>
+              <div className="grid grid-cols-2 gap-2">
                 <Button variant="secondary" className="px-2" onClick={onEdit}>
                   <Pencil className="size-4" aria-hidden /> Editar
                 </Button>
@@ -229,14 +225,6 @@ export function ReservationDetail({
 
       {sub === 'pay' && <PaymentSheet target={{ reservationId: r.id }} suggested={balance} onClose={() => setSub(null)} />}
       {sub === 'quitar' && <PayBalanceSheet reservationId={r.id} balance={balance} onClose={() => setSub(null)} />}
-      {sub === 'whatsapp' && (
-        <WhatsAppSheet
-          phone={customer?.phone ?? ''}
-          context={{ customerName: customer?.name ?? '', courtName: court?.name ?? '', date: r.date, startMin: r.startMin, endMin: r.endMin, price: r.price, balance }}
-          kinds={balance > 0 ? ['confirmar', 'lembrar', 'cobrar'] : ['confirmar', 'lembrar']}
-          onClose={() => setSub(null)}
-        />
-      )}
 
       <ConfirmSheet
         open={sub === 'cancel'}
