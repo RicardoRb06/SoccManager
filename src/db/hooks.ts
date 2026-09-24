@@ -9,8 +9,13 @@ const DEFAULTS = defaultSettings(tenant);
 
 /** Configurações atuais (com padrões do tenant enquanto carrega). */
 export function useSettings(): AppSettings {
+  return useSettingsState().settings;
+}
+
+/** Configurações + se já foram lidas do banco. */
+export function useSettingsState(): { settings: AppSettings; loaded: boolean } {
   const rows = useLiveQuery(() => db.settings.toArray(), []);
-  return rows ? rowsToSettings(rows, DEFAULTS) : DEFAULTS;
+  return { settings: rows ? rowsToSettings(rows, DEFAULTS) : DEFAULTS, loaded: !!rows };
 }
 
 export function useCourts() {

@@ -1,5 +1,5 @@
 /** Controles básicos com alvos de toque ≥ 44px. */
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react';
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
@@ -58,15 +58,15 @@ export function Field({ label, hint, error, children, htmlFor }: { label: ReactN
 const inputCls =
   'min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 disabled:bg-slate-100';
 
-export function Input({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) {
+export function Input({ className = '', ...props }: ComponentProps<'input'>) {
   return <input className={`${inputCls} ${className}`} {...props} />;
 }
 
-export function Select({ className = '', ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
+export function Select({ className = '', ...props }: ComponentProps<'select'>) {
   return <select className={`${inputCls} ${className}`} {...props} />;
 }
 
-export function Textarea({ className = '', ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function Textarea({ className = '', ...props }: ComponentProps<'textarea'>) {
   return <textarea className={`${inputCls} min-h-20 py-2 ${className}`} {...props} />;
 }
 

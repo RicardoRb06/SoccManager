@@ -2,7 +2,7 @@
 
 PWA de agendamento para quadras esportivas (futsal, basquete, society…), **100% local**: sem backend, sem login, funciona offline depois do primeiro acesso. Os dados ficam no IndexedDB do aparelho, com backup em arquivo.
 
-> Status: **marco 5 concluído**: além de agenda, reservas, pagamentos, clientes, WhatsApp e mensalistas, o Resumo (recebido, a receber, ocupação, faltas, horas vazias em R$, mapa de calor com sugestão de promoção, melhores clientes, cobrança), exportação CSV e impressão da agenda do dia. Próximo: backup, restauração, Lixeira, Configurações e onboarding (marco 6).
+> Status: **marco 6 concluído**: além de agenda, reservas, pagamentos, clientes, WhatsApp, mensalistas e Resumo, o app tem backup em arquivo, restauração segura, cópias internas automáticas, armazenamento protegido, Lixeira, Configurações completas e assistente inicial. Próximo: recursos da demonstração, polimento e publicação (marco 7).
 
 ## Requisitos
 
@@ -108,6 +108,23 @@ O `base` padrão é relativo (`./`), então o mesmo `dist/` funciona em domínio
 5. **Mapa de calor** em CSS grid (sem biblioteca de gráficos), escala de uma só cor (a da quadra), valor exato ao tocar ou passar o mouse.
 6. **CSV**: separador `;`, UTF-8 com BOM, vírgula decimal e datas dd/MM/aaaa (abre certo no Excel brasileiro). Dois arquivos: reservas (inclui jogos de mensalistas) e pagamentos.
 7. **Impressão**: versão própria para papel (A4, uma página, tabela por quadra), acionada pelo botão "Imprimir agenda do dia".
+
+## Backup e restauração (como usar)
+
+- **Fazer backup:** Mais › Backup e segurança › "Salvar arquivo" (ou "Compartilhar" para mandar direto ao Drive/WhatsApp). O arquivo se chama `backup-<quadra>-AAAA-MM-DD-HHmm.json` e contém tudo. O botão também aparece em "Encerrar o dia" e num aviso no topo quando o último backup está velho.
+- **Restaurar / trocar de aparelho:** Mais › Backup e segurança › "Escolher arquivo de backup". O app valida o arquivo, mostra o que tem nele (reservas, clientes, data), pede confirmação, guarda uma cópia do estado atual e só então substitui. Logo depois aparece "Desfazer".
+- **Cópias internas:** uma por dia, automática, as 5 mais recentes, para desfazer erros. Ficam no próprio aparelho: não substituem o backup em arquivo.
+- **Arquivo inválido** (ou de uma versão mais nova do app) é recusado sem alterar nada. Backups de versões anteriores são convertidos automaticamente.
+
+## Decisões técnicas (marco 6)
+
+1. **Formato do backup**: `{ format, schemaVersion, appVersion, tenantId, exportedAt, data }`, validado com Zod antes de qualquer gravação; a substituição acontece numa única transação.
+2. **Cópias internas** guardadas numa tabela própria (`snapshots`), fora do backup; no máximo 5. Também são criadas antes de importar e antes de restaurar uma cópia, então toda troca de dados pode ser desfeita.
+3. **Armazenamento persistente** é pedido na primeira abertura (`navigator.storage.persist()`); a tela mostra se foi concedido e o espaço usado.
+4. **Lembrete de backup**: aparece quando o último backup tem mais dias que o configurado (padrão 7) ou, se nunca foi feito, depois de 10 reservas criadas pelo usuário (os dados de exemplo não contam).
+5. **Quadras com histórico não podem ser excluídas**, só desativadas; a regra de preço de uma quadra excluída sai junto.
+6. **Logo** é reduzida para no máximo 256 px e guardada no banco (vai junto no backup).
+7. **Assistente inicial** só aparece com `demo: false` e reaproveita as telas de Configurações (estabelecimento → quadras → horários → preços), partindo dos valores do `tenant.config.ts`.
 
 ## Limitações conhecidas
 
