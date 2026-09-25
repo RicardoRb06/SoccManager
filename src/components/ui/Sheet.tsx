@@ -1,10 +1,16 @@
 /**
- * Bottom sheet no celular, modal centralizado no desktop (≥1024px).
- * Fecha com Esc, clique fora ou botão X. Trava a rolagem do fundo e devolve o foco ao sair.
+ * Painel do app (padrão "responsive dialog" do shadcn/ui):
+ *  - celular: Drawer (vaul) que sobe de baixo e fecha arrastando para baixo;
+ *  - desktop (≥1024px): Dialog centralizado.
+ * Fecha com Esc, toque fora ou X, trava a rolagem do fundo e devolve o foco ao sair.
+ * Ao abrir, foca o painel (não o primeiro campo), para não abrir o teclado sem querer.
  */
-import { useEffect, useId, useRef, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { useIsDesktop } from '@/utils/hooks';
+import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogTitle } from './dialog';
+import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from './drawer';
 
 interface SheetProps {
   open: boolean;
@@ -16,77 +22,54 @@ interface SheetProps {
   size?: 'md' | 'lg';
 }
 
-let openCount = 0;
-
 export function Sheet({ open, onClose, title, children, footer, size = 'md' }: SheetProps) {
-  const titleId = useId();
-  const panelRef = useRef<HTMLDivElement>(null);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  const desktop = useIsDesktop();
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const onOpenChange = (o: boolean) => {
+    if (!o) onClose();
+  };
+  const focusPanel = (e: Event) => {
+    e.preventDefault();
+    bodyRef.current?.focus();
+  };
 
-  useEffect(() => {
-    if (!open) return;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    openCount++;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        onCloseRef.current();
-      }
-      if (e.key === 'Tab' && panelRef.current) {
-        const focusables = panelRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        );
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        if (!first || !last) return;
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    // foca o painel (não o primeiro campo, para não abrir o teclado no celular sem querer)
-    requestAnimationFrame(() => panelRef.current?.focus());
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      openCount--;
-      if (openCount === 0) document.body.style.overflow = '';
-      previouslyFocused?.focus?.();
-    };
-  }, [open]);
-
-  if (!open) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex items-end justify-center lg:items-center">
-      <div className="absolute inset-0 bg-slate-900/40" aria-hidden onClick={onClose} />
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className={`relative flex max-h-[92dvh] w-full flex-col rounded-t-3xl bg-white shadow-2xl outline-none lg:rounded-3xl ${size === 'lg' ? 'lg:max-w-2xl' : 'lg:max-w-lg'}`}
-      >
-        <div className="mx-auto mt-2 h-1.5 w-10 rounded-full bg-slate-200 lg:hidden" aria-hidden />
-        <header className="flex items-center gap-2 px-4 pb-2 pt-3">
-          <h2 id={titleId} className="flex-1 text-lg font-bold">
-            {title}
-          </h2>
-          <button type="button" onClick={onClose} aria-label="Fechar" className="grid size-11 place-items-center rounded-full text-slate-500 hover:bg-slate-100">
-            <X className="size-5" aria-hidden />
-          </button>
-        </header>
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-4">{children}</div>
-        {footer && <footer className="pb-safe border-t border-slate-100 px-4 py-3">{footer}</footer>}
+  const body = (
+    <>
+      <div ref={bodyRef} tabIndex={-1} className="flex-1 overflow-y-auto overscroll-contain px-4 pb-4 outline-none lg:px-6">
+        {children}
       </div>
-    </div>,
-    document.body,
+      {footer && <div className="pb-safe border-t px-4 py-3 lg:px-6">{footer}</div>}
+    </>
+  );
+
+  if (desktop) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          aria-describedby={undefined}
+          onOpenAutoFocus={focusPanel}
+          className={cn('flex max-h-[88dvh] flex-col gap-0 p-0', size === 'lg' ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
+        >
+          <div className="flex min-h-16 items-center py-3 pl-6 pr-16">
+            <DialogTitle className="text-lg font-bold">{title}</DialogTitle>
+          </div>
+          {body}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+      <DrawerContent aria-describedby={undefined} onOpenAutoFocus={focusPanel}>
+        <div className="flex items-center gap-2 px-4 pb-2 pt-2">
+          <DrawerTitle className="flex-1 text-lg font-bold">{title}</DrawerTitle>
+          <DrawerClose aria-label="Fechar" className="grid size-11 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground">
+            <X className="size-5" aria-hidden />
+          </DrawerClose>
+        </div>
+        {body}
+      </DrawerContent>
+    </Drawer>
   );
 }

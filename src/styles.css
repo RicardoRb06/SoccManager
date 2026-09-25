@@ -1,9 +1,70 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
-/* Cores da marca vêm da configuração da quadra (aplicadas em runtime em :root). */
+/* shadcn/ui: modo escuro pela classe .dark no <html> (ver ThemeSync). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Tokens do design system (shadcn/ui, base "neutral").
+ * A cor principal (primary) é a cor da quadra, vinda das configurações em runtime (--brand-primary).
+ * Cores de situação (pago, pendente, sinal, falta) têm tokens próprios para claro e escuro.
+ */
 :root {
   --brand-primary: #15803d;
   --brand-accent: #f59e0b;
+
+  --radius: 0.75rem;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: var(--brand-primary);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.52 0 0);
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.87 0 0);
+  --ring: var(--brand-primary);
+  --overlay: oklch(0 0 0 / 0.45);
+
+  /* texto/realces na cor da quadra (mais claro no modo escuro para manter contraste) */
+  --brand: var(--brand-primary);
+  --brand-strong: color-mix(in oklab, var(--brand-primary) 80%, black);
+  --brand-soft: color-mix(in oklab, var(--brand-primary) 12%, var(--card));
+
+  /* situação */
+  --success: var(--color-green-700);
+  --success-fg: var(--color-green-800);
+  --success-soft: var(--color-green-50);
+  --success-muted: var(--color-green-100);
+  --success-border: var(--color-green-300);
+  --warning: var(--color-amber-600);
+  --warning-fg: var(--color-amber-900);
+  --warning-soft: var(--color-amber-50);
+  --warning-muted: var(--color-amber-100);
+  --warning-border: var(--color-amber-300);
+  --info: var(--color-blue-700);
+  --info-fg: var(--color-blue-800);
+  --info-soft: var(--color-blue-50);
+  --info-muted: var(--color-blue-100);
+  --info-border: var(--color-blue-300);
+  --danger: var(--color-red-600);
+  --danger-fg: var(--color-red-800);
+  --danger-soft: var(--color-red-50);
+  --danger-muted: var(--color-red-100);
+  --danger-border: var(--color-red-300);
+  --hatch-danger-a: var(--color-red-100);
+  --hatch-danger-b: var(--color-red-50);
+  --hatch-muted-a: oklch(0.92 0 0);
+  --hatch-muted-b: oklch(0.96 0 0);
+
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
@@ -12,13 +73,118 @@
   color-scheme: light;
 }
 
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: var(--brand-primary);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.3 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: color-mix(in oklab, var(--brand-primary) 70%, white);
+  --overlay: oklch(0 0 0 / 0.6);
+
+  --brand: color-mix(in oklab, var(--brand-primary) 65%, white);
+  --brand-strong: color-mix(in oklab, var(--brand-primary) 45%, white);
+  --brand-soft: color-mix(in oklab, var(--brand-primary) 22%, var(--card));
+
+  --success: var(--color-green-400);
+  --success-fg: var(--color-green-300);
+  --success-soft: color-mix(in oklab, var(--color-green-500) 12%, var(--card));
+  --success-muted: color-mix(in oklab, var(--color-green-500) 22%, var(--card));
+  --success-border: color-mix(in oklab, var(--color-green-500) 45%, var(--card));
+  --warning: var(--color-amber-400);
+  --warning-fg: var(--color-amber-200);
+  --warning-soft: color-mix(in oklab, var(--color-amber-500) 12%, var(--card));
+  --warning-muted: color-mix(in oklab, var(--color-amber-500) 22%, var(--card));
+  --warning-border: color-mix(in oklab, var(--color-amber-500) 45%, var(--card));
+  --info: var(--color-blue-400);
+  --info-fg: var(--color-blue-200);
+  --info-soft: color-mix(in oklab, var(--color-blue-500) 14%, var(--card));
+  --info-muted: color-mix(in oklab, var(--color-blue-500) 24%, var(--card));
+  --info-border: color-mix(in oklab, var(--color-blue-500) 45%, var(--card));
+  --danger: var(--color-red-400);
+  --danger-fg: var(--color-red-200);
+  --danger-soft: color-mix(in oklab, var(--color-red-500) 12%, var(--card));
+  --danger-muted: color-mix(in oklab, var(--color-red-500) 22%, var(--card));
+  --danger-border: color-mix(in oklab, var(--color-red-500) 45%, var(--card));
+  --hatch-danger-a: color-mix(in oklab, var(--color-red-500) 22%, var(--card));
+  --hatch-danger-b: color-mix(in oklab, var(--color-red-500) 10%, var(--card));
+  --hatch-muted-a: oklch(0.3 0 0);
+  --hatch-muted-b: oklch(0.24 0 0);
+  color-scheme: dark;
+}
+
 @theme inline {
-  --color-brand: var(--brand-primary);
-  --color-brand-strong: color-mix(in oklab, var(--brand-primary) 80%, black);
-  --color-brand-soft: color-mix(in oklab, var(--brand-primary) 12%, white);
-  --color-accent: var(--brand-accent);
-  --color-accent-soft: color-mix(in oklab, var(--brand-accent) 15%, white);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-highlight: var(--brand-accent);
+
+  --color-success: var(--success);
+  --color-success-fg: var(--success-fg);
+  --color-success-soft: var(--success-soft);
+  --color-success-muted: var(--success-muted);
+  --color-success-border: var(--success-border);
+  --color-warning: var(--warning);
+  --color-warning-fg: var(--warning-fg);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-muted: var(--warning-muted);
+  --color-warning-border: var(--warning-border);
+  --color-info: var(--info);
+  --color-info-fg: var(--info-fg);
+  --color-info-soft: var(--info-soft);
+  --color-info-muted: var(--info-muted);
+  --color-info-border: var(--info-border);
+  --color-danger: var(--danger);
+  --color-danger-fg: var(--danger-fg);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-muted: var(--danger-muted);
+  --color-danger-border: var(--danger-border);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
 }
 
 html,
@@ -28,23 +194,23 @@ body,
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-background text-foreground antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
 
-/* Foco sempre visível para teclado */
+/* Foco sempre visível para teclado (elementos sem anel próprio do shadcn) */
 :focus-visible {
-  outline: 3px solid var(--brand-primary);
+  outline: 3px solid var(--ring);
   outline-offset: 2px;
 }
 
 /* Hachurado para "falta" e "bloqueado" (estado nunca só por cor: também há ícone e texto) */
 .hatch-red {
-  background-image: repeating-linear-gradient(135deg, rgb(254 226 226) 0 8px, rgb(254 242 242) 8px 16px);
+  background-image: repeating-linear-gradient(135deg, var(--hatch-danger-a) 0 8px, var(--hatch-danger-b) 8px 16px);
 }
 .hatch-gray {
-  background-image: repeating-linear-gradient(135deg, rgb(226 232 240) 0 8px, rgb(241 245 249) 8px 16px);
+  background-image: repeating-linear-gradient(135deg, var(--hatch-muted-a) 0 8px, var(--hatch-muted-b) 8px 16px);
 }
 
 .pt-safe {
@@ -91,6 +257,16 @@ body {
   }
   .print-only {
     display: block !important;
+  }
+  /* impressão sempre no tema claro */
+  :root.dark {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --muted-foreground: oklch(0.45 0 0);
+    --border: oklch(0.85 0 0);
+    color-scheme: light;
   }
   body {
     background: white;

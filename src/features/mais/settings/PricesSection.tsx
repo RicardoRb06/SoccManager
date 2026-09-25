@@ -58,7 +58,7 @@ function RuleSheet({ rule, courts, defaultCourt, onClose }: { rule?: PriceRule; 
           {rule && (
             <Button
               variant="ghost"
-              className="text-red-700"
+              className="text-danger"
               onClick={() =>
                 void deletePriceRule(rule.id).then(() => {
                   toast.success('Preço removido.');
@@ -161,29 +161,29 @@ export function PricesSection() {
 
   return (
     <div className="flex flex-col gap-4">
-      <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <ul className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
         {sortedRules.map((r) => (
           <li key={r.id} className="flex items-center gap-3 px-3 py-2">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{courtName(r.courtId)}</p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 {weekdaysLabel(r.weekdays)} · {minToHHMM(r.startMin)}–{minToHHMM(r.endMin)}
               </p>
             </div>
             <span className="font-semibold tabular-nums">{formatBRL(r.price)}/h</span>
-            <button type="button" aria-label="Editar preço" className="grid size-10 place-items-center rounded-full hover:bg-slate-100" onClick={() => setEditing(r)}>
+            <button type="button" aria-label="Editar preço" className="grid size-10 place-items-center rounded-full hover:bg-accent" onClick={() => setEditing(r)}>
               <Pencil className="size-4" aria-hidden />
             </button>
           </li>
         ))}
-        {data && sortedRules.length === 0 && <li className="px-3 py-4 text-sm text-slate-500">Nenhum preço cadastrado. Os horários vão aparecer como R$ 0.</li>}
+        {data && sortedRules.length === 0 && <li className="px-3 py-4 text-sm text-muted-foreground">Nenhum preço cadastrado. Os horários vão aparecer como R$ 0.</li>}
       </ul>
-      <Button variant="secondary" onClick={() => setEditing('new')}>
+      <Button variant="outline" onClick={() => setEditing('new')}>
         <Plus className="size-4" aria-hidden /> Adicionar preço
       </Button>
-      <p className="text-xs text-slate-500">Regra de uma quadra específica vale mais que a regra de “Todas as quadras”.</p>
+      <p className="text-xs text-muted-foreground">Regra de uma quadra específica vale mais que a regra de “Todas as quadras”.</p>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-3">
+      <section className="rounded-xl border bg-card shadow-xs p-3">
         <h3 className="mb-2 font-semibold">Pré-visualização (preço de 1 hora)</h3>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {[1, 2, 3, 4, 5, 6, 0].map((d) => (
@@ -193,12 +193,12 @@ export function PricesSection() {
           ))}
         </div>
         {!h ? (
-          <p className="text-sm text-slate-500">Fechado neste dia.</p>
+          <p className="text-sm text-muted-foreground">Fechado neste dia.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-slate-500">
+                <tr className="text-left text-xs text-muted-foreground">
                   <th className="py-1 pr-2 font-semibold">Horário</th>
                   {courts.map((c) => (
                     <th key={c.id} className="py-1 pr-2 text-right font-semibold">
@@ -207,14 +207,14 @@ export function PricesSection() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {hoursList.map((start) => (
                   <tr key={start}>
-                    <td className="py-1 pr-2 tabular-nums text-slate-600">{minToHHMM(start)}</td>
+                    <td className="py-1 pr-2 tabular-nums text-muted-foreground">{minToHHMM(start)}</td>
                     {courts.map((c) => {
                       const p = priceFor(data?.rules ?? [], c.id, sampleDate, start, Math.min(start + 60, h.close));
                       return (
-                        <td key={c.id} className={`py-1 pr-2 text-right tabular-nums ${p === 0 ? 'text-amber-700' : ''}`}>
+                        <td key={c.id} className={`py-1 pr-2 text-right tabular-nums ${p === 0 ? 'text-warning' : ''}`}>
                           {p === 0 ? (
                             <span className="inline-flex items-center gap-1">
                               <AlertTriangle className="size-3.5" aria-hidden /> sem preço

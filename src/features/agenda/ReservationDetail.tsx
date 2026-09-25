@@ -57,7 +57,7 @@ export function ReservationDetail({
   if (!data)
     return (
       <Sheet open onClose={onClose} title="Reserva">
-        <p className="py-6 text-center text-slate-500">Carregando…</p>
+        <p className="py-6 text-center text-muted-foreground">Carregando…</p>
       </Sheet>
     );
 
@@ -93,7 +93,7 @@ export function ReservationDetail({
             <div className="flex flex-col gap-2">
               {balance > 0 && (
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="secondary" className="whitespace-nowrap px-3" onClick={() => setSub('pay')}>
+                  <Button variant="outline" className="whitespace-nowrap px-3" onClick={() => setSub('pay')}>
                     <HandCoins className="size-4" aria-hidden /> Pagamento
                   </Button>
                   <Button className="whitespace-nowrap px-3" onClick={() => setSub('quitar')}>
@@ -102,15 +102,15 @@ export function ReservationDetail({
                 </div>
               )}
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="secondary" className="px-2" onClick={onEdit}>
+                <Button variant="outline" className="px-2" onClick={onEdit}>
                   <Pencil className="size-4" aria-hidden /> Editar
                 </Button>
                 {r.status === 'falta' ? (
-                  <Button variant="secondary" className="px-2" onClick={() => run(() => setFalta(r.id, false), 'Falta removida.')}>
+                  <Button variant="outline" className="px-2" onClick={() => run(() => setFalta(r.id, false), 'Falta removida.')}>
                     <UserCheck className="size-4" aria-hidden /> Tirar falta
                   </Button>
                 ) : (
-                  <Button variant="secondary" className="px-2" onClick={() => run(() => setFalta(r.id, true), 'Falta registrada. O horário continua ocupado.')}>
+                  <Button variant="outline" className="px-2" onClick={() => run(() => setFalta(r.id, true), 'Falta registrada. O horário continua ocupado.')}>
                     <UserX className="size-4" aria-hidden /> Falta
                   </Button>
                 )}
@@ -119,7 +119,7 @@ export function ReservationDetail({
                 <Button variant="ghost" onClick={() => setSub('cancel')}>
                   <XCircle className="size-4" aria-hidden /> Cancelar
                 </Button>
-                <Button variant="ghost" className="text-red-700" onClick={() => setSub('delete')}>
+                <Button variant="ghost" className="text-danger" onClick={() => setSub('delete')}>
                   <Trash2 className="size-4" aria-hidden /> Excluir
                 </Button>
               </div>
@@ -127,12 +127,12 @@ export function ReservationDetail({
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {cancelled && !r.deletedAt && (
-                <Button variant="secondary" onClick={() => run(() => reactivateReservation(r.id), 'Reserva reativada.')}>
+                <Button variant="outline" onClick={() => run(() => reactivateReservation(r.id), 'Reserva reativada.')}>
                   <RotateCcw className="size-4" aria-hidden /> Reativar
                 </Button>
               )}
               {!r.deletedAt && (
-                <Button variant="ghost" className="text-red-700" onClick={() => setSub('delete')}>
+                <Button variant="ghost" className="text-danger" onClick={() => setSub('delete')}>
                   <Trash2 className="size-4" aria-hidden /> Excluir
                 </Button>
               )}
@@ -143,30 +143,30 @@ export function ReservationDetail({
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {cancelled ? (
-              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700">Cancelada</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-foreground/85">Cancelada</span>
             ) : (
               <StateBadge state={state} />
             )}
             {rec && <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand-strong">Mensalista{rec.notes ? ` · ${rec.notes}` : ''}</span>}
           </div>
 
-          <ul className="flex flex-col gap-2 text-slate-700">
+          <ul className="flex flex-col gap-2 text-foreground/85">
             <li className="flex items-center gap-2">
-              <CalendarDays className="size-4 text-slate-400" aria-hidden /> <span className="first-letter:uppercase">{formatLongDate(r.date)}</span>
+              <CalendarDays className="size-4 text-muted-foreground/70" aria-hidden /> <span className="first-letter:uppercase">{formatLongDate(r.date)}</span>
             </li>
             <li className="flex items-center gap-2">
-              <Clock className="size-4 text-slate-400" aria-hidden /> {formatTimeRange(r.startMin, r.endMin)} ({formatDuration(r.endMin - r.startMin)})
+              <Clock className="size-4 text-muted-foreground/70" aria-hidden /> {formatTimeRange(r.startMin, r.endMin)} ({formatDuration(r.endMin - r.startMin)})
             </li>
             <li className="flex items-center gap-2">
-              <MapPin className="size-4 text-slate-400" aria-hidden /> {court?.name ?? 'Quadra removida'}
+              <MapPin className="size-4 text-muted-foreground/70" aria-hidden /> {court?.name ?? 'Quadra removida'}
             </li>
             {customer?.phone && (
               <li className="flex items-center gap-2">
-                <Phone className="size-4 text-slate-400" aria-hidden />
+                <Phone className="size-4 text-muted-foreground/70" aria-hidden />
                 <a className="text-brand underline-offset-2 hover:underline" href={`tel:${customer.phone.replace(/\D/g, '')}`}>
                   {formatPhone(customer.phone)}
                 </a>
-                <a className="ml-auto text-sm font-medium text-slate-600 underline-offset-2 hover:underline" href={`#/clientes/${customer.id}`} onClick={onClose}>
+                <a className="ml-auto text-sm font-medium text-muted-foreground underline-offset-2 hover:underline" href={`#/clientes/${customer.id}`} onClick={onClose}>
                   Ver cliente
                 </a>
               </li>
@@ -174,29 +174,29 @@ export function ReservationDetail({
           </ul>
 
           {monthly ? (
-            <p className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-700">Jogo coberto pela mensalidade do mensalista.</p>
+            <p className="rounded-2xl bg-muted/60 p-3 text-sm text-foreground/85">Jogo coberto pela mensalidade do mensalista.</p>
           ) : (
-            <dl className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-50 p-3 text-center">
+            <dl className="grid grid-cols-3 gap-2 rounded-2xl bg-muted/60 p-3 text-center">
               <div>
-                <dt className="text-xs text-slate-500">Valor</dt>
+                <dt className="text-xs text-muted-foreground">Valor</dt>
                 <dd className="font-bold tabular-nums">{formatBRL(r.price)}</dd>
-                <dd className="text-[11px] text-slate-500">{r.priceManual ? 'manual' : 'automático'}</dd>
+                <dd className="text-[11px] text-muted-foreground">{r.priceManual ? 'manual' : 'automático'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">Pago</dt>
-                <dd className="font-bold tabular-nums text-green-700">{formatBRL(paid)}</dd>
+                <dt className="text-xs text-muted-foreground">Pago</dt>
+                <dd className="font-bold tabular-nums text-success">{formatBRL(paid)}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">Saldo</dt>
-                <dd className={`font-bold tabular-nums ${balance > 0 ? 'text-amber-700' : 'text-slate-700'}`}>{formatBRL(balance)}</dd>
+                <dt className="text-xs text-muted-foreground">Saldo</dt>
+                <dd className={`font-bold tabular-nums ${balance > 0 ? 'text-warning' : 'text-foreground/85'}`}>{formatBRL(balance)}</dd>
               </div>
             </dl>
           )}
 
           {payments.length > 0 && (
             <div>
-              <h3 className="mb-1 text-sm font-semibold text-slate-700">Pagamentos</h3>
-              <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200">
+              <h3 className="mb-1 text-sm font-semibold text-foreground/85">Pagamentos</h3>
+              <ul className="divide-y divide-border rounded-2xl border border-border">
                 {payments.map((p) => (
                   <li key={p.id} className="flex items-center gap-2 py-1 pl-3 pr-1 text-sm">
                     <span className="flex-1">
@@ -207,7 +207,7 @@ export function ReservationDetail({
                     <button
                       type="button"
                       aria-label={`Remover pagamento de ${formatBRL(p.amount)}`}
-                      className="grid size-10 place-items-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-600"
+                      className="grid size-10 place-items-center rounded-full text-muted-foreground/70 hover:bg-danger-soft hover:text-danger"
                       onClick={() => setSub({ removePayment: p })}
                     >
                       <Trash2 className="size-4" aria-hidden />
@@ -218,8 +218,8 @@ export function ReservationDetail({
             </div>
           )}
 
-          {r.notes && <p className="rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{r.notes}</p>}
-          {cancelled && r.cancelReason && <p className="text-sm text-slate-600">Motivo do cancelamento: {r.cancelReason}</p>}
+          {r.notes && <p className="rounded-2xl bg-warning-soft p-3 text-sm text-warning-fg">{r.notes}</p>}
+          {cancelled && r.cancelReason && <p className="text-sm text-muted-foreground">Motivo do cancelamento: {r.cancelReason}</p>}
         </div>
       </Sheet>
 

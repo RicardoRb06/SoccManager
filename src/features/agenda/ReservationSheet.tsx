@@ -226,7 +226,7 @@ export function ReservationSheet({
       footer={
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-slate-500">{repeat ? (billing === 'mensal' ? 'Mensalidade' : 'Por jogo') : 'Total'}</p>
+            <p className="text-xs text-muted-foreground">{repeat ? (billing === 'mensal' ? 'Mensalidade' : 'Por jogo') : 'Total'}</p>
             <p className="text-lg font-bold tabular-nums">
               {repeat && billing === 'mensal' ? (monthly !== null ? formatBRL(monthly) : '—') : price !== null ? formatBRL(price) : '—'}
             </p>
@@ -273,12 +273,12 @@ export function ReservationSheet({
                 {formatDuration(d)}
               </Chip>
             ))}
-            <div className="flex items-center rounded-full border border-slate-300 bg-white">
-              <button type="button" aria-label="Diminuir duração" className="grid size-11 place-items-center disabled:text-slate-300" disabled={duration <= slot} onClick={() => setDuration((d) => Math.max(slot, d - slot))}>
+            <div className="flex items-center rounded-full border border-input bg-card">
+              <button type="button" aria-label="Diminuir duração" className="grid size-11 place-items-center disabled:text-muted-foreground/50" disabled={duration <= slot} onClick={() => setDuration((d) => Math.max(slot, d - slot))}>
                 <Minus className="size-4" aria-hidden />
               </button>
               <span className="min-w-12 text-center text-sm font-semibold tabular-nums">{formatDuration(duration)}</span>
-              <button type="button" aria-label="Aumentar duração" className="grid size-11 place-items-center disabled:text-slate-300" disabled={duration >= 8 * 60} onClick={() => setDuration((d) => d + slot)}>
+              <button type="button" aria-label="Aumentar duração" className="grid size-11 place-items-center disabled:text-muted-foreground/50" disabled={duration >= 8 * 60} onClick={() => setDuration((d) => d + slot)}>
                 <Plus className="size-4" aria-hidden />
               </button>
             </div>
@@ -286,18 +286,18 @@ export function ReservationSheet({
         </Field>
 
         {occupants.length > 0 && maps && (
-          <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-3">
-            <p className="flex items-center gap-2 font-semibold text-red-800">
+          <div role="alert" className="rounded-2xl border border-danger-border bg-danger-soft p-3">
+            <p className="flex items-center gap-2 font-semibold text-danger-fg">
               <AlertTriangle className="size-5" aria-hidden /> Horário indisponível
             </p>
-            <ul className="mt-1 list-disc pl-6 text-sm text-red-800">
+            <ul className="mt-1 list-disc pl-6 text-sm text-danger-fg">
               {occupants.map((o, i) => (
                 <li key={i}>{occupantText(o, maps, courtId)}</li>
               ))}
             </ul>
             {suggestions.length > 0 ? (
               <>
-                <p className="mt-3 text-sm font-medium text-slate-700">Horários livres mais próximos:</p>
+                <p className="mt-3 text-sm font-medium text-foreground/85">Horários livres mais próximos:</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {suggestions.map((s) => (
                     <Chip key={s.startMin} onClick={() => setStartMin(s.startMin)}>
@@ -307,7 +307,7 @@ export function ReservationSheet({
                 </div>
               </>
             ) : (
-              <p className="mt-2 text-sm text-slate-700">Não há outro horário livre com essa duração neste dia. Tente outra data ou quadra.</p>
+              <p className="mt-2 text-sm text-foreground/85">Não há outro horário livre com essa duração neste dia. Tente outra data ou quadra.</p>
             )}
           </div>
         )}
@@ -346,7 +346,7 @@ export function ReservationSheet({
               </button>
             ) : null}
           </div>
-          <p className={`mt-1 inline-flex items-center gap-1 text-xs font-medium ${priceManual ? 'text-amber-700' : 'text-brand-strong'}`}>
+          <p className={`mt-1 inline-flex items-center gap-1 text-xs font-medium ${priceManual ? 'text-warning' : 'text-brand-strong'}`}>
             <Sparkles className="size-3.5" aria-hidden />
             {priceManual ? 'Alterado manualmente' : 'Preço automático pela tabela'}
           </p>
@@ -354,7 +354,7 @@ export function ReservationSheet({
         )}
 
         {!editing && !reschedule && (
-          <div className={`rounded-2xl border p-3 ${repeat ? 'border-brand/50 bg-brand-soft/40' : 'border-slate-200'}`}>
+          <div className={`rounded-2xl border p-3 ${repeat ? 'border-brand/50 bg-brand-soft/40' : 'border-border'}`}>
             <Switch
               id="res-repeat"
               label={
@@ -370,7 +370,7 @@ export function ReservationSheet({
             />
             {repeat && (
               <div className="mt-3 flex flex-col gap-3">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   Toda <strong>{isISODate(date) ? WEEKDAY_LONG[weekdayOf(date)] : '—'}</strong>
                   {startMin !== undefined && endMin !== undefined ? ` das ${minToHHMM(startMin)} às ${minToHHMM(endMin)}` : ''}, a partir de{' '}
                   {isISODate(date) ? formatDateBR(date) : '—'}.
@@ -404,12 +404,12 @@ export function ReservationSheet({
                     <Input id="rec-monthly" inputMode="decimal" value={monthlyText} onChange={(e) => setMonthlyText(e.target.value)} />
                   </Field>
                 )}
-                {billing === 'por_jogo' && <p className="text-xs text-slate-500">Cada jogo usa o valor acima {priceManual ? '(fixo)' : '(tabela de preços)'}.</p>}
+                {billing === 'por_jogo' && <p className="text-xs text-muted-foreground">Cada jogo usa o valor acima {priceManual ? '(fixo)' : '(tabela de preços)'}.</p>}
 
                 {recConflicts === undefined ? (
-                  <p className="text-sm text-slate-500">Verificando as próximas semanas…</p>
+                  <p className="text-sm text-muted-foreground">Verificando as próximas semanas…</p>
                 ) : futureConflicts.length > 0 ? (
-                  <div role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+                  <div role="alert" className="rounded-2xl border border-warning-border bg-warning-soft p-3 text-sm text-warning-fg">
                     <p className="flex items-center gap-2 font-semibold">
                       <AlertTriangle className="size-4" aria-hidden /> {futureConflicts.length} data(s) já ocupada(s) nas próximas semanas
                     </p>
@@ -426,7 +426,7 @@ export function ReservationSheet({
                     </label>
                   </div>
                 ) : (
-                  <p className="text-sm text-green-800">Nenhum conflito nas próximas 12 semanas.</p>
+                  <p className="text-sm text-success-fg">Nenhum conflito nas próximas 12 semanas.</p>
                 )}
               </div>
             )}
@@ -434,7 +434,7 @@ export function ReservationSheet({
         )}
 
         {!editing && !repeat && (
-          <div className="rounded-2xl border border-slate-200 p-3">
+          <div className="rounded-2xl border border-border p-3">
             <Switch
               id="res-deposit"
               label="Recebeu sinal agora?"
@@ -465,7 +465,7 @@ export function ReservationSheet({
           <Textarea id="res-notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Opcional" rows={2} />
         </Field>
 
-        {!hours && isISODate(date) && <p className="text-sm text-amber-700">A quadra não abre neste dia da semana.</p>}
+        {!hours && isISODate(date) && <p className="text-sm text-warning">A quadra não abre neste dia da semana.</p>}
       </div>
     </Sheet>
   );

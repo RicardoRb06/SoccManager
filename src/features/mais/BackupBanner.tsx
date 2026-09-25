@@ -11,8 +11,8 @@ export function BackupBanner() {
   const [hidden, setHidden] = useState(dismissedThisSession);
   if (!due || hidden) return null;
   return (
-    <div role="status" className="no-print pt-safe flex items-center gap-3 border-b border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-950">
-      <ShieldAlert className="size-5 shrink-0 text-amber-700" aria-hidden />
+    <div role="status" className="no-print pt-safe flex items-center gap-3 border-b border-warning-border bg-warning-soft px-4 py-2 text-sm text-warning-fg">
+      <ShieldAlert className="size-5 shrink-0 text-warning" aria-hidden />
       <p className="flex-1">
         {daysSince === null ? 'Você ainda não fez nenhum backup.' : `Último backup há ${daysSince} dias.`}{' '}
         <a href="#/mais/backup" className="font-semibold underline">
@@ -25,7 +25,7 @@ export function BackupBanner() {
       <button
         type="button"
         aria-label="Lembrar depois"
-        className="grid size-11 shrink-0 place-items-center rounded-full hover:bg-amber-100"
+        className="grid size-11 shrink-0 place-items-center rounded-full hover:bg-warning-muted"
         onClick={() => {
           dismissedThisSession = true;
           setHidden(true);

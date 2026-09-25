@@ -28,11 +28,11 @@ export function ConfirmSheet({
       title={title}
       footer={
         <div className="flex gap-2">
-          <Button variant="secondary" className="flex-1" onClick={onClose}>
+          <Button variant="outline" className="flex-1" onClick={onClose}>
             Voltar
           </Button>
           <Button
-            variant={danger ? 'danger' : 'primary'}
+            variant={danger ? 'destructive' : 'default'}
             className="flex-1"
             disabled={busy}
             onClick={async () => {
@@ -49,7 +49,7 @@ export function ConfirmSheet({
         </div>
       }
     >
-      <div className="text-slate-700">{children}</div>
+      <div className="text-foreground/85">{children}</div>
     </Sheet>
   );
 }

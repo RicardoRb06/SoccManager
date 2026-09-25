@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -29,6 +30,8 @@ function escapeHtml(s: string): string {
 
 export default defineConfig({
   base,
+  // atalho de import "@/…" = src/… (padrão do shadcn/ui)
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.0'),
   },

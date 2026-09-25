@@ -49,7 +49,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
     return (
       <>
         <PageHeader title="Cliente não encontrado" />
-        <p className="p-6 text-center text-slate-500">
+        <p className="p-6 text-center text-muted-foreground">
           <a href="#/clientes" className="text-brand underline">
             Voltar para Clientes
           </a>
@@ -67,7 +67,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
         title={c.name}
         subtitle={c.deletedAt ? 'Na Lixeira' : s.isMensalista ? 'Mensalista' : 'Cliente'}
         actions={
-          <a href="#/clientes" className="grid size-11 place-items-center rounded-full hover:bg-slate-100" aria-label="Voltar para Clientes">
+          <a href="#/clientes" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Clientes">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }
@@ -75,53 +75,53 @@ export default function ClienteDetailPage({ id }: { id: string }) {
       <div className="flex flex-col gap-4 p-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-start">
         <div className="flex flex-col gap-4">
           {c.deletedAt && (
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-100 p-3 text-sm">
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-muted p-3 text-sm">
               <span>Este cliente está na Lixeira.</span>
-              <Button variant="secondary" onClick={() => restoreCustomer(c.id).then(() => toast.success('Cliente restaurado.'))}>
+              <Button variant="outline" onClick={() => restoreCustomer(c.id).then(() => toast.success('Cliente restaurado.'))}>
                 Restaurar
               </Button>
             </div>
           )}
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="rounded-xl border bg-card shadow-xs p-4">
             {c.phone ? (
-              <p className="flex items-center gap-2 text-slate-700">
-                <Phone className="size-4 text-slate-400" aria-hidden />
+              <p className="flex items-center gap-2 text-foreground/85">
+                <Phone className="size-4 text-muted-foreground/70" aria-hidden />
                 <a href={`tel:${c.phone.replace(/\D/g, '')}`} className="text-brand underline-offset-2 hover:underline">
                   {formatPhone(c.phone)}
                 </a>
               </p>
             ) : (
-              <p className="text-sm text-slate-500">Sem telefone cadastrado.</p>
+              <p className="text-sm text-muted-foreground">Sem telefone cadastrado.</p>
             )}
-            {c.notes && <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{c.notes}</p>}
-            <Button variant="secondary" block className="mt-4" onClick={() => setOverlay({ type: 'edit' })}>
+            {c.notes && <p className="mt-3 rounded-xl bg-warning-soft p-3 text-sm text-warning-fg">{c.notes}</p>}
+            <Button variant="outline" className="mt-4 w-full" onClick={() => setOverlay({ type: 'edit' })}>
               <Pencil className="size-4" aria-hidden /> Editar
             </Button>
           </section>
 
           <dl className="grid grid-cols-2 gap-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-3">
-              <dt className="text-xs text-slate-500">Jogos</dt>
+            <div className="rounded-xl border bg-card shadow-xs p-3">
+              <dt className="text-xs text-muted-foreground">Jogos</dt>
               <dd className="text-xl font-bold tabular-nums">{s.stats.games}</dd>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-3">
-              <dt className="text-xs text-slate-500">Total pago</dt>
+            <div className="rounded-xl border bg-card shadow-xs p-3">
+              <dt className="text-xs text-muted-foreground">Total pago</dt>
               <dd className="text-xl font-bold tabular-nums">{formatBRL(s.stats.totalPaid)}</dd>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-3">
-              <dt className="text-xs text-slate-500">Faltas</dt>
-              <dd className={`text-xl font-bold tabular-nums ${s.stats.faltas ? 'text-red-700' : ''}`}>{s.stats.faltas}</dd>
+            <div className="rounded-xl border bg-card shadow-xs p-3">
+              <dt className="text-xs text-muted-foreground">Faltas</dt>
+              <dd className={`text-xl font-bold tabular-nums ${s.stats.faltas ? 'text-danger' : ''}`}>{s.stats.faltas}</dd>
             </div>
-            <div className={`rounded-2xl border p-3 ${s.debt > 0 ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
-              <dt className="text-xs text-slate-500">Débito</dt>
-              <dd className={`text-xl font-bold tabular-nums ${s.debt > 0 ? 'text-amber-800' : ''}`}>{formatBRL(s.debt)}</dd>
+            <div className={`rounded-2xl border p-3 ${s.debt > 0 ? 'border-warning-border bg-warning-soft' : 'border-border bg-card'}`}>
+              <dt className="text-xs text-muted-foreground">Débito</dt>
+              <dd className={`text-xl font-bold tabular-nums ${s.debt > 0 ? 'text-warning-fg' : ''}`}>{formatBRL(s.debt)}</dd>
             </div>
           </dl>
 
           {s.debt > 0 && (
-            <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
-              <h2 className="mb-2 font-semibold text-amber-900">Em aberto</h2>
-              <ul className="flex flex-col gap-1 text-sm text-amber-900">
+            <section className="rounded-2xl border border-warning-border bg-warning-soft p-4">
+              <h2 className="mb-2 font-semibold text-warning-fg">Em aberto</h2>
+              <ul className="flex flex-col gap-1 text-sm text-warning-fg">
                 {pending.map((p, i) => (
                   <li key={i} className="flex justify-between">
                     <span>{p.kind === 'mensalidade' ? `Mensalidade ${p.month.slice(5)}/${p.month.slice(0, 4)}` : `Jogo de ${formatDateBR(p.date)}`}</span>
@@ -133,11 +133,11 @@ export default function ClienteDetailPage({ id }: { id: string }) {
           )}
 
           {recs.length > 0 && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <section className="rounded-xl border bg-card shadow-xs p-4">
               <h2 className="mb-2 flex items-center gap-2 font-semibold">
                 <Repeat className="size-4 text-brand" aria-hidden /> Mensalista
               </h2>
-              <ul className="flex flex-col gap-1 text-sm text-slate-700">
+              <ul className="flex flex-col gap-1 text-sm text-foreground/85">
                 {recs.map((r) => (
                   <li key={r.id}>
                     {r.notes ? <strong>{r.notes}: </strong> : null}
@@ -150,16 +150,16 @@ export default function ClienteDetailPage({ id }: { id: string }) {
           )}
 
           {!c.deletedAt && (
-            <Button variant="ghost" className="self-start text-red-700" onClick={() => setOverlay({ type: 'delete' })}>
+            <Button variant="ghost" className="self-start text-danger" onClick={() => setOverlay({ type: 'delete' })}>
               <Trash2 className="size-4" aria-hidden /> Excluir cliente
             </Button>
           )}
         </div>
 
         <section>
-          <h2 className="mb-2 font-semibold text-slate-700">Histórico de reservas</h2>
+          <h2 className="mb-2 font-semibold text-foreground/85">Histórico de reservas</h2>
           {history.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">Nenhuma reserva ainda.</p>
+            <p className="rounded-2xl border border-dashed border-input bg-card p-6 text-center text-muted-foreground">Nenhuma reserva ainda.</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {visible.map((r) => {
@@ -171,20 +171,20 @@ export default function ClienteDetailPage({ id }: { id: string }) {
                     <button
                       type="button"
                       onClick={() => setOverlay({ type: 'res', id: r.id })}
-                      className={`flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-left hover:bg-slate-50 ${r.status === 'cancelada' ? 'opacity-60' : ''}`}
+                      className={`flex w-full items-center gap-3 rounded-xl border bg-card shadow-xs px-3 py-2 text-left hover:bg-accent ${r.status === 'cancelada' ? 'opacity-60' : ''}`}
                     >
                       <span className="min-w-0 flex-1">
                         <span className="block font-medium">
                           {formatDateBR(r.date)} · {formatTimeRange(r.startMin, r.endMin)}
                         </span>
-                        <span className="block truncate text-xs text-slate-500">
+                        <span className="block truncate text-xs text-muted-foreground">
                           {courts.get(r.courtId)?.name}
                           {r.recurrenceId ? ' · mensalista' : ''}
                         </span>
                       </span>
                       <span className="flex flex-col items-end gap-1">
-                        <span className="text-sm tabular-nums text-slate-700">{formatBRL(r.price)}</span>
-                        {state ? <StateBadge state={state} /> : <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700">Cancelada</span>}
+                        <span className="text-sm tabular-nums text-foreground/85">{formatBRL(r.price)}</span>
+                        {state ? <StateBadge state={state} /> : <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-foreground/85">Cancelada</span>}
                       </span>
                     </button>
                   </li>
@@ -193,7 +193,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
             </ul>
           )}
           {!showAll && history.length > 20 && (
-            <Button variant="ghost" block className="mt-2" onClick={() => setShowAll(true)}>
+            <Button variant="ghost" className="mt-2 w-full" onClick={() => setShowAll(true)}>
               Ver todas ({history.length})
             </Button>
           )}
@@ -226,7 +226,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
         }}
       >
         <p>O cliente sai da lista e vai para a Lixeira. O histórico e as reservas continuam salvos.</p>
-        {future > 0 && <p className="mt-2 font-medium text-amber-800">Atenção: ele tem {future} reserva(s) futura(s), que continuam na agenda.</p>}
+        {future > 0 && <p className="mt-2 font-medium text-warning-fg">Atenção: ele tem {future} reserva(s) futura(s), que continuam na agenda.</p>}
       </ConfirmSheet>
     </>
   );

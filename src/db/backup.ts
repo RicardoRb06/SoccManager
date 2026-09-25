@@ -199,7 +199,7 @@ export async function restoreSnapshot(id: string, database: AgendaDB = db): Prom
 }
 
 /** Chaves de configuração do aparelho que continuam valendo depois de trocar os dados. */
-const DEVICE_KEYS: (keyof AppSettings)[] = ['persistRequested', 'lastSnapshotDate'];
+const DEVICE_KEYS: (keyof AppSettings)[] = ['persistRequested', 'lastSnapshotDate', 'theme'];
 
 /**
  * Demonstração: volta aos dados de exemplo (gerados a partir de hoje),

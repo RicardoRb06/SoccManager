@@ -14,7 +14,7 @@ export function InstallItem() {
         <CheckCircle2 className="size-5 text-brand" aria-hidden />
         <span className="min-w-0 flex-1">
           <span className="block font-medium">App instalado</span>
-          <span className="block text-xs text-slate-500">Abra pelo ícone na tela inicial</span>
+          <span className="block text-xs text-muted-foreground">Abra pelo ícone na tela inicial</span>
         </span>
       </div>
     );
@@ -24,15 +24,15 @@ export function InstallItem() {
     <>
       <button
         type="button"
-        className="flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left hover:bg-slate-50"
+        className="flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left hover:bg-accent"
         onClick={() => (state === 'available' ? void promptInstall() : setHelp(true))}
       >
         <Download className="size-5 text-brand" aria-hidden />
         <span className="min-w-0 flex-1">
           <span className="block font-medium">Instalar app</span>
-          <span className="block text-xs text-slate-500">Ícone na tela inicial, abre em tela cheia e funciona sem internet</span>
+          <span className="block text-xs text-muted-foreground">Ícone na tela inicial, abre em tela cheia e funciona sem internet</span>
         </span>
-        <ChevronRight className="size-5 text-slate-400" aria-hidden />
+        <ChevronRight className="size-5 text-muted-foreground/70" aria-hidden />
       </button>
 
       {help && (
@@ -59,14 +59,14 @@ export function InstallItem() {
               </li>
             </ol>
           ) : (
-            <div className="flex flex-col gap-3 text-sm text-slate-700">
+            <div className="flex flex-col gap-3 text-sm text-foreground/85">
               <p>
                 <strong>Android (Chrome):</strong> toque no menu ⋮ e escolha <strong>Instalar app</strong> ou <strong>Adicionar à tela inicial</strong>.
               </p>
               <p>
                 <strong>Computador (Chrome ou Edge):</strong> clique no ícone de instalar no fim da barra de endereço.
               </p>
-              <p className="text-slate-500">Se a opção não aparecer, o app pode já estar instalado ou o navegador não oferece instalação.</p>
+              <p className="text-muted-foreground">Se a opção não aparecer, o app pode já estar instalado ou o navegador não oferece instalação.</p>
             </div>
           )}
         </Sheet>

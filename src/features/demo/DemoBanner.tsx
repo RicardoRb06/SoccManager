@@ -11,7 +11,7 @@ export function DemoBanner() {
         <span className="hidden font-semibold sm:inline">Versão de demonstração</span>
         <span className="hidden sm:inline"> · dados de exemplo</span>
       </p>
-      <button type="button" onClick={openTour} className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl px-2 font-semibold hover:bg-white/60">
+      <button type="button" onClick={openTour} className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl px-2 font-semibold hover:bg-card/60">
         <PlayCircle className="size-4" aria-hidden /> Como funciona?
       </button>
     </div>

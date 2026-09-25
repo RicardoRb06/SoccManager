@@ -53,9 +53,9 @@ export default function App() {
     <ToastProvider>
       <ThemeSync />
       {!tenant.demo && !loaded ? (
-        <p className="p-6 text-center text-slate-500">Carregando…</p>
+        <p className="p-6 text-center text-muted-foreground">Carregando…</p>
       ) : needsOnboarding ? (
-        <Suspense fallback={<p className="p-6 text-center text-slate-500">Carregando…</p>}>
+        <Suspense fallback={<p className="p-6 text-center text-muted-foreground">Carregando…</p>}>
           <OnboardingPage />
         </Suspense>
       ) : (
@@ -68,7 +68,7 @@ export default function App() {
             </>
           }
         >
-          <Suspense fallback={<p className="p-6 text-center text-slate-500">Carregando…</p>}>
+          <Suspense fallback={<p className="p-6 text-center text-muted-foreground">Carregando…</p>}>
             <Routes path={path} />
           </Suspense>
         </AppShell>

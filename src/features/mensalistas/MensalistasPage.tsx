@@ -68,17 +68,17 @@ export default function MensalistasPage() {
     const title = rec.notes || customer?.name || 'Mensalista';
     const status =
       rec.status === 'pausado'
-        ? { text: 'Pausado', cls: 'bg-slate-200 text-slate-700' }
+        ? { text: 'Pausado', cls: 'bg-muted text-foreground/85' }
         : rec.status === 'encerrado'
-          ? { text: 'Encerrado', cls: 'bg-slate-200 text-slate-700' }
+          ? { text: 'Encerrado', cls: 'bg-muted text-foreground/85' }
           : summary.debt > 0
-            ? { text: `Devendo ${formatBRL(summary.debt)}`, cls: 'bg-amber-100 text-amber-800' }
-            : { text: 'Em dia', cls: 'bg-green-100 text-green-800' };
+            ? { text: `Devendo ${formatBRL(summary.debt)}`, cls: 'bg-warning-muted text-warning-fg' }
+            : { text: 'Em dia', cls: 'bg-success-muted text-success-fg' };
     return (
       <li key={rec.id}>
         <a
           href={`#/mensalistas?id=${rec.id}`}
-          className={`block rounded-2xl border bg-white p-3 hover:bg-slate-50 ${summary.debt > 0 && rec.status === 'ativo' ? 'border-amber-300' : 'border-slate-200'} ${rec.status !== 'ativo' ? 'opacity-75' : ''}`}
+          className={`block rounded-2xl border bg-card p-3 hover:bg-accent ${summary.debt > 0 && rec.status === 'ativo' ? 'border-warning-border' : 'border-border'} ${rec.status !== 'ativo' ? 'opacity-75' : ''}`}
         >
           <div className="flex items-start gap-3">
             <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-brand-soft text-center text-brand-strong">
@@ -92,18 +92,18 @@ export default function MensalistasPage() {
                 <p className="truncate font-semibold">{title}</p>
                 <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${status.cls}`}>{status.text}</span>
               </div>
-              {rec.notes && customer && <p className="truncate text-xs text-slate-500">{customer.name}</p>}
-              <p className="mt-0.5 text-sm text-slate-600">
+              {rec.notes && customer && <p className="truncate text-xs text-muted-foreground">{customer.name}</p>}
+              <p className="mt-0.5 text-sm text-muted-foreground">
                 {formatTimeRange(rec.startMin, rec.endMin)} · {view?.courts.get(rec.courtId)?.name}
               </p>
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-sm font-medium text-foreground/85">
                 {rec.billingMode === 'mensal' ? `${formatBRL(rec.monthlyPrice ?? 0)}/mês` : `${formatBRL(gamePrice)} por jogo`}
               </p>
               {rec.status === 'ativo' && summary.nextDates.length > 0 && (
-                <p className="mt-1 text-xs text-slate-500">Próximos: {summary.nextDates.map((d) => formatDateBR(d).slice(0, 5)).join(', ')}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Próximos: {summary.nextDates.map((d) => formatDateBR(d).slice(0, 5)).join(', ')}</p>
               )}
               {summary.upcomingSkips.length > 0 && rec.status !== 'encerrado' && (
-                <p className="text-xs text-slate-500">Não joga: {summary.upcomingSkips.slice(0, 3).map((d) => formatDateBR(d).slice(0, 5)).join(', ')}</p>
+                <p className="text-xs text-muted-foreground">Não joga: {summary.upcomingSkips.slice(0, 3).map((d) => formatDateBR(d).slice(0, 5)).join(', ')}</p>
               )}
             </div>
           </div>
@@ -118,20 +118,20 @@ export default function MensalistasPage() {
       <div className="flex flex-col gap-4 p-4">
         {view && (
           <section className="grid grid-cols-2 gap-2 lg:grid-cols-3">
-            <div className="col-span-2 rounded-2xl bg-brand p-4 text-white lg:col-span-1">
+            <div className="col-span-2 rounded-2xl bg-primary p-4 text-white lg:col-span-1">
               <p className="flex items-center gap-2 text-sm text-white/85">
                 <TrendingUp className="size-4" aria-hidden /> Receita fixa prevista
               </p>
               <p className="text-2xl font-bold tabular-nums">{formatBRL(view.revenue)}/mês</p>
               <p className="text-xs text-white/75">Mensalistas ativos em {formatMonthBR(monthOf(today))}</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-sm text-slate-500">Ativos</p>
+            <div className="rounded-xl border bg-card shadow-xs p-4">
+              <p className="text-sm text-muted-foreground">Ativos</p>
               <p className="text-2xl font-bold tabular-nums">{activeCount}</p>
             </div>
-            <div className={`rounded-2xl border p-4 ${debtTotal > 0 ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
-              <p className="text-sm text-slate-500">Em aberto</p>
-              <p className={`text-2xl font-bold tabular-nums ${debtTotal > 0 ? 'text-amber-800' : ''}`}>{formatBRL(debtTotal)}</p>
+            <div className={`rounded-2xl border p-4 ${debtTotal > 0 ? 'border-warning-border bg-warning-soft' : 'border-border bg-card'}`}>
+              <p className="text-sm text-muted-foreground">Em aberto</p>
+              <p className={`text-2xl font-bold tabular-nums ${debtTotal > 0 ? 'text-warning-fg' : ''}`}>{formatBRL(debtTotal)}</p>
             </div>
           </section>
         )}
@@ -151,10 +151,10 @@ export default function MensalistasPage() {
         </div>
 
         {!view ? (
-          <p className="py-10 text-center text-slate-500">Carregando…</p>
+          <p className="py-10 text-center text-muted-foreground">Carregando…</p>
         ) : list.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">
-            <Repeat className="mx-auto mb-2 size-8 text-slate-300" aria-hidden />
+          <div className="rounded-2xl border border-dashed border-input bg-card p-6 text-center text-muted-foreground">
+            <Repeat className="mx-auto mb-2 size-8 text-muted-foreground/50" aria-hidden />
             {filter === 'todos' ? 'Nenhum mensalista ainda. Crie o primeiro pelo botão abaixo.' : 'Nenhum mensalista neste filtro.'}
           </div>
         ) : (
@@ -163,19 +163,19 @@ export default function MensalistasPage() {
 
         {ended.length > 0 && (
           <div>
-            <button type="button" className="flex min-h-11 items-center gap-1 text-sm font-medium text-slate-600" onClick={() => setShowEnded((v) => !v)} aria-expanded={showEnded}>
+            <button type="button" className="flex min-h-11 items-center gap-1 text-sm font-medium text-muted-foreground" onClick={() => setShowEnded((v) => !v)} aria-expanded={showEnded}>
               <ChevronDown className={`size-4 transition-transform ${showEnded ? 'rotate-180' : ''}`} aria-hidden /> Encerrados ({ended.length})
             </button>
             {showEnded && <ul className="mt-2 grid gap-2 lg:grid-cols-2">{ended.map(card)}</ul>}
           </div>
         )}
-        <p className="text-xs text-slate-500">Dica: também dá para criar um mensalista pela agenda, ligando “Repetir toda semana” ao marcar um horário.</p>
+        <p className="text-xs text-muted-foreground">Dica: também dá para criar um mensalista pela agenda, ligando “Repetir toda semana” ao marcar um horário.</p>
       </div>
 
       <button
         type="button"
         onClick={() => setCreating(true)}
-        className="fab-bottom no-print fixed right-4 z-30 flex min-h-14 items-center gap-2 rounded-full bg-brand px-5 font-semibold text-white shadow-lg hover:bg-brand-strong lg:right-8"
+        className="fab-bottom no-print fixed right-4 z-30 flex min-h-14 items-center gap-2 rounded-full bg-primary px-5 font-semibold text-white shadow-lg hover:bg-primary/90 lg:right-8"
       >
         <Plus className="size-5" aria-hidden /> Novo mensalista
       </button>

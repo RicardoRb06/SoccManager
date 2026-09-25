@@ -1,7 +1,7 @@
 /** Mais › Configurações (carregada sob demanda). */
 import { ChevronLeft } from 'lucide-react';
 import { PageHeader } from '../../../components/AppShell';
-import { Chip } from '../../../components/ui/controls';
+import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs';
 import { navigate, useHashPath } from '../../../utils/router';
 import { VenueSection } from './VenueSection';
 import { CourtsSection } from './CourtsSection';
@@ -27,19 +27,21 @@ export default function SettingsPage() {
       <PageHeader
         title="Configurações"
         actions={
-          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-slate-100" aria-label="Voltar para Mais">
+          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }
       />
       <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4" role="tablist" aria-label="Seções">
-          {TABS.map((t) => (
-            <Chip key={t.key} role="tab" aria-selected={tab === t.key} selected={tab === t.key} className="shrink-0" onClick={() => navigate(`/mais/configuracoes/${t.key}`, { replace: true })}>
-              {t.label}
-            </Chip>
-          ))}
-        </div>
+        <Tabs value={tab} onValueChange={(v) => navigate(`/mais/configuracoes/${v}`, { replace: true })}>
+          <TabsList aria-label="Seções" className="w-full">
+            {TABS.map((t) => (
+              <TabsTrigger key={t.key} value={t.key}>
+                {t.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
         {tab === 'quadra' && <VenueSection />}
         {tab === 'quadras' && <CourtsSection />}
         {tab === 'horarios' && <HoursSection />}

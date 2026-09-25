@@ -7,14 +7,14 @@ import type { HeatCell } from '../../domain/metrics';
 import { WEEKDAY_LONG, WEEKDAY_SHORT } from '../../domain/dates';
 
 function fill(ratio: number): string {
-  // 8% a 92% da cor da marca misturada com branco
+  // 8% a 92% da cor da quadra misturada com o fundo do cartão (branco no claro, grafite no escuro)
   const pct = Math.round(8 + ratio * 84);
-  return `color-mix(in oklab, var(--brand-primary) ${pct}%, white)`;
+  return `color-mix(in oklab, var(--brand-primary) ${pct}%, var(--card))`;
 }
 
 export function Heatmap({ cells, weekStartsOn }: { cells: HeatCell[]; weekStartsOn: 0 | 1 }) {
   const [sel, setSel] = useState<HeatCell | null>(null);
-  if (!cells.length) return <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">Ainda não há horários passados neste período.</p>;
+  if (!cells.length) return <p className="rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">Ainda não há horários passados neste período.</p>;
 
   const days = Array.from({ length: 7 }, (_, i) => (i + weekStartsOn) % 7);
   const hours = [...new Set(cells.map((c) => c.hour))].sort((a, b) => a - b);
@@ -26,18 +26,18 @@ export function Heatmap({ cells, weekStartsOn }: { cells: HeatCell[]; weekStarts
       <div className="grid gap-[2px]" style={{ gridTemplateColumns: `2.75rem repeat(7, minmax(0, 1fr))` }} role="grid" aria-label="Ocupação por dia da semana e horário">
         <div />
         {days.map((d) => (
-          <div key={d} className="pb-1 text-center text-[11px] font-semibold uppercase text-slate-500" role="columnheader">
+          <div key={d} className="pb-1 text-center text-[11px] font-semibold uppercase text-muted-foreground" role="columnheader">
             {WEEKDAY_SHORT[d]}
           </div>
         ))}
         {hours.map((h) => (
           <div key={h} className="contents" role="row">
-            <div className="flex items-center justify-end pr-1.5 text-[11px] tabular-nums text-slate-500" role="rowheader">
+            <div className="flex items-center justify-end pr-1.5 text-[11px] tabular-nums text-muted-foreground" role="rowheader">
               {h}h
             </div>
             {days.map((d) => {
               const c = byKey.get(`${d}|${h}`);
-              if (!c) return <div key={d} className="h-7 rounded-[4px] bg-slate-50" aria-hidden />;
+              if (!c) return <div key={d} className="h-7 rounded-[4px] bg-muted/60" aria-hidden />;
               const pct = Math.round(c.ratio * 100);
               const label = `${WEEKDAY_LONG[d]} ${h}h: ${pct}% ocupado (${c.occupied} de ${c.total})`;
               const active = detail?.weekday === d && detail.hour === h;
@@ -51,7 +51,7 @@ export function Heatmap({ cells, weekStartsOn }: { cells: HeatCell[]; weekStarts
                   onMouseEnter={() => setSel(c)}
                   onFocus={() => setSel(c)}
                   onClick={() => setSel(c)}
-                  className={`h-7 rounded-[4px] transition-transform ${active ? 'ring-2 ring-slate-900 ring-offset-1' : ''}`}
+                  className={`h-7 rounded-[4px] transition-transform ${active ? 'ring-2 ring-foreground ring-offset-1' : ''}`}
                   style={{ background: fill(c.ratio) }}
                 />
               );
@@ -60,8 +60,8 @@ export function Heatmap({ cells, weekStartsOn }: { cells: HeatCell[]; weekStarts
         ))}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
-        <p aria-live="polite" className="min-h-5 font-medium text-slate-800">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+        <p aria-live="polite" className="min-h-5 font-medium text-foreground">
           {detail
             ? `${WEEKDAY_LONG[detail.weekday]}, ${detail.hour}h: ${Math.round(detail.ratio * 100)}% ocupado (${detail.occupied} de ${detail.total} horários)`
             : 'Toque em um quadrado para ver a ocupação.'}

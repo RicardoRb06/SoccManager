@@ -11,14 +11,14 @@ import { RestoreDemoItem } from './RestoreDemoItem';
 
 function Item({ href, icon: Icon, title, subtitle, warn }: { href: string; icon: LucideIcon; title: string; subtitle: string; warn?: string }) {
   return (
-    <a href={href} className="flex min-h-16 items-center gap-3 px-4 py-2 hover:bg-slate-50">
-      <Icon className={`size-5 ${warn ? 'text-amber-600' : 'text-brand'}`} aria-hidden />
+    <a href={href} className="flex min-h-16 items-center gap-3 px-4 py-2 hover:bg-accent">
+      <Icon className={`size-5 ${warn ? 'text-warning' : 'text-brand'}`} aria-hidden />
       <span className="min-w-0 flex-1">
         <span className="block font-medium">{title}</span>
-        <span className="block text-xs text-slate-500">{subtitle}</span>
+        <span className="block text-xs text-muted-foreground">{subtitle}</span>
       </span>
-      {warn && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">{warn}</span>}
-      <ChevronRight className="size-5 text-slate-400" aria-hidden />
+      {warn && <span className="rounded-full bg-warning-muted px-2 py-0.5 text-xs font-semibold text-warning-fg">{warn}</span>}
+      <ChevronRight className="size-5 text-muted-foreground/70" aria-hidden />
     </a>
   );
 }
@@ -32,7 +32,7 @@ export default function MaisPage() {
     <>
       <PageHeader title="Mais" />
       <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-        <nav aria-label="Opções" className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <nav aria-label="Opções" className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
           <Item
             href="#/mais/backup"
             icon={reminder.due ? ShieldAlert : ShieldCheck}
@@ -47,35 +47,35 @@ export default function MaisPage() {
         </nav>
 
         {license.mode === 'demo' && (
-          <nav aria-label="Demonstração" className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <nav aria-label="Demonstração" className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
             <RestoreDemoItem />
           </nav>
         )}
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
+        <section className="rounded-xl border bg-card shadow-xs p-4">
           <h2 className="mb-3 flex items-center gap-2 font-semibold">
             <Database className="size-5 text-brand" aria-hidden /> Dados neste aparelho
           </h2>
           <dl className="grid grid-cols-2 gap-2 text-sm">
-            <dt className="text-slate-500">Reservas</dt>
+            <dt className="text-muted-foreground">Reservas</dt>
             <dd className="text-right font-medium tabular-nums">{counts?.reservations ?? '…'}</dd>
-            <dt className="text-slate-500">Clientes</dt>
+            <dt className="text-muted-foreground">Clientes</dt>
             <dd className="text-right font-medium tabular-nums">{counts?.customers ?? '…'}</dd>
-            <dt className="text-slate-500">Mensalistas</dt>
+            <dt className="text-muted-foreground">Mensalistas</dt>
             <dd className="text-right font-medium tabular-nums">{counts?.recurrences ?? '…'}</dd>
-            <dt className="text-slate-500">Pagamentos</dt>
+            <dt className="text-muted-foreground">Pagamentos</dt>
             <dd className="text-right font-medium tabular-nums">{counts?.payments ?? '…'}</dd>
           </dl>
           {s.courtPhone && (
-            <p className="mt-3 flex items-center gap-2 text-sm text-slate-700">
-              <Phone className="size-4 text-slate-400" aria-hidden /> Telefone da quadra: {formatPhone(s.courtPhone)}
+            <p className="mt-3 flex items-center gap-2 text-sm text-foreground/85">
+              <Phone className="size-4 text-muted-foreground/70" aria-hidden /> Telefone da quadra: {formatPhone(s.courtPhone)}
             </p>
           )}
-          <p className="mt-3 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-muted-foreground">
             Banco: <code>{DB_NAME}</code> · formato {s.schemaVersion}
           </p>
         </section>
-        <p className="flex items-center justify-center gap-1 text-center text-xs text-slate-400">
+        <p className="flex items-center justify-center gap-1 text-center text-xs text-muted-foreground/70">
           {license.mode === 'licensed' && <BadgeCheck className="size-4" aria-hidden />}
           {license.mode === 'licensed' ? `Licenciado para ${license.licensedTo}` : 'Versão de demonstração'} · Agenda da Quadra · versão {__APP_VERSION__}
         </p>

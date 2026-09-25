@@ -32,7 +32,7 @@ export default function OnboardingPage() {
       <header className="mb-4 flex items-center gap-3">
         <CourtBadge size={44} />
         <div>
-          <p className="text-sm text-slate-500">Bem-vindo à Agenda da Quadra</p>
+          <p className="text-sm text-muted-foreground">Bem-vindo à Agenda da Quadra</p>
           <h1 className="text-xl font-bold">{s.courtName}: configuração inicial</h1>
         </div>
       </header>
@@ -44,9 +44,9 @@ export default function OnboardingPage() {
               type="button"
               onClick={() => setStep(i)}
               aria-current={i === step ? 'step' : undefined}
-              className={`flex w-full flex-col items-center gap-1 rounded-xl p-2 text-xs font-medium ${i === step ? 'bg-brand-soft text-brand-strong' : 'text-slate-500'}`}
+              className={`flex w-full flex-col items-center gap-1 rounded-xl p-2 text-xs font-medium ${i === step ? 'bg-brand-soft text-brand-strong' : 'text-muted-foreground'}`}
             >
-              <span className={`grid size-7 place-items-center rounded-full text-sm font-bold ${i < step ? 'bg-brand text-white' : i === step ? 'border-2 border-brand' : 'border border-slate-300'}`}>
+              <span className={`grid size-7 place-items-center rounded-full text-sm font-bold ${i < step ? 'bg-primary text-white' : i === step ? 'border-2 border-brand' : 'border border-input'}`}>
                 {i < step ? <Check className="size-4" aria-hidden /> : i + 1}
               </span>
               {label}
@@ -58,7 +58,7 @@ export default function OnboardingPage() {
       <h2 className="mb-1 text-lg font-bold">
         {step + 1}. {STEPS[step]}
       </h2>
-      <p className="mb-4 text-sm text-slate-600">
+      <p className="mb-4 text-sm text-muted-foreground">
         {step === 0 && 'Nome, logo, cores e telefone. Tudo pode ser mudado depois em Mais › Configurações.'}
         {step === 1 && 'Cadastre cada quadra que pode ser alugada separadamente.'}
         {step === 2 && 'Marque os dias e horários em que a quadra funciona.'}

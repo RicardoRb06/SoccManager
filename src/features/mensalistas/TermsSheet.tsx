@@ -49,7 +49,7 @@ export function TermsSheet({ rec, onClose }: { rec: Recurrence; onClose: () => v
       onClose={onClose}
       title="Editar mensalista"
       footer={
-        <Button block onClick={save} disabled={invalid || busy}>
+        <Button className="w-full" onClick={save} disabled={invalid || busy}>
           Salvar
         </Button>
       }
@@ -88,7 +88,7 @@ export function TermsSheet({ rec, onClose }: { rec: Recurrence; onClose: () => v
         <Field label="Data final (opcional)" htmlFor="t-end" hint="Deixe em branco para não ter fim.">
           <Input id="t-end" type="date" min={rec.startDate} value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </Field>
-        <p className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-600">
+        <p className="rounded-2xl bg-muted/60 p-3 text-sm text-muted-foreground">
           Para mudar o dia, o horário ou a quadra, encerre este mensalista e crie outro. Assim o histórico dos jogos anteriores fica correto.
         </p>
       </div>

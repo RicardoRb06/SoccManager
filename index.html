@@ -12,6 +12,13 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <title>%TENANT_NAME% · Agenda</title>
+    <script>
+      // Aplica o tema escuro antes de desenhar a tela (a preferência real fica no banco do app)
+      try {
+        var t = localStorage.getItem('agenda-quadra-theme') || 'system';
+        if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

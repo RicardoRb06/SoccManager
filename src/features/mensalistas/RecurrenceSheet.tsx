@@ -85,26 +85,26 @@ export function RecurrenceSheet({
                 <a
                   href={`#/agenda/${summary.nextDates[0] ?? today}`}
                   onClick={onClose}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand px-3 font-semibold text-white hover:bg-brand-strong"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-3 font-semibold text-white hover:bg-primary/90"
                 >
                   Ver na agenda
                 </a>
               )}
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <Button variant="secondary" className="px-2" onClick={() => setSub('terms')}>
+              <Button variant="outline" className="px-2" onClick={() => setSub('terms')}>
                 <Pencil className="size-4" aria-hidden /> Editar
               </Button>
               {rec.status === 'pausado' ? (
-                <Button variant="secondary" className="px-2" onClick={() => setSub('resume')}>
+                <Button variant="outline" className="px-2" onClick={() => setSub('resume')}>
                   <Play className="size-4" aria-hidden /> Retomar
                 </Button>
               ) : (
-                <Button variant="secondary" className="px-2" disabled={rec.status !== 'ativo'} onClick={() => setSub('pause')}>
+                <Button variant="outline" className="px-2" disabled={rec.status !== 'ativo'} onClick={() => setSub('pause')}>
                   <Pause className="size-4" aria-hidden /> Pausar
                 </Button>
               )}
-              <Button variant="secondary" className="px-2 text-red-700" disabled={rec.status === 'encerrado'} onClick={() => setSub('end')}>
+              <Button variant="outline" className="px-2 text-danger" disabled={rec.status === 'encerrado'} onClick={() => setSub('end')}>
                 <Square className="size-4" aria-hidden /> Encerrar
               </Button>
             </div>
@@ -115,7 +115,7 @@ export function RecurrenceSheet({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                rec.status !== 'ativo' ? 'bg-slate-200 text-slate-700' : summary.debt > 0 ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
+                rec.status !== 'ativo' ? 'bg-muted text-foreground/85' : summary.debt > 0 ? 'bg-warning-muted text-warning-fg' : 'bg-success-muted text-success-fg'
               }`}
             >
               {statusText}
@@ -127,7 +127,7 @@ export function RecurrenceSheet({
             )}
           </div>
 
-          <div className="rounded-2xl bg-slate-50 p-3 text-slate-700">
+          <div className="rounded-2xl bg-muted/60 p-3 text-foreground/85">
             <p className="font-medium">
               Toda {WEEKDAY_LONG[rec.weekday]} · {formatTimeRange(rec.startMin, rec.endMin)} · {court?.name}
             </p>
@@ -137,7 +137,7 @@ export function RecurrenceSheet({
               {rec.endDate && rec.status !== 'encerrado' ? ` até ${formatDateBR(rec.endDate)}` : ''}
             </p>
             {summary.currentMonth && (
-              <p className={`mt-1 text-sm font-semibold ${summary.currentMonth.emDia ? 'text-green-800' : 'text-amber-800'}`}>
+              <p className={`mt-1 text-sm font-semibold ${summary.currentMonth.emDia ? 'text-success-fg' : 'text-warning-fg'}`}>
                 {formatMonthBR(summary.currentMonth.month)}: {summary.currentMonth.emDia ? 'pago' : `falta ${formatBRL(summary.currentMonth.balance)}`}
               </p>
             )}
@@ -145,8 +145,8 @@ export function RecurrenceSheet({
 
           {summary.pending.length > 0 && (
             <div>
-              <h3 className="mb-1 text-sm font-semibold text-slate-700">Em aberto</h3>
-              <ul className="divide-y divide-slate-100 rounded-2xl border border-amber-200 bg-amber-50 text-sm text-amber-900">
+              <h3 className="mb-1 text-sm font-semibold text-foreground/85">Em aberto</h3>
+              <ul className="divide-y divide-border rounded-2xl border border-warning-border bg-warning-soft text-sm text-warning-fg">
                 {summary.pending.map((p, i) => (
                   <li key={i} className="flex justify-between px-3 py-2">
                     <span>{p.kind === 'mensalidade' ? `Mensalidade de ${formatMonthBR(p.month)}` : `Jogo de ${formatDateBR(p.date)}`}</span>
@@ -159,14 +159,14 @@ export function RecurrenceSheet({
 
           {rec.status !== 'encerrado' && (
             <div>
-              <h3 className="mb-1 text-sm font-semibold text-slate-700">Próximas datas · toque para pular</h3>
+              <h3 className="mb-1 text-sm font-semibold text-foreground/85">Próximas datas · toque para pular</h3>
               {upcoming.length === 0 ? (
-                <p className="text-sm text-slate-500">Nenhuma data programada.</p>
+                <p className="text-sm text-muted-foreground">Nenhuma data programada.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {upcoming.map((d) => (
                     <Chip key={d} onClick={() => setSub({ skip: d })}>
-                      <CalendarX2 className="size-4 text-slate-400" aria-hidden /> {formatDateBR(d).slice(0, 5)}
+                      <CalendarX2 className="size-4 text-muted-foreground/70" aria-hidden /> {formatDateBR(d).slice(0, 5)}
                     </Chip>
                   ))}
                 </div>
@@ -176,10 +176,10 @@ export function RecurrenceSheet({
 
           {summary.upcomingSkips.length > 0 && (
             <div>
-              <h3 className="mb-1 text-sm font-semibold text-slate-700">Exceções (não joga)</h3>
+              <h3 className="mb-1 text-sm font-semibold text-foreground/85">Exceções (não joga)</h3>
               <ul className="flex flex-col gap-1">
                 {summary.upcomingSkips.map((d) => (
-                  <li key={d} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-1 text-sm">
+                  <li key={d} className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-1 text-sm">
                     <span>{formatDateBR(d)}</span>
                     <button
                       type="button"

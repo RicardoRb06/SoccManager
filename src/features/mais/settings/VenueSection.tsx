@@ -9,6 +9,7 @@ import { CourtBadge } from '../../../components/AppShell';
 import { useToast } from '../../../components/ui/Toast';
 import { resizeImageToDataUrl } from '../../../utils/image';
 import { errorMessage } from '../../../utils/text';
+import { ThemeField } from './ThemeField';
 
 type VenueFields = Pick<
   AppSettings,
@@ -28,7 +29,7 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
     }
   }, [loaded, settings, f]);
 
-  if (!f) return <p className="py-6 text-center text-slate-500">Carregando…</p>;
+  if (!f) return <p className="py-6 text-center text-muted-foreground">Carregando…</p>;
   const set = <K extends keyof VenueFields>(k: K, v: VenueFields[K]) => setF({ ...f, [k]: v });
 
   async function save() {
@@ -58,7 +59,7 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
       <Field label="Logo">
         <div className="flex items-center gap-3">
           {f.logo ? <img src={f.logo} alt="Logo atual" className="size-14 rounded-xl object-cover" /> : <CourtBadge size={56} />}
-          <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold hover:bg-slate-50">
+          <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold hover:bg-accent">
             <ImagePlus className="size-4" aria-hidden /> Escolher imagem
             <input
               type="file"
@@ -86,14 +87,14 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
       <div className="grid grid-cols-2 gap-3">
         <Field label="Cor principal" htmlFor="v-color1">
           <div className="flex items-center gap-2">
-            <input id="v-color1" type="color" value={f.primaryColor} onChange={(e) => set('primaryColor', e.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border border-slate-300" />
-            <span className="text-sm tabular-nums text-slate-600">{f.primaryColor}</span>
+            <input id="v-color1" type="color" value={f.primaryColor} onChange={(e) => set('primaryColor', e.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border border-input" />
+            <span className="text-sm tabular-nums text-muted-foreground">{f.primaryColor}</span>
           </div>
         </Field>
         <Field label="Cor de destaque" htmlFor="v-color2">
           <div className="flex items-center gap-2">
-            <input id="v-color2" type="color" value={f.accentColor} onChange={(e) => set('accentColor', e.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border border-slate-300" />
-            <span className="text-sm tabular-nums text-slate-600">{f.accentColor}</span>
+            <input id="v-color2" type="color" value={f.accentColor} onChange={(e) => set('accentColor', e.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border border-input" />
+            <span className="text-sm tabular-nums text-muted-foreground">{f.accentColor}</span>
           </div>
         </Field>
       </div>
@@ -104,6 +105,7 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
 
       {!compact && (
         <>
+          <ThemeField />
           <Field label="A semana começa no">
             <div className="flex gap-2">
               <Chip selected={f.weekStartsOn === 0} onClick={() => set('weekStartsOn', 0)}>

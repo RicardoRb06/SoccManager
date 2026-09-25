@@ -23,12 +23,13 @@ import { downloadText } from '../../utils/download';
 import { Heatmap } from './Heatmap';
 
 function Kpi({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: 'good' | 'warn' | 'bad' }) {
-  const toneCls = tone === 'good' ? 'text-green-800' : tone === 'warn' ? 'text-amber-800' : tone === 'bad' ? 'text-red-700' : 'text-slate-900';
+  const toneCls = tone === 'good' ? 'text-success-fg' : tone === 'warn' ? 'text-warning-fg' : tone === 'bad' ? 'text-danger' : 'text-foreground';
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className={`break-words text-xl font-bold tabular-nums sm:text-2xl ${toneCls}`}>{value}</p>
-      {hint && <p className="text-xs text-slate-500">{hint}</p>}
+    <div className="min-w-0 rounded-xl border bg-card p-4 shadow-xs">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      {/* tipografia fluida: o valor encolhe em telas estreitas para caber numa linha */}
+      <p className={`text-[clamp(1rem,4.6vw,1.5rem)] font-bold tabular-nums ${toneCls}`}>{value}</p>
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -86,7 +87,7 @@ export default function ResumoPage() {
         title="Resumo"
         subtitle={periodText}
         actions={
-          <Button variant="secondary" className="px-3" onClick={() => setExporting(true)} aria-label="Exportar CSV" disabled={!r}>
+          <Button variant="outline" className="px-3" onClick={() => setExporting(true)} aria-label="Exportar CSV" disabled={!r}>
             <Download className="size-4" aria-hidden /> <span className="hidden sm:inline">Exportar CSV</span>
           </Button>
         }
@@ -101,7 +102,7 @@ export default function ResumoPage() {
         </div>
 
         {!r || !view ? (
-          <p className="py-10 text-center text-slate-500">Calculando…</p>
+          <p className="py-10 text-center text-muted-foreground">Calculando…</p>
         ) : (
           <>
             <section className="grid grid-cols-2 gap-2 lg:grid-cols-4" aria-label="Indicadores">
@@ -111,7 +112,7 @@ export default function ResumoPage() {
               <Kpi label="Faltas" value={String(r.faltas)} hint="Times que não apareceram" tone={r.faltas > 0 ? 'bad' : undefined} />
             </section>
 
-            <section className="rounded-2xl bg-slate-900 p-5 text-white">
+            <section className="rounded-xl bg-slate-900 p-5 text-white shadow-sm dark:bg-slate-900 dark:ring-1 dark:ring-border">
               <p className="flex items-center gap-2 text-sm font-medium text-amber-300">
                 <Hourglass className="size-4" aria-hidden /> Horas vazias
               </p>
@@ -129,11 +130,11 @@ export default function ResumoPage() {
             </section>
 
             <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-              <section className="rounded-2xl border border-slate-200 bg-white p-4">
+              <section className="rounded-xl border bg-card shadow-xs p-4">
                 <h2 className="mb-3 font-semibold">Ocupação por dia e horário</h2>
                 <Heatmap cells={r.heat} weekStartsOn={settings.weekStartsOn} />
                 {r.promotions.length > 0 && (
-                  <div className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm text-amber-950">
+                  <div className="mt-4 rounded-2xl bg-warning-soft p-3 text-sm text-warning-fg">
                     <p className="mb-1 flex items-center gap-2 font-semibold">
                       <Lightbulb className="size-4" aria-hidden /> Horários mais vazios
                     </p>
@@ -153,12 +154,12 @@ export default function ResumoPage() {
                 )}
               </section>
 
-              <section className="rounded-2xl border border-slate-200 bg-white p-4">
+              <section className="rounded-xl border bg-card shadow-xs p-4">
                 <h2 className="mb-3 flex items-center gap-2 font-semibold">
-                  <Trophy className="size-4 text-amber-500" aria-hidden /> Melhores clientes
+                  <Trophy className="size-4 text-warning" aria-hidden /> Melhores clientes
                 </h2>
                 {r.top.length === 0 ? (
-                  <p className="text-sm text-slate-500">Nenhum pagamento neste período.</p>
+                  <p className="text-sm text-muted-foreground">Nenhum pagamento neste período.</p>
                 ) : (
                   <ol className="flex flex-col gap-2">
                     {r.top.map((t, i) => {
@@ -166,17 +167,17 @@ export default function ResumoPage() {
                       const max = r.top[0]!.total || 1;
                       return (
                         <li key={t.customerId}>
-                          <a href={`#/clientes/${t.customerId}`} className="block rounded-xl px-1 py-1 hover:bg-slate-50">
+                          <a href={`#/clientes/${t.customerId}`} className="block rounded-xl px-1 py-1 hover:bg-accent">
                             <div className="flex items-baseline justify-between gap-2 text-sm">
                               <span className="truncate font-medium">
                                 {i + 1}. {c?.name ?? 'Cliente'}
                               </span>
-                              <span className="shrink-0 tabular-nums text-slate-700">{formatBRL(t.total)}</span>
+                              <span className="shrink-0 tabular-nums text-foreground/85">{formatBRL(t.total)}</span>
                             </div>
-                            <div className="mt-1 h-1.5 rounded-full bg-slate-100" aria-hidden>
-                              <div className="h-full rounded-full bg-brand" style={{ width: `${(t.total / max) * 100}%` }} />
+                            <div className="mt-1 h-1.5 rounded-full bg-muted" aria-hidden>
+                              <div className="h-full rounded-full bg-primary" style={{ width: `${(t.total / max) * 100}%` }} />
                             </div>
-                            <p className="mt-0.5 text-xs text-slate-500">{t.games} jogo(s) no período</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">{t.games} jogo(s) no período</p>
                           </a>
                         </li>
                       );
@@ -186,12 +187,12 @@ export default function ResumoPage() {
               </section>
             </div>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <section className="rounded-xl border bg-card shadow-xs p-4">
               <h2 className="mb-3 font-semibold">A receber</h2>
               {r.receivables.length === 0 ? (
-                <p className="rounded-xl bg-green-50 p-3 text-sm text-green-900">Nenhuma pendência no período.</p>
+                <p className="rounded-xl bg-success-soft p-3 text-sm text-success-fg">Nenhuma pendência no período.</p>
               ) : (
-                <ul className="divide-y divide-slate-100">
+                <ul className="divide-y divide-border">
                   {r.receivables.map((i, idx) => {
                     const c = view.lookups.customers.get(i.customerId);
                     const info = chargeInfo(i);
@@ -203,9 +204,9 @@ export default function ResumoPage() {
                       <li key={idx} className="flex items-center gap-2 py-2">
                         <a href={`#/clientes/${i.customerId}`} className="min-w-0 flex-1">
                           <span className="block truncate font-medium">{c?.name ?? 'Cliente'}</span>
-                          <span className="block truncate text-xs text-slate-500">{what}</span>
+                          <span className="block truncate text-xs text-muted-foreground">{what}</span>
                         </a>
-                        <span className="font-semibold tabular-nums text-amber-800">{formatBRL(i.amount)}</span>
+                        <span className="font-semibold tabular-nums text-warning-fg">{formatBRL(i.amount)}</span>
                       </li>
                     );
                   })}
@@ -219,14 +220,14 @@ export default function ResumoPage() {
 
       {exporting && r && (
         <Sheet open onClose={() => setExporting(false)} title="Exportar CSV">
-          <p className="mb-3 text-sm text-slate-600">
+          <p className="mb-3 text-sm text-muted-foreground">
             Período: {periodText}. O arquivo abre direto no Excel ou no Google Planilhas, com acentos e valores em reais.
           </p>
           <div className="grid gap-2">
             <Button onClick={() => exportCsv('reservas')}>
               <Download className="size-4" aria-hidden /> Reservas do período
             </Button>
-            <Button variant="secondary" onClick={() => exportCsv('pagamentos')}>
+            <Button variant="outline" onClick={() => exportCsv('pagamentos')}>
               <Download className="size-4" aria-hidden /> Pagamentos do período
             </Button>
           </div>

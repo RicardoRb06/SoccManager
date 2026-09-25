@@ -42,7 +42,7 @@ export function CustomerSheet({ customer, onClose, onCreated }: { customer?: Cus
       onClose={onClose}
       title={customer ? 'Editar cliente' : 'Novo cliente'}
       footer={
-        <Button block onClick={save} disabled={busy}>
+        <Button className="w-full" onClick={save} disabled={busy}>
           Salvar
         </Button>
       }

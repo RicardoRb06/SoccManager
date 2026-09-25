@@ -56,7 +56,7 @@ export function OccurrenceDetail({
   if (!data)
     return (
       <Sheet open onClose={onClose} title="Mensalista">
-        <p className="py-6 text-center text-slate-500">Carregando…</p>
+        <p className="py-6 text-center text-muted-foreground">Carregando…</p>
       </Sheet>
     );
 
@@ -84,7 +84,7 @@ export function OccurrenceDetail({
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-1 gap-2">
               {mensal ? (
-                <Button variant={ms?.emDia ? 'secondary' : 'primary'} className="px-3" onClick={() => setSub('monthPay')}>
+                <Button variant={ms?.emDia ? 'outline' : 'default'} className="px-3" onClick={() => setSub('monthPay')}>
                   <HandCoins className="size-4" aria-hidden /> Mensalidade
                 </Button>
               ) : (
@@ -103,7 +103,7 @@ export function OccurrenceDetail({
             </div>
             <div className="grid grid-cols-3 gap-2">
               <Button
-                variant="secondary"
+                variant="outline"
                 className="px-2"
                 onClick={() =>
                   act(async () => {
@@ -115,10 +115,10 @@ export function OccurrenceDetail({
               >
                 <UserX className="size-4" aria-hidden /> Falta
               </Button>
-              <Button variant="secondary" className="px-2" onClick={() => setSub('skip')}>
+              <Button variant="outline" className="px-2" onClick={() => setSub('skip')}>
                 <CalendarX2 className="size-4" aria-hidden /> Pular
               </Button>
-              <Button variant="secondary" className="px-2" onClick={() => onReschedule(rec, date)}>
+              <Button variant="outline" className="px-2" onClick={() => onReschedule(rec, date)}>
                 <MoveRight className="size-4" aria-hidden /> Remarcar
               </Button>
             </div>
@@ -129,23 +129,23 @@ export function OccurrenceDetail({
           <span className="inline-flex w-fit items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand-strong">
             <Repeat className="size-3.5" aria-hidden /> Mensalista{rec.notes ? ` · ${rec.notes}` : ''}
           </span>
-          <ul className="flex flex-col gap-2 text-slate-700">
+          <ul className="flex flex-col gap-2 text-foreground/85">
             <li className="flex items-center gap-2">
-              <CalendarDays className="size-4 text-slate-400" aria-hidden /> <span className="first-letter:uppercase">{formatLongDate(date)}</span>
+              <CalendarDays className="size-4 text-muted-foreground/70" aria-hidden /> <span className="first-letter:uppercase">{formatLongDate(date)}</span>
             </li>
             <li className="flex items-center gap-2">
-              <Clock className="size-4 text-slate-400" aria-hidden /> {formatTimeRange(rec.startMin, rec.endMin)} ({formatDuration(rec.endMin - rec.startMin)})
+              <Clock className="size-4 text-muted-foreground/70" aria-hidden /> {formatTimeRange(rec.startMin, rec.endMin)} ({formatDuration(rec.endMin - rec.startMin)})
             </li>
             <li className="flex items-center gap-2">
-              <MapPin className="size-4 text-slate-400" aria-hidden /> {court?.name}
+              <MapPin className="size-4 text-muted-foreground/70" aria-hidden /> {court?.name}
             </li>
           </ul>
-          <div className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-700">
+          <div className="rounded-2xl bg-muted/60 p-3 text-sm text-foreground/85">
             <p>
               Toda {WEEKDAY_LONG[rec.weekday]} às {minToHHMM(rec.startMin)} · {mensal ? `mensalidade de ${formatBRL(rec.monthlyPrice ?? 0)}` : `${formatBRL(price)} por jogo`}
             </p>
             {ms && (
-              <p className={`mt-1 font-semibold ${ms.emDia ? 'text-green-800' : 'text-amber-800'}`}>
+              <p className={`mt-1 font-semibold ${ms.emDia ? 'text-success-fg' : 'text-warning-fg'}`}>
                 {ms.emDia ? 'Mensalidade do mês em dia' : `Mensalidade do mês: falta ${formatBRL(ms.balance)}`}
               </p>
             )}

@@ -30,7 +30,8 @@ src/
   domain/        regras de negócio puras + testes (datas, horários, preço, conflito, recorrência, pagamentos, métricas, telefone)
   db/            Dexie (IndexedDB), migrações, bootstrap, seed (dados de exemplo)
   features/      telas: agenda, mensalistas, clientes, resumo, mais, onboarding, demo
-  components/    layout e componentes compartilhados
+  components/    layout e componentes compartilhados; ui/ = componentes shadcn/ui
+  lib/           utils.ts (cn: junta classes do Tailwind)
   license/       LicenseService (esboço: demonstração ou licenciado)
   pwa/           aviso de nova versão e "Instalar app"
   utils/         ids, roteador por hash, download, área de transferência
@@ -70,6 +71,16 @@ O repositório já traz o workflow `.github/workflows/deploy.yml`. A cada `git p
 - Nova versão publicada: quem já tem o app aberto vê o aviso "Nova versão disponível" e atualiza com um toque. Os dados continuam no aparelho.
 - Para testar a versão de produção no seu computador antes de publicar: `pnpm build` e depois `pnpm preview`.
 - Para gerar a versão de um cliente real, crie uma cópia do repositório, edite o `tenant.config.ts` (com `demo: false` e um `tenantId` próprio) e publique do mesmo jeito.
+
+## Design system (shadcn/ui)
+
+A interface usa os componentes do [shadcn/ui](https://ui.shadcn.com), copiados para `src/components/ui/` (o código é do projeto e pode ser ajustado). Por baixo: **Radix UI** (acessibilidade e teclado), **vaul** (painel que sobe de baixo), **Sonner** (avisos), **class-variance-authority** + **tailwind-merge** (variantes e classes).
+
+- **Cores por tokens** em `src/styles.css` (`--background`, `--card`, `--primary`, `--muted-foreground`…). A cor principal (`--primary`) é a cor da quadra, definida em Configurações. As telas usam `bg-card`, `text-muted-foreground` etc., nunca cores fixas; por isso o modo escuro funciona trocando só os valores das variáveis.
+- **Cores de situação** com tokens próprios para claro e escuro: `success` (pago/em dia), `warning` (pendente/devendo), `info` (sinal), `danger` (falta). Sempre com ícone e texto junto, nunca só cor.
+- **Modo escuro**: Configurações › Estabelecimento › Aparência (Automático, Claro, Escuro). A escolha fica no banco (vai no backup) e é espelhada no `localStorage` só para o `index.html` aplicar o tema antes de desenhar a tela. A impressão sai sempre no tema claro.
+- **Ajustes para uso no celular**: botões e campos com 44px de altura (o padrão do shadcn é 36px); painéis viram Drawer no celular e Dialog no computador (`components/ui/Sheet.tsx`); seletores nativos (`NativeSelect`) para abrir a lista do próprio sistema.
+- **Adicionar componentes** com a ferramenta oficial: `pnpm dlx shadcn@latest add <componente>` (configurada em `components.json`, com o atalho de import `@/` = `src/`). Revise o diff: a ferramenta pode sobrescrever arquivos com o mesmo nome e mexer no `styles.css`.
 
 ## Demonstração (`demo: true`)
 
@@ -159,6 +170,14 @@ O repositório já traz o workflow `.github/workflows/deploy.yml`. A cada `git p
 2. **"Instalar app" só em Mais**: o aviso `beforeinstallprompt` do navegador é guardado ao abrir o app e usado quando a pessoa toca no item. No iPhone (que não tem esse aviso) aparece o passo a passo do Safari; com o app já instalado, o item mostra "App instalado".
 3. **Restaurar exemplos** reaproveita as cópias internas do marco 6 (motivo "antes de restaurar exemplo") e preserva só as chaves do aparelho (`persistRequested`, `lastSnapshotDate`).
 4. **Publicação por GitHub Actions** com `pnpm install --frozen-lockfile`, testes antes do build e `VITE_BASE=/<repositorio>/`.
+
+## Decisões técnicas (design system)
+
+1. **Componentes reais do shadcn/ui** (não só o visual), para herdar a acessibilidade do Radix: foco preso no painel, Esc, leitor de tela, rolagem do fundo travada.
+2. **Fundo levemente cinza e cartões brancos com borda** para separar reservas e clientes à primeira vista.
+3. **Abas (Tabs) para escolher a quadra** e as seções de Configurações; pílulas (Chip) ficam para opções e filtros.
+4. **Mapa de calor** mistura a cor da quadra com a cor do cartão: vazio = fundo, cheio = cor da quadra, nos dois temas.
+5. **Números do Resumo com tipografia fluida** (`clamp()`), para caber numa linha no celular.
 
 ## Sem integrações externas
 

@@ -28,6 +28,7 @@ export function defaultSettings(t: TenantConfig): AppSettings {
     seededAt: null,
     lastSnapshotDate: null,
     persistRequested: false,
+    theme: 'system',
     schemaVersion: SCHEMA_VERSION,
   };
 }

@@ -32,10 +32,10 @@ export function CustomerPicker({
   if (value.kind === 'existing') {
     const c = customers.find((x) => x.id === value.id);
     return (
-      <div className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-300 bg-white px-3 py-2">
+      <div className="flex min-h-11 items-center gap-3 rounded-xl border border-input bg-card px-3 py-2">
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold">{c?.name ?? 'Cliente removido'}</p>
-          {c?.phone && <p className="text-xs text-slate-500">{formatPhone(c.phone)}</p>}
+          {c?.phone && <p className="text-xs text-muted-foreground">{formatPhone(c.phone)}</p>}
         </div>
         <button type="button" className="min-h-11 rounded-lg px-3 text-sm font-semibold text-brand" onClick={() => onChange({ kind: 'none' })}>
           Trocar
@@ -51,7 +51,7 @@ export function CustomerPicker({
           <p className="flex items-center gap-2 text-sm font-semibold text-brand-strong">
             <UserPlus className="size-4" aria-hidden /> Novo cliente
           </p>
-          <button type="button" aria-label="Cancelar cadastro" className="grid size-9 place-items-center rounded-full hover:bg-white/60" onClick={() => onChange({ kind: 'none' })}>
+          <button type="button" aria-label="Cancelar cadastro" className="grid size-9 place-items-center rounded-full hover:bg-card/60" onClick={() => onChange({ kind: 'none' })}>
             <X className="size-4" aria-hidden />
           </button>
         </div>
@@ -64,7 +64,7 @@ export function CustomerPicker({
           value={value.phone}
           onChange={(e) => onChange({ ...value, phone: e.target.value })}
         />
-        {error && <p className="text-xs font-medium text-red-600">{error}</p>}
+        {error && <p className="text-xs font-medium text-danger">{error}</p>}
       </div>
     );
   }
@@ -85,14 +85,14 @@ export function CustomerPicker({
         onFocus={() => setFocused(true)}
         onBlur={() => window.setTimeout(() => setFocused(false), 150)}
       />
-      {error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs font-medium text-danger">{error}</p>}
       {showList && (
-        <ul id={`${id}-list`} role="listbox" className="mt-1 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+        <ul id={`${id}-list`} role="listbox" className="mt-1 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
           {matches.map((c) => (
             <li key={c.id} role="option" aria-selected={false}>
               <button
                 type="button"
-                className="flex min-h-11 w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-slate-50"
+                className="flex min-h-11 w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-accent"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onChange({ kind: 'existing', id: c.id });
@@ -100,14 +100,14 @@ export function CustomerPicker({
                 }}
               >
                 <span className="truncate font-medium">{c.name}</span>
-                <span className="shrink-0 text-xs text-slate-500">{formatPhone(c.phone)}</span>
+                <span className="shrink-0 text-xs text-muted-foreground">{formatPhone(c.phone)}</span>
               </button>
             </li>
           ))}
           <li role="option" aria-selected={false}>
             <button
               type="button"
-              className="flex min-h-11 w-full items-center gap-2 border-t border-slate-100 px-3 py-2 text-left font-semibold text-brand hover:bg-brand-soft"
+              className="flex min-h-11 w-full items-center gap-2 border-t border-border px-3 py-2 text-left font-semibold text-brand hover:bg-brand-soft"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 const digits = query.replace(/\D/g, '');

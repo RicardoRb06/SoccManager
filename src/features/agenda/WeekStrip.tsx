@@ -34,13 +34,13 @@ export function WeekStrip({
             aria-label={`${WEEKDAY_SHORT[weekdayOf(d)]} ${parseISODate(d).d}${occ === null ? ', fechado' : `, ${pct}% ocupado`}`}
             onClick={() => onSelect(d)}
             className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 pb-1.5 pt-1 text-center transition-colors ${
-              isSel ? 'border-brand bg-brand text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              isSel ? 'border-brand bg-primary text-white' : 'border-border bg-card text-foreground/85 hover:bg-accent'
             }`}
           >
-            <span className={`text-[11px] font-medium uppercase ${isSel ? 'text-white/85' : 'text-slate-500'}`}>{WEEKDAY_SHORT[weekdayOf(d)]}</span>
+            <span className={`text-[11px] font-medium uppercase ${isSel ? 'text-white/85' : 'text-muted-foreground'}`}>{WEEKDAY_SHORT[weekdayOf(d)]}</span>
             <span className={`text-base font-bold leading-none ${d === today && !isSel ? 'text-brand' : ''}`}>{parseISODate(d).d}</span>
-            <span className={`mt-1 h-1.5 w-full max-w-9 overflow-hidden rounded-full ${isSel ? 'bg-white/30' : 'bg-slate-200'}`} aria-hidden>
-              <span className={`block h-full rounded-full ${isSel ? 'bg-white' : 'bg-brand'}`} style={{ width: `${pct}%` }} />
+            <span className={`mt-1 h-1.5 w-full max-w-9 overflow-hidden rounded-full ${isSel ? 'bg-card/30' : 'bg-muted'}`} aria-hidden>
+              <span className={`block h-full rounded-full ${isSel ? 'bg-card' : 'bg-primary'}`} style={{ width: `${pct}%` }} />
             </span>
           </button>
         );

@@ -28,7 +28,7 @@ export function CourtBadge({ size = 36 }: { size?: number }) {
     .slice(0, 2)
     .toUpperCase();
   return (
-    <span aria-hidden className="grid shrink-0 place-items-center rounded-xl bg-brand font-bold text-white" style={{ width: size, height: size, fontSize: size * 0.4 }}>
+    <span aria-hidden className="grid shrink-0 place-items-center rounded-xl bg-primary font-bold text-white" style={{ width: size, height: size, fontSize: size * 0.4 }}>
       {initials}
     </span>
   );
@@ -40,12 +40,12 @@ export function AppShell({ path, children, banner }: { path: string; children: R
   return (
     <div className="min-h-dvh lg:flex">
       {/* Sidebar (desktop) */}
-      <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-4 lg:flex">
+      <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-border bg-card p-4 lg:flex">
         <div className="mb-6 flex items-center gap-3 px-2">
           <CourtBadge size={40} />
           <div className="min-w-0">
             <p className="truncate font-bold leading-tight">{s.courtName}</p>
-            <p className="text-xs text-slate-500">{license.mode === 'demo' ? 'Versão de demonstração' : `Licenciado para ${license.licensedTo}`}</p>
+            <p className="text-xs text-muted-foreground">{license.mode === 'demo' ? 'Versão de demonstração' : `Licenciado para ${license.licensedTo}`}</p>
           </div>
         </div>
         <nav aria-label="Principal" className="flex flex-col gap-1">
@@ -57,7 +57,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
                 href={`#${p}`}
                 data-tour={`tab-${p.slice(1)}`}
                 aria-current={active ? 'page' : undefined}
-                className={`flex min-h-11 items-center gap-3 rounded-xl px-3 font-medium ${active ? 'bg-brand-soft text-brand-strong' : 'text-slate-600 hover:bg-slate-100'}`}
+                className={`flex min-h-11 items-center gap-3 rounded-xl px-3 font-medium ${active ? 'bg-brand-soft text-brand-strong' : 'text-muted-foreground hover:bg-accent'}`}
               >
                 <Icon className="size-5" aria-hidden />
                 {label}
@@ -77,7 +77,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
       {/* Barra inferior (celular) */}
       <nav
         aria-label="Principal"
-        className="no-print pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden"
+        className="no-print pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur lg:hidden"
       >
         <ul className="mx-auto grid max-w-lg grid-cols-5" style={{ height: 'var(--nav-height)' }}>
           {TABS.map(({ path: p, label, icon: Icon }) => {
@@ -88,7 +88,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
                   href={`#${p}`}
                   data-tour={`tab-${p.slice(1)}`}
                   aria-current={active ? 'page' : undefined}
-                  className={`flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${active ? 'text-brand' : 'text-slate-500'}`}
+                  className={`flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${active ? 'text-brand' : 'text-muted-foreground'}`}
                 >
                   <Icon className="size-6" strokeWidth={active ? 2.4 : 1.8} aria-hidden />
                   {label}
@@ -105,14 +105,14 @@ export function AppShell({ path, children, banner }: { path: string; children: R
 /** Cabeçalho padrão de página. */
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
-    <header className="pt-safe sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="pt-safe sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
       <div className="flex min-h-14 items-center gap-3 px-4 py-2">
         <div className="lg:hidden">
           <CourtBadge size={32} />
         </div>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-bold leading-tight">{title}</h1>
-          {subtitle && <p className="truncate text-xs text-slate-500">{subtitle}</p>}
+          {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
         </div>
         {actions}
       </div>
@@ -123,7 +123,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
 /** Placeholder das telas ainda não implementadas neste marco. */
 export function ComingSoon({ milestone, children }: { milestone: number; children?: ReactNode }) {
   return (
-    <div className="m-4 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-600">
+    <div className="m-4 rounded-2xl border border-dashed border-input bg-card p-6 text-center text-muted-foreground">
       <p className="font-medium">Esta tela chega no marco {milestone}.</p>
       {children}
     </div>

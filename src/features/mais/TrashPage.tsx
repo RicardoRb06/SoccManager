@@ -45,7 +45,7 @@ export default function TrashPage() {
         title="Lixeira"
         subtitle="Itens excluídos podem ser restaurados"
         actions={
-          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-slate-100" aria-label="Voltar para Mais">
+          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }
@@ -61,23 +61,23 @@ export default function TrashPage() {
         </div>
 
         {!data ? (
-          <p className="py-8 text-center text-slate-500">Carregando…</p>
+          <p className="py-8 text-center text-muted-foreground">Carregando…</p>
         ) : (tab === 'reservas' ? data.reservations.length : data.customers.length) === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">
-            <Trash2 className="mx-auto mb-2 size-8 text-slate-300" aria-hidden />A lixeira está vazia.
+          <div className="rounded-2xl border border-dashed border-input bg-card p-6 text-center text-muted-foreground">
+            <Trash2 className="mx-auto mb-2 size-8 text-muted-foreground/50" aria-hidden />A lixeira está vazia.
           </div>
         ) : tab === 'reservas' ? (
           <ul className="flex flex-col gap-2">
             {data.reservations.map((r) => (
-              <li key={r.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3">
+              <li key={r.id} className="flex items-center gap-3 rounded-xl border bg-card shadow-xs p-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{data.names.get(r.customerId) ?? 'Cliente'}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     {formatDateBR(r.date)} · {formatTimeRange(r.startMin, r.endMin)} · {data.courts.get(r.courtId)} · {formatBRL(r.price)}
                   </p>
-                  <p className="text-xs text-slate-400">Excluída em {r.deletedAt ? new Date(r.deletedAt).toLocaleString('pt-BR') : ''}</p>
+                  <p className="text-xs text-muted-foreground/70">Excluída em {r.deletedAt ? new Date(r.deletedAt).toLocaleString('pt-BR') : ''}</p>
                 </div>
-                <Button variant="secondary" className="shrink-0 px-3" onClick={() => run(() => restoreReservation(r.id), 'Reserva restaurada.')}>
+                <Button variant="outline" className="shrink-0 px-3" onClick={() => run(() => restoreReservation(r.id), 'Reserva restaurada.')}>
                   <RotateCcw className="size-4" aria-hidden /> Restaurar
                 </Button>
               </li>
@@ -86,19 +86,19 @@ export default function TrashPage() {
         ) : (
           <ul className="flex flex-col gap-2">
             {data.customers.map((c) => (
-              <li key={c.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3">
+              <li key={c.id} className="flex items-center gap-3 rounded-xl border bg-card shadow-xs p-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{c.name}</p>
-                  <p className="text-xs text-slate-400">Excluído em {c.deletedAt ? new Date(c.deletedAt).toLocaleString('pt-BR') : ''}</p>
+                  <p className="text-xs text-muted-foreground/70">Excluído em {c.deletedAt ? new Date(c.deletedAt).toLocaleString('pt-BR') : ''}</p>
                 </div>
-                <Button variant="secondary" className="shrink-0 px-3" onClick={() => run(() => restoreCustomer(c.id), 'Cliente restaurado.')}>
+                <Button variant="outline" className="shrink-0 px-3" onClick={() => run(() => restoreCustomer(c.id), 'Cliente restaurado.')}>
                   <RotateCcw className="size-4" aria-hidden /> Restaurar
                 </Button>
               </li>
             ))}
           </ul>
         )}
-        <p className="text-xs text-slate-500">Itens na lixeira não aparecem na agenda nem nos relatórios, mas continuam no backup.</p>
+        <p className="text-xs text-muted-foreground">Itens na lixeira não aparecem na agenda nem nos relatórios, mas continuam no backup.</p>
       </div>
     </>
   );

@@ -66,7 +66,7 @@ export function PaymentSheet({
       onClose={onClose}
       title={title}
       footer={
-        <Button block onClick={save} disabled={invalid || busy}>
+        <Button className="w-full" onClick={save} disabled={invalid || busy}>
           {amount && amount > 0 ? `Registrar ${formatBRL(amount)}` : 'Registrar'}
         </Button>
       }
@@ -111,10 +111,10 @@ export function PayBalanceSheet({ reservationId, balance, onClose }: { reservati
   }
   return (
     <Sheet open onClose={onClose} title={`Quitar ${formatBRL(balance)}`}>
-      <p className="mb-3 text-slate-600">Como o cliente pagou?</p>
+      <p className="mb-3 text-muted-foreground">Como o cliente pagou?</p>
       <div className="grid grid-cols-2 gap-2">
         {PAYMENT_METHODS.map((m) => (
-          <Button key={m.value} variant="secondary" className="min-h-14 text-base" disabled={busy} onClick={() => pay(m.value)}>
+          <Button key={m.value} variant="outline" className="min-h-14 text-base" disabled={busy} onClick={() => pay(m.value)}>
             {m.label}
           </Button>
         ))}

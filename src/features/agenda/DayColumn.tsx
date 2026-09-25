@@ -29,7 +29,7 @@ export function DayColumn({
   const rows = buildDayRows(data.prep, courtId, date, slotMinutes);
 
   if (rows.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">Fechado neste dia.</p>;
+    return <p className="rounded-2xl border border-dashed border-input bg-card p-6 text-center text-muted-foreground">Fechado neste dia.</p>;
   }
 
   return (
@@ -39,8 +39,8 @@ export function DayColumn({
         const dur = row.endMin - row.startMin;
         const time = (
           <span className="w-16 shrink-0 tabular-nums" aria-label={formatTimeRange(row.startMin, row.endMin)}>
-            <span className="block text-base font-bold leading-tight text-slate-800">{minToHHMM(row.startMin)}</span>
-            <span className="block text-xs text-slate-500">
+            <span className="block text-base font-bold leading-tight text-foreground">{minToHHMM(row.startMin)}</span>
+            <span className="block text-xs text-muted-foreground">
               até {minToHHMM(row.endMin)}
               {dur !== slotMinutes && <span className="block">{formatDuration(dur)}</span>}
             </span>
@@ -58,8 +58,8 @@ export function DayColumn({
                 className={`flex min-h-14 w-full items-center gap-3 rounded-2xl border px-3 text-left transition-colors hover:border-brand hover:bg-brand-soft ${STATE_STYLES.livre.row} ${past ? 'opacity-50' : ''}`}
               >
                 {time}
-                <span className="flex-1 text-sm text-slate-500">
-                  Livre · <span className="font-medium text-slate-700">{formatBRL(price)}</span>
+                <span className="flex-1 text-sm text-muted-foreground">
+                  Livre · <span className="font-medium text-foreground/85">{formatBRL(price)}</span>
                 </span>
                 <span className="grid size-9 place-items-center rounded-full bg-brand-soft text-brand" aria-hidden>
                   <Plus className="size-5" />
@@ -82,14 +82,14 @@ export function DayColumn({
               {time}
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-1.5">
-                  {v.isRecurrence && <Repeat className="size-3.5 shrink-0 text-slate-500" aria-label="Mensalista" />}
-                  <span className="truncate font-semibold text-slate-900">{v.title}</span>
+                  {v.isRecurrence && <Repeat className="size-3.5 shrink-0 text-muted-foreground" aria-label="Mensalista" />}
+                  <span className="truncate font-semibold text-foreground">{v.title}</span>
                 </span>
-                {v.subtitle && <span className="block truncate text-xs text-slate-600">{v.subtitle}</span>}
+                {v.subtitle && <span className="block truncate text-xs text-muted-foreground">{v.subtitle}</span>}
               </span>
               <span className="flex shrink-0 flex-col items-end gap-1">
                 {v.value !== undefined && (
-                  <span className="text-sm font-medium tabular-nums text-slate-700">{typeof v.value === 'number' ? formatBRL(v.value) : v.value}</span>
+                  <span className="text-sm font-medium tabular-nums text-foreground/85">{typeof v.value === 'number' ? formatBRL(v.value) : v.value}</span>
                 )}
                 <StateBadge state={v.state} />
               </span>

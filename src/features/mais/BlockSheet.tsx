@@ -70,7 +70,7 @@ export function BlockSheet({ block, defaults, onClose }: { block?: Block; defaul
         footer={
           <div className="flex gap-2">
             {block && (
-              <Button variant="ghost" className="text-red-700" onClick={() => setConfirmDelete(true)}>
+              <Button variant="ghost" className="text-danger" onClick={() => setConfirmDelete(true)}>
                 <Trash2 className="size-4" aria-hidden /> Excluir
               </Button>
             )}
@@ -140,7 +140,7 @@ export function BlockSheet({ block, defaults, onClose }: { block?: Block; defaul
           </Field>
 
           {affected && affected.length > 0 && (
-            <div role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            <div role="alert" className="rounded-2xl border border-warning-border bg-warning-soft p-3 text-sm text-warning-fg">
               <p className="flex items-center gap-2 font-semibold">
                 <AlertTriangle className="size-4" aria-hidden /> {affected.length} reserva(s) já marcada(s) neste período
               </p>

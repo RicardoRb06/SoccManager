@@ -88,24 +88,24 @@ export default function BackupPage() {
         title="Backup e segurança"
         subtitle="Seus dados ficam só neste aparelho"
         actions={
-          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-slate-100" aria-label="Voltar para Mais">
+          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }
       />
       <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
         {/* Backup em arquivo */}
-        <section className={`rounded-2xl border p-4 ${reminder.due ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
+        <section className={`rounded-2xl border p-4 ${reminder.due ? 'border-warning-border bg-warning-soft' : 'border-border bg-card'}`}>
           <h2 className="mb-1 flex items-center gap-2 font-semibold">
             <Download className="size-5 text-brand" aria-hidden /> Backup em arquivo
           </h2>
-          <p className="text-sm text-slate-700">
+          <p className="text-sm text-foreground/85">
             Último backup:{' '}
             <strong>
               {s.lastBackupAt ? `${fmtDateTime(s.lastBackupAt)}${reminder.daysSince ? ` (há ${reminder.daysSince} dia${reminder.daysSince > 1 ? 's' : ''})` : ''}` : 'nunca feito'}
             </strong>
           </p>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Gera um arquivo com tudo (reservas, clientes, mensalistas, pagamentos e configurações). Guarde fora do aparelho: Google Drive, e-mail ou pendrive.
             Recomendado a cada {s.backupReminderDays} dias.
           </p>
@@ -114,7 +114,7 @@ export default function BackupPage() {
               <Download className="size-4" aria-hidden /> Salvar arquivo
             </Button>
             {canShare && (
-              <Button variant="secondary" onClick={() => void share()}>
+              <Button variant="outline" onClick={() => void share()}>
                 <Share2 className="size-4" aria-hidden /> Compartilhar (Drive, e-mail…)
               </Button>
             )}
@@ -122,39 +122,39 @@ export default function BackupPage() {
         </section>
 
         {/* Restaurar de arquivo */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
+        <section className="rounded-xl border bg-card shadow-xs p-4">
           <h2 className="mb-1 flex items-center gap-2 font-semibold">
             <FileUp className="size-5 text-brand" aria-hidden /> Restaurar de um arquivo
           </h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             Use para trocar de aparelho ou recuperar dados. Antes de substituir, o app mostra o conteúdo do arquivo e guarda uma cópia do que existe hoje.
           </p>
           <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" id="backup-file" onChange={(e) => void onFile(e.target.files?.[0])} />
           <label
             htmlFor="backup-file"
-            className="mt-3 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 font-semibold text-slate-800 hover:bg-slate-50"
+            className="mt-3 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-input bg-card px-4 font-semibold text-foreground hover:bg-accent"
           >
             <FileUp className="size-4" aria-hidden /> Escolher arquivo de backup
           </label>
         </section>
 
         {/* Armazenamento protegido */}
-        <section className={`rounded-2xl border p-4 ${protectedOk ? 'border-green-300 bg-green-50' : 'border-amber-300 bg-amber-50'}`}>
+        <section className={`rounded-2xl border p-4 ${protectedOk ? 'border-success-border bg-success-soft' : 'border-warning-border bg-warning-soft'}`}>
           <h2 className="mb-1 flex items-center gap-2 font-semibold">
-            {protectedOk ? <ShieldCheck className="size-5 text-green-700" aria-hidden /> : <ShieldAlert className="size-5 text-amber-700" aria-hidden />}
+            {protectedOk ? <ShieldCheck className="size-5 text-success" aria-hidden /> : <ShieldAlert className="size-5 text-warning" aria-hidden />}
             Armazenamento protegido: {status === null ? '…' : protectedOk ? 'sim' : 'não'}
           </h2>
-          <p className="text-sm text-slate-700">
+          <p className="text-sm text-foreground/85">
             {protectedOk
               ? 'O navegador foi instruído a não apagar os dados deste app para liberar espaço.'
               : 'O navegador ainda pode apagar os dados deste app se o aparelho ficar sem espaço. Instalar o app na tela inicial costuma liberar a proteção.'}
           </p>
-          <p className="mt-1 text-xs text-slate-600">
+          <p className="mt-1 text-xs text-muted-foreground">
             Espaço usado: {formatBytes(status?.usage ?? null)} de {formatBytes(status?.quota ?? null)} disponíveis para o app.
           </p>
           {!protectedOk && status?.supported && (
             <Button
-              variant="secondary"
+              variant="outline"
               className="mt-3"
               onClick={async () => {
                 const ok = await requestPersistence();
@@ -169,32 +169,32 @@ export default function BackupPage() {
         </section>
 
         {/* Cópias internas */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
+        <section className="rounded-xl border bg-card shadow-xs p-4">
           <h2 className="mb-1 flex items-center gap-2 font-semibold">
             <History className="size-5 text-brand" aria-hidden /> Cópias internas automáticas
           </h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             Todo dia, na primeira abertura, o app guarda uma cópia (as 5 mais recentes). Serve para desfazer um erro, como excluir algo por engano.
           </p>
-          <p className="mt-2 flex items-start gap-2 rounded-xl bg-amber-50 p-2 text-sm text-amber-900">
+          <p className="mt-2 flex items-start gap-2 rounded-xl bg-warning-soft p-2 text-sm text-warning-fg">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
             Elas ficam neste aparelho: se o celular quebrar ou os dados do navegador forem limpos, somem junto. Não substituem o backup em arquivo.
           </p>
-          <ul className="mt-3 divide-y divide-slate-100">
+          <ul className="mt-3 divide-y divide-border">
             {(snapshots ?? []).map((sn) => (
               <li key={sn.id} className="flex items-center gap-3 py-2">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{fmtDateTime(sn.createdAt)}</p>
-                  <p className="truncate text-xs text-slate-500">
+                  <p className="truncate text-xs text-muted-foreground">
                     {REASON[sn.reason]} · {countsLine(sn.counts)}
                   </p>
                 </div>
-                <Button variant="secondary" className="shrink-0 px-3 text-sm" onClick={() => setRestore(sn)}>
+                <Button variant="outline" className="shrink-0 px-3 text-sm" onClick={() => setRestore(sn)}>
                   Restaurar
                 </Button>
               </li>
             ))}
-            {snapshots && snapshots.length === 0 && <li className="py-2 text-sm text-slate-500">Nenhuma cópia ainda.</li>}
+            {snapshots && snapshots.length === 0 && <li className="py-2 text-sm text-muted-foreground">Nenhuma cópia ainda.</li>}
           </ul>
           <Button
             variant="ghost"
@@ -206,8 +206,8 @@ export default function BackupPage() {
         </section>
 
         {/* Orientação */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
-          <h2 className="mb-2 flex items-center gap-2 font-semibold text-slate-900">
+        <section className="rounded-xl border bg-card shadow-xs p-4 text-sm text-foreground/85">
+          <h2 className="mb-2 flex items-center gap-2 font-semibold text-foreground">
             <Info className="size-5 text-brand" aria-hidden /> Para não perder dados
           </h2>
           <ul className="flex list-disc flex-col gap-2 pl-5">
@@ -237,37 +237,37 @@ export default function BackupPage() {
           title="Restaurar este backup?"
           footer={
             <div className="flex gap-2">
-              <Button variant="secondary" className="flex-1" onClick={() => setPreview(null)}>
+              <Button variant="outline" className="flex-1" onClick={() => setPreview(null)}>
                 Cancelar
               </Button>
-              <Button variant="danger" className="flex-1" disabled={!agree || busy} onClick={() => void doImport()}>
+              <Button variant="destructive" className="flex-1" disabled={!agree || busy} onClick={() => void doImport()}>
                 Substituir tudo
               </Button>
             </div>
           }
         >
           <div className="flex flex-col gap-3 text-sm">
-            <dl className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-50 p-3">
-              <dt className="text-slate-500">Backup de</dt>
+            <dl className="grid grid-cols-2 gap-2 rounded-2xl bg-muted/60 p-3">
+              <dt className="text-muted-foreground">Backup de</dt>
               <dd className="font-medium">{fmtDateTime(preview.backup.exportedAt)}</dd>
-              <dt className="text-slate-500">Reservas</dt>
+              <dt className="text-muted-foreground">Reservas</dt>
               <dd className="font-medium tabular-nums">{preview.counts.reservas}</dd>
-              <dt className="text-slate-500">Clientes</dt>
+              <dt className="text-muted-foreground">Clientes</dt>
               <dd className="font-medium tabular-nums">{preview.counts.clientes}</dd>
-              <dt className="text-slate-500">Mensalistas</dt>
+              <dt className="text-muted-foreground">Mensalistas</dt>
               <dd className="font-medium tabular-nums">{preview.counts.mensalistas}</dd>
-              <dt className="text-slate-500">Pagamentos</dt>
+              <dt className="text-muted-foreground">Pagamentos</dt>
               <dd className="font-medium tabular-nums">{preview.counts.pagamentos}</dd>
-              <dt className="text-slate-500">Quadras</dt>
+              <dt className="text-muted-foreground">Quadras</dt>
               <dd className="font-medium tabular-nums">{preview.counts.quadras}</dd>
             </dl>
             {preview.otherTenant && (
-              <p className="flex items-start gap-2 rounded-xl bg-amber-50 p-2 text-amber-900">
+              <p className="flex items-start gap-2 rounded-xl bg-warning-soft p-2 text-warning-fg">
                 <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden /> Este backup parece ser de outra quadra. Confira antes de continuar.
               </p>
             )}
-            {preview.migratedFrom !== undefined && <p className="text-slate-600">Backup de uma versão anterior do app: ele será convertido automaticamente.</p>}
-            <p className="text-slate-700">
+            {preview.migratedFrom !== undefined && <p className="text-muted-foreground">Backup de uma versão anterior do app: ele será convertido automaticamente.</p>}
+            <p className="text-foreground/85">
               <strong>Todos os dados atuais deste aparelho serão substituídos</strong> pelos do arquivo. Uma cópia interna do estado atual é guardada antes, e você pode desfazer logo em seguida.
             </p>
             <label className="flex min-h-11 cursor-pointer items-center gap-2 font-medium">

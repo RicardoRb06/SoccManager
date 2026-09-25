@@ -10,7 +10,7 @@ import type { Block, ISODate, Minutes, Reservation } from '../../domain/types';
 import { addDays, diffDays, formatDayMonth, isISODate, MONTH_LONG, nowMinutes, parseISODate, todayISO, WEEKDAY_LONG, weekDates, weekdayOf } from '../../domain/dates';
 import type { Occupant } from '../../domain/schedule';
 import { CourtBadge } from '../../components/AppShell';
-import { Chip } from '../../components/ui/controls';
+import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { navigate } from '../../utils/router';
 import { useIsDesktop, useNow } from '../../utils/hooks';
 import { useAgendaData } from './useAgendaData';
@@ -73,23 +73,23 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
 
   return (
     <>
-      <header className="pt-safe no-print sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <header className="pt-safe no-print sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
         <div className="flex items-center gap-3 px-4 pb-2 pt-3">
           <div className="lg:hidden">
             <CourtBadge size={36} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-medium text-slate-500 lg:hidden">{settings.courtName}</p>
+            <p className="truncate text-xs font-medium text-muted-foreground lg:hidden">{settings.courtName}</p>
             <h1 className="truncate text-lg font-bold leading-tight first-letter:uppercase">
               {rel ?? WEEKDAY_LONG[weekdayOf(date)]}, {dayNum} de {MONTH_LONG[m - 1]}
             </h1>
           </div>
         </div>
         <div className="flex items-center gap-2 px-4 pb-3 lg:max-w-lg">
-          <button type="button" aria-label="Dia anterior" onClick={() => goTo(addDays(date, -1))} className="grid size-11 place-items-center rounded-xl border border-slate-300 bg-white hover:bg-slate-50">
+          <button type="button" aria-label="Dia anterior" onClick={() => goTo(addDays(date, -1))} className="grid size-11 place-items-center rounded-xl border border-input bg-card hover:bg-accent">
             <ChevronLeft className="size-5" aria-hidden />
           </button>
-          <label className="relative flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold hover:bg-slate-50">
+          <label className="relative flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-input bg-card px-3 text-sm font-semibold hover:bg-accent">
             <CalendarDays className="size-4 text-brand" aria-hidden />
             <span>{formatDayMonth(date)}</span>
             <span className="sr-only">Escolher data</span>
@@ -101,14 +101,14 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
               aria-label="Escolher data"
             />
           </label>
-          <button type="button" aria-label="Próximo dia" onClick={() => goTo(addDays(date, 1))} className="grid size-11 place-items-center rounded-xl border border-slate-300 bg-white hover:bg-slate-50">
+          <button type="button" aria-label="Próximo dia" onClick={() => goTo(addDays(date, 1))} className="grid size-11 place-items-center rounded-xl border border-input bg-card hover:bg-accent">
             <ChevronRight className="size-5" aria-hidden />
           </button>
           <button
             type="button"
             onClick={() => goTo(today)}
             disabled={date === today}
-            className="min-h-11 rounded-xl bg-brand-soft px-4 text-sm font-semibold text-brand-strong disabled:opacity-50"
+            className="min-h-11 rounded-lg bg-brand-soft px-4 text-sm font-semibold text-brand-strong disabled:opacity-50"
           >
             Hoje
           </button>
@@ -117,27 +117,29 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
           <WeekStrip dates={week} selected={date} today={today} prep={data?.prep} slotMinutes={settings.slotMinutes} onSelect={goTo} />
         </div>
         {!isDesktop && courts.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto px-4 pb-3" role="group" aria-label="Quadras">
-            {courts.map((c) => (
-              <Chip key={c.id} selected={c.id === selectedCourtId} onClick={() => setCourtSel(c.id)} className="shrink-0">
-                {c.name}
-              </Chip>
-            ))}
-          </div>
+          <Tabs value={selectedCourtId ?? ''} onValueChange={setCourtSel} className="px-4 pb-3">
+            <TabsList aria-label="Quadras" className="w-full">
+              {courts.map((c) => (
+                <TabsTrigger key={c.id} value={c.id}>
+                  {c.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         )}
       </header>
 
       {data && <PrintDay data={data} date={date} slotMinutes={settings.slotMinutes} venue={settings.courtName} />}
       <div className="no-print p-4">
         {!data ? (
-          <p className="py-10 text-center text-slate-500">Carregando agenda…</p>
+          <p className="py-10 text-center text-muted-foreground">Carregando agenda…</p>
         ) : courts.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-600">Nenhuma quadra cadastrada ainda.</p>
+          <p className="rounded-2xl border border-dashed border-input bg-card p-6 text-center text-muted-foreground">Nenhuma quadra cadastrada ainda.</p>
         ) : (
           <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${visibleCourts.length}, minmax(0, 1fr))` }}>
             {visibleCourts.map((c) => (
               <section key={c.id} aria-label={c.name}>
-                {isDesktop && <h2 className="mb-2 font-semibold text-slate-700">{c.name}</h2>}
+                {isDesktop && <h2 className="mb-2 font-semibold text-foreground/85">{c.name}</h2>}
                 <DayColumn
                   data={data}
                   courtId={c.id}
@@ -157,7 +159,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             <button
               type="button"
               onClick={() => setOverlay({ type: 'closeDay' })}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold text-foreground/85 hover:bg-accent"
             >
               <ClipboardCheck className="size-4 text-brand" aria-hidden /> Encerrar o dia
             </button>
@@ -165,7 +167,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold text-foreground/85 hover:bg-accent"
             >
               <Printer className="size-4 text-brand" aria-hidden /> Imprimir agenda do dia
             </button>
@@ -176,7 +178,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
       <button
         type="button"
         onClick={() => newReservation(selectedCourtId)}
-        className="fab-bottom no-print fixed right-4 z-30 flex min-h-14 items-center gap-2 rounded-full bg-brand px-5 font-semibold text-white shadow-lg hover:bg-brand-strong lg:right-8"
+        className="fab-bottom no-print fixed right-4 z-30 flex min-h-14 items-center gap-2 rounded-full bg-primary px-5 font-semibold text-white shadow-lg hover:bg-primary/90 lg:right-8"
       >
         <Plus className="size-5" aria-hidden /> Nova reserva
       </button>

@@ -145,8 +145,12 @@ export interface AppSettings {
   seededAt: ISODateTime | null;
   lastSnapshotDate: ISODate | null;
   persistRequested: boolean;
+  /** Aparência: seguir o celular, sempre claro ou sempre escuro */
+  theme: ThemePreference;
   schemaVersion: number;
 }
+
+export type ThemePreference = 'system' | 'light' | 'dark';
 
 export type SettingKey = keyof AppSettings;
 

@@ -120,7 +120,7 @@ export function Tour() {
           style={{ top: box.top - 4, left: box.left - 4, width: box.width + 8, height: box.height + 8, boxShadow: '0 0 0 9999px rgb(15 23 42 / 0.55)' }}
         />
       ) : (
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-slate-900/55" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-overlay" />
       )}
 
       <div
@@ -129,7 +129,7 @@ export function Tour() {
         aria-modal="true"
         aria-labelledby="tour-title"
         tabIndex={-1}
-        className="absolute rounded-2xl bg-white p-4 shadow-xl outline-none"
+        className="absolute rounded-2xl bg-card p-4 shadow-xl outline-none"
         style={{ ...style, width: Math.min(BALLOON_W, vw - 32) }}
       >
         <p className="text-xs font-semibold text-brand">
@@ -138,20 +138,20 @@ export function Tour() {
         <h2 id="tour-title" className="mt-1 font-bold">
           {current.title}
         </h2>
-        <p className="mt-1 text-sm text-slate-600">{current.text}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{current.text}</p>
         <div className="mt-4 flex items-center gap-2">
-          <button type="button" className="min-h-11 rounded-xl px-2 text-sm font-medium text-slate-500 hover:bg-slate-100" onClick={closeTour}>
+          <button type="button" className="min-h-11 rounded-xl px-2 text-sm font-medium text-muted-foreground hover:bg-accent" onClick={closeTour}>
             Pular
           </button>
           <span className="flex-1" />
           {step > 0 && (
-            <button type="button" className="min-h-11 rounded-xl border border-slate-300 px-3 text-sm font-semibold hover:bg-slate-50" onClick={() => setStep((s) => s - 1)}>
+            <button type="button" className="min-h-11 rounded-xl border border-input px-3 text-sm font-semibold hover:bg-accent" onClick={() => setStep((s) => s - 1)}>
               Voltar
             </button>
           )}
           <button
             type="button"
-            className="min-h-11 rounded-xl bg-brand px-4 text-sm font-semibold text-white hover:bg-brand-strong"
+            className="min-h-11 rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90"
             onClick={() => (last ? (closeTour(), navigate('/agenda')) : setStep((s) => s + 1))}
           >
             {last ? 'Concluir' : 'Próximo'}

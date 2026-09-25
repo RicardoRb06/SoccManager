@@ -32,7 +32,7 @@ export function PrintDay({ data, date, slotMinutes, venue }: { data: AgendaData;
               {buildDayRows(data.prep, c.id, date, slotMinutes).map((row, i) => {
                 if (row.type === 'livre')
                   return (
-                    <tr key={i} className="border-b border-gray-300 text-gray-500">
+                    <tr key={i} className="border-b border-input text-muted-foreground">
                       <td className="whitespace-nowrap py-0.5 pr-1 tabular-nums">{formatTimeRange(row.startMin, row.endMin)}</td>
                       <td className="py-0.5 pr-1">—</td>
                       <td className="py-0.5 pr-1">Livre</td>
@@ -41,7 +41,7 @@ export function PrintDay({ data, date, slotMinutes, venue }: { data: AgendaData;
                   );
                 const v = describeOccupant(row.occupant, data, c.id, date);
                 return (
-                  <tr key={i} className="border-b border-gray-300">
+                  <tr key={i} className="border-b border-input">
                     <td className="whitespace-nowrap py-0.5 pr-1 tabular-nums">{formatTimeRange(row.startMin, row.endMin)}</td>
                     <td className="py-0.5 pr-1">
                       {v.title}
@@ -56,7 +56,7 @@ export function PrintDay({ data, date, slotMinutes, venue }: { data: AgendaData;
           </table>
         ))}
       </div>
-      <p className="mt-2 text-[9px] text-gray-500">Impresso em {new Date().toLocaleString('pt-BR')}</p>
+      <p className="mt-2 text-[9px] text-muted-foreground">Impresso em {new Date().toLocaleString('pt-BR')}</p>
     </div>
   );
 }

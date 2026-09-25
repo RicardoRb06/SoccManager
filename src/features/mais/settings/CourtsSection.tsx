@@ -46,7 +46,7 @@ function CourtSheet({ court, onClose }: { court?: Court; onClose: () => void }) 
         footer={
           <div className="flex gap-2">
             {court && (
-              <Button variant="ghost" className="text-red-700" onClick={() => setConfirmDelete(true)}>
+              <Button variant="ghost" className="text-danger" onClick={() => setConfirmDelete(true)}>
                 Excluir
               </Button>
             )}
@@ -110,36 +110,36 @@ export function CourtsSection() {
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <ul className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
         {(courts ?? []).map((c, i) => (
           <li key={c.id} className="flex items-center gap-2 px-3 py-2">
             <div className="min-w-0 flex-1">
-              <p className={`truncate font-medium ${c.active ? '' : 'text-slate-400 line-through'}`}>{c.name}</p>
-              <p className="text-xs text-slate-500">
+              <p className={`truncate font-medium ${c.active ? '' : 'text-muted-foreground/70 line-through'}`}>{c.name}</p>
+              <p className="text-xs text-muted-foreground">
                 {MODALITIES.find((m) => m.value === c.modality)?.label}
                 {c.sharedSpaceGroup ? ` · espaço “${c.sharedSpaceGroup}”` : ''}
                 {!c.active ? ' · desativada' : ''}
               </p>
             </div>
-            <button type="button" aria-label={`Subir ${c.name}`} disabled={i === 0} className="grid size-10 place-items-center rounded-full hover:bg-slate-100 disabled:opacity-30" onClick={() => void moveCourt(c.id, -1).catch((e) => toast.error(errorMessage(e)))}>
+            <button type="button" aria-label={`Subir ${c.name}`} disabled={i === 0} className="grid size-10 place-items-center rounded-full hover:bg-accent disabled:opacity-30" onClick={() => void moveCourt(c.id, -1).catch((e) => toast.error(errorMessage(e)))}>
               <ArrowUp className="size-4" aria-hidden />
             </button>
             <button
               type="button"
               aria-label={`Descer ${c.name}`}
               disabled={i === (courts?.length ?? 0) - 1}
-              className="grid size-10 place-items-center rounded-full hover:bg-slate-100 disabled:opacity-30"
+              className="grid size-10 place-items-center rounded-full hover:bg-accent disabled:opacity-30"
               onClick={() => void moveCourt(c.id, 1).catch((e) => toast.error(errorMessage(e)))}
             >
               <ArrowDown className="size-4" aria-hidden />
             </button>
-            <button type="button" aria-label={`Editar ${c.name}`} className="grid size-10 place-items-center rounded-full hover:bg-slate-100" onClick={() => setEditing(c)}>
+            <button type="button" aria-label={`Editar ${c.name}`} className="grid size-10 place-items-center rounded-full hover:bg-accent" onClick={() => setEditing(c)}>
               <Pencil className="size-4" aria-hidden />
             </button>
           </li>
         ))}
       </ul>
-      <Button variant="secondary" onClick={() => setEditing('new')}>
+      <Button variant="outline" onClick={() => setEditing('new')}>
         <Plus className="size-4" aria-hidden /> Adicionar quadra
       </Button>
       {editing && <CourtSheet court={editing === 'new' ? undefined : editing} onClose={() => setEditing(null)} />}
