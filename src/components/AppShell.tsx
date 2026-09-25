@@ -28,7 +28,7 @@ export function CourtBadge({ size = 36 }: { size?: number }) {
     .slice(0, 2)
     .toUpperCase();
   return (
-    <span aria-hidden className="grid shrink-0 place-items-center rounded-xl bg-primary font-bold text-white" style={{ width: size, height: size, fontSize: size * 0.4 }}>
+    <span aria-hidden className="grid shrink-0 place-items-center rounded-xl bg-primary font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.4 }}>
       {initials}
     </span>
   );
@@ -44,7 +44,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
         <div className="mb-6 flex items-center gap-3 px-2">
           <CourtBadge size={40} />
           <div className="min-w-0">
-            <p className="truncate font-bold leading-tight">{s.courtName}</p>
+            <p className="truncate font-semibold leading-tight">{s.courtName}</p>
             <p className="text-xs text-muted-foreground">{license.mode === 'demo' ? 'Versão de demonstração' : `Licenciado para ${license.licensedTo}`}</p>
           </div>
         </div>
@@ -57,7 +57,7 @@ export function AppShell({ path, children, banner }: { path: string; children: R
                 href={`#${p}`}
                 data-tour={`tab-${p.slice(1)}`}
                 aria-current={active ? 'page' : undefined}
-                className={`flex min-h-11 items-center gap-3 rounded-xl px-3 font-medium ${active ? 'bg-brand-soft text-brand-strong' : 'text-muted-foreground hover:bg-accent'}`}
+                className={`flex min-h-10 items-center gap-3 rounded-xl px-3 font-medium ${active ? 'bg-brand-soft text-brand-strong' : 'text-muted-foreground hover:bg-accent'}`}
               >
                 <Icon className="size-5" aria-hidden />
                 {label}
@@ -111,7 +111,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
           <CourtBadge size={32} />
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-lg font-bold leading-tight">{title}</h1>
+          <h1 className="truncate text-lg font-semibold leading-tight tracking-tight">{title}</h1>
           {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
         </div>
         {actions}

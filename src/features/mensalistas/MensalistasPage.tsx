@@ -82,7 +82,7 @@ export default function MensalistasPage() {
         >
           <div className="flex items-start gap-3">
             <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-brand-soft text-center text-brand-strong">
-              <span className="text-[11px] font-bold uppercase leading-none">
+              <span className="text-[11px] font-semibold uppercase leading-none">
                 {WEEKDAY_SHORT[rec.weekday]}
                 <span className="mt-0.5 block text-sm">{minToHHMM(rec.startMin)}</span>
               </span>
@@ -122,16 +122,16 @@ export default function MensalistasPage() {
               <p className="flex items-center gap-2 text-sm text-white/85">
                 <TrendingUp className="size-4" aria-hidden /> Receita fixa prevista
               </p>
-              <p className="text-2xl font-bold tabular-nums">{formatBRL(view.revenue)}/mês</p>
+              <p className="text-2xl font-semibold tabular-nums">{formatBRL(view.revenue)}/mês</p>
               <p className="text-xs text-white/75">Mensalistas ativos em {formatMonthBR(monthOf(today))}</p>
             </div>
-            <div className="rounded-xl border bg-card shadow-xs p-4">
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
               <p className="text-sm text-muted-foreground">Ativos</p>
-              <p className="text-2xl font-bold tabular-nums">{activeCount}</p>
+              <p className="text-2xl font-semibold tabular-nums">{activeCount}</p>
             </div>
             <div className={`rounded-2xl border p-4 ${debtTotal > 0 ? 'border-warning-border bg-warning-soft' : 'border-border bg-card'}`}>
               <p className="text-sm text-muted-foreground">Em aberto</p>
-              <p className={`text-2xl font-bold tabular-nums ${debtTotal > 0 ? 'text-warning-fg' : ''}`}>{formatBRL(debtTotal)}</p>
+              <p className={`text-2xl font-semibold tabular-nums ${debtTotal > 0 ? 'text-warning-fg' : ''}`}>{formatBRL(debtTotal)}</p>
             </div>
           </section>
         )}
@@ -163,7 +163,7 @@ export default function MensalistasPage() {
 
         {ended.length > 0 && (
           <div>
-            <button type="button" className="flex min-h-11 items-center gap-1 text-sm font-medium text-muted-foreground" onClick={() => setShowEnded((v) => !v)} aria-expanded={showEnded}>
+            <button type="button" className="flex min-h-10 items-center gap-1 text-sm font-medium text-muted-foreground" onClick={() => setShowEnded((v) => !v)} aria-expanded={showEnded}>
               <ChevronDown className={`size-4 transition-transform ${showEnded ? 'rotate-180' : ''}`} aria-hidden /> Encerrados ({ended.length})
             </button>
             {showEnded && <ul className="mt-2 grid gap-2 lg:grid-cols-2">{ended.map(card)}</ul>}

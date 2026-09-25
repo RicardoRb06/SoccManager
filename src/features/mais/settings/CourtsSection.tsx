@@ -110,7 +110,7 @@ export function CourtsSection() {
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
+      <ul className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
         {(courts ?? []).map((c, i) => (
           <li key={c.id} className="flex items-center gap-2 px-3 py-2">
             <div className="min-w-0 flex-1">

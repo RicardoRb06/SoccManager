@@ -49,7 +49,7 @@ export function DialogContent({
           <DialogPrimitive.Close
             data-slot="dialog-close"
             aria-label="Fechar"
-            className="absolute top-3 right-3 grid size-11 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none [&_svg]:size-5"
+            className="absolute top-3 right-3 grid size-10 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none [&_svg]:size-5"
           >
             <X aria-hidden />
           </DialogPrimitive.Close>

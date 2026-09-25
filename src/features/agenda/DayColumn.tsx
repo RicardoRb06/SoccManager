@@ -39,7 +39,7 @@ export function DayColumn({
         const dur = row.endMin - row.startMin;
         const time = (
           <span className="w-16 shrink-0 tabular-nums" aria-label={formatTimeRange(row.startMin, row.endMin)}>
-            <span className="block text-base font-bold leading-tight text-foreground">{minToHHMM(row.startMin)}</span>
+            <span className="block text-base font-semibold leading-tight text-foreground">{minToHHMM(row.startMin)}</span>
             <span className="block text-xs text-muted-foreground">
               até {minToHHMM(row.endMin)}
               {dur !== slotMinutes && <span className="block">{formatDuration(dur)}</span>}

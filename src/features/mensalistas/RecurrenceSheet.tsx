@@ -85,7 +85,7 @@ export function RecurrenceSheet({
                 <a
                   href={`#/agenda/${summary.nextDates[0] ?? today}`}
                   onClick={onClose}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-3 font-semibold text-white hover:bg-primary/90"
+                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-primary px-3 font-semibold text-white hover:bg-primary/90"
                 >
                   Ver na agenda
                 </a>

@@ -40,19 +40,19 @@ export function InstallItem() {
           {state === 'ios' ? (
             <ol className="flex flex-col gap-3 text-sm">
               <li className="flex items-start gap-3">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft font-bold text-brand-strong">1</span>
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft font-semibold text-brand-strong">1</span>
                 <span>
                   Abra esta página no <strong>Safari</strong> e toque em <strong>Compartilhar</strong> <Share className="inline size-4 align-text-bottom" aria-label="(ícone de compartilhar)" /> na barra de baixo.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft font-bold text-brand-strong">2</span>
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft font-semibold text-brand-strong">2</span>
                 <span>
                   Role e toque em <strong>Adicionar à Tela de Início</strong> <SquarePlus className="inline size-4 align-text-bottom" aria-hidden />.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft font-bold text-brand-strong">3</span>
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft font-semibold text-brand-strong">3</span>
                 <span>
                   Toque em <strong>Adicionar</strong>. O ícone da quadra aparece na tela inicial.
                 </span>

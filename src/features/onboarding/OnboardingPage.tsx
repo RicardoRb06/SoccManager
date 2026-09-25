@@ -33,7 +33,7 @@ export default function OnboardingPage() {
         <CourtBadge size={44} />
         <div>
           <p className="text-sm text-muted-foreground">Bem-vindo à Agenda da Quadra</p>
-          <h1 className="text-xl font-bold">{s.courtName}: configuração inicial</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{s.courtName}: configuração inicial</h1>
         </div>
       </header>
 
@@ -46,7 +46,7 @@ export default function OnboardingPage() {
               aria-current={i === step ? 'step' : undefined}
               className={`flex w-full flex-col items-center gap-1 rounded-xl p-2 text-xs font-medium ${i === step ? 'bg-brand-soft text-brand-strong' : 'text-muted-foreground'}`}
             >
-              <span className={`grid size-7 place-items-center rounded-full text-sm font-bold ${i < step ? 'bg-primary text-white' : i === step ? 'border-2 border-brand' : 'border border-input'}`}>
+              <span className={`grid size-7 place-items-center rounded-full text-sm font-semibold ${i < step ? 'bg-primary text-white' : i === step ? 'border-2 border-brand' : 'border border-input'}`}>
                 {i < step ? <Check className="size-4" aria-hidden /> : i + 1}
               </span>
               {label}
@@ -55,7 +55,7 @@ export default function OnboardingPage() {
         ))}
       </ol>
 
-      <h2 className="mb-1 text-lg font-bold">
+      <h2 className="mb-1 text-lg font-semibold tracking-tight">
         {step + 1}. {STEPS[step]}
       </h2>
       <p className="mb-4 text-sm text-muted-foreground">

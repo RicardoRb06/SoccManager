@@ -80,16 +80,16 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium text-muted-foreground lg:hidden">{settings.courtName}</p>
-            <h1 className="truncate text-lg font-bold leading-tight first-letter:uppercase">
+            <h1 className="truncate text-lg font-semibold leading-tight first-letter:uppercase tracking-tight">
               {rel ?? WEEKDAY_LONG[weekdayOf(date)]}, {dayNum} de {MONTH_LONG[m - 1]}
             </h1>
           </div>
         </div>
         <div className="flex items-center gap-2 px-4 pb-3 lg:max-w-lg">
-          <button type="button" aria-label="Dia anterior" onClick={() => goTo(addDays(date, -1))} className="grid size-11 place-items-center rounded-xl border border-input bg-card hover:bg-accent">
+          <button type="button" aria-label="Dia anterior" onClick={() => goTo(addDays(date, -1))} className="grid size-10 place-items-center rounded-xl border border-input bg-card hover:bg-accent">
             <ChevronLeft className="size-5" aria-hidden />
           </button>
-          <label className="relative flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-input bg-card px-3 text-sm font-semibold hover:bg-accent">
+          <label className="relative flex min-h-10 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-input bg-card px-3 text-sm font-semibold hover:bg-accent">
             <CalendarDays className="size-4 text-brand" aria-hidden />
             <span>{formatDayMonth(date)}</span>
             <span className="sr-only">Escolher data</span>
@@ -101,14 +101,14 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
               aria-label="Escolher data"
             />
           </label>
-          <button type="button" aria-label="Próximo dia" onClick={() => goTo(addDays(date, 1))} className="grid size-11 place-items-center rounded-xl border border-input bg-card hover:bg-accent">
+          <button type="button" aria-label="Próximo dia" onClick={() => goTo(addDays(date, 1))} className="grid size-10 place-items-center rounded-xl border border-input bg-card hover:bg-accent">
             <ChevronRight className="size-5" aria-hidden />
           </button>
           <button
             type="button"
             onClick={() => goTo(today)}
             disabled={date === today}
-            className="min-h-11 rounded-lg bg-brand-soft px-4 text-sm font-semibold text-brand-strong disabled:opacity-50"
+            className="min-h-10 rounded-lg bg-brand-soft px-4 text-sm font-semibold text-brand-strong disabled:opacity-50"
           >
             Hoje
           </button>
@@ -139,7 +139,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
           <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${visibleCourts.length}, minmax(0, 1fr))` }}>
             {visibleCourts.map((c) => (
               <section key={c.id} aria-label={c.name}>
-                {isDesktop && <h2 className="mb-2 font-semibold text-foreground/85">{c.name}</h2>}
+                {isDesktop && <h2 className="mb-2 font-semibold text-foreground/85 tracking-tight">{c.name}</h2>}
                 <DayColumn
                   data={data}
                   courtId={c.id}
@@ -159,7 +159,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             <button
               type="button"
               onClick={() => setOverlay({ type: 'closeDay' })}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold text-foreground/85 hover:bg-accent"
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold text-foreground/85 hover:bg-accent"
             >
               <ClipboardCheck className="size-4 text-brand" aria-hidden /> Encerrar o dia
             </button>
@@ -167,7 +167,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold text-foreground/85 hover:bg-accent"
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold text-foreground/85 hover:bg-accent"
             >
               <Printer className="size-4 text-brand" aria-hidden /> Imprimir agenda do dia
             </button>

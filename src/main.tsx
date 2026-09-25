@@ -1,5 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+// Fonte Geist do design system, empacotada no app (funciona offline, sem Google Fonts)
+import '@fontsource-variable/geist';
 import './styles.css';
 import App from './App';
 import { bootstrapDatabase } from './db/bootstrap';
@@ -18,12 +20,12 @@ const root = createRoot(rootEl);
 function Fatal({ message }: { message: string }) {
   return (
     <div className="mx-auto max-w-md p-6 text-center">
-      <h1 className="mb-2 text-lg font-bold">Não foi possível abrir os dados</h1>
+      <h1 className="mb-2 text-lg font-semibold tracking-tight">Não foi possível abrir os dados</h1>
       <p className="mb-4 text-sm text-muted-foreground">{message}</p>
       <p className="text-sm text-muted-foreground">
         Verifique se o navegador não está em aba anônima e se há espaço livre no aparelho. Seus dados não foram apagados.
       </p>
-      <button type="button" className="mt-4 min-h-11 rounded-xl bg-primary px-5 font-semibold text-white" onClick={() => location.reload()}>
+      <button type="button" className="mt-4 min-h-10 rounded-xl bg-primary px-5 font-semibold text-white" onClick={() => location.reload()}>
         Tentar de novo
       </button>
     </div>

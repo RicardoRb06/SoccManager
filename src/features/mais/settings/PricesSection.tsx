@@ -161,7 +161,7 @@ export function PricesSection() {
 
   return (
     <div className="flex flex-col gap-4">
-      <ul className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
+      <ul className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
         {sortedRules.map((r) => (
           <li key={r.id} className="flex items-center gap-3 px-3 py-2">
             <div className="min-w-0 flex-1">
@@ -183,7 +183,7 @@ export function PricesSection() {
       </Button>
       <p className="text-xs text-muted-foreground">Regra de uma quadra específica vale mais que a regra de “Todas as quadras”.</p>
 
-      <section className="rounded-xl border bg-card shadow-xs p-3">
+      <section className="rounded-xl border bg-card shadow-sm p-3">
         <h3 className="mb-2 font-semibold">Pré-visualização (preço de 1 hora)</h3>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {[1, 2, 3, 4, 5, 6, 0].map((d) => (

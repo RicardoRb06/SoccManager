@@ -38,7 +38,7 @@ export function WeekStrip({
             }`}
           >
             <span className={`text-[11px] font-medium uppercase ${isSel ? 'text-white/85' : 'text-muted-foreground'}`}>{WEEKDAY_SHORT[weekdayOf(d)]}</span>
-            <span className={`text-base font-bold leading-none ${d === today && !isSel ? 'text-brand' : ''}`}>{parseISODate(d).d}</span>
+            <span className={`text-base font-semibold leading-none ${d === today && !isSel ? 'text-brand' : ''}`}>{parseISODate(d).d}</span>
             <span className={`mt-1 h-1.5 w-full max-w-9 overflow-hidden rounded-full ${isSel ? 'bg-card/30' : 'bg-muted'}`} aria-hidden>
               <span className={`block h-full rounded-full ${isSel ? 'bg-card' : 'bg-primary'}`} style={{ width: `${pct}%` }} />
             </span>

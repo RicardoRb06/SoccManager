@@ -19,13 +19,13 @@ export function BackupBanner() {
           Saiba mais
         </a>
       </p>
-      <button type="button" className="min-h-11 shrink-0 rounded-xl bg-amber-600 px-3 font-semibold text-white hover:bg-amber-700" onClick={() => void save()}>
+      <button type="button" className="min-h-10 shrink-0 rounded-xl bg-amber-600 px-3 font-semibold text-white hover:bg-amber-700" onClick={() => void save()}>
         Fazer backup
       </button>
       <button
         type="button"
         aria-label="Lembrar depois"
-        className="grid size-11 shrink-0 place-items-center rounded-full hover:bg-warning-muted"
+        className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-warning-muted"
         onClick={() => {
           dismissedThisSession = true;
           setHidden(true);

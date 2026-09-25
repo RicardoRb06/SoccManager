@@ -32,7 +32,7 @@ export default function MaisPage() {
     <>
       <PageHeader title="Mais" />
       <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-        <nav aria-label="Opções" className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
+        <nav aria-label="Opções" className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
           <Item
             href="#/mais/backup"
             icon={reminder.due ? ShieldAlert : ShieldCheck}
@@ -47,13 +47,13 @@ export default function MaisPage() {
         </nav>
 
         {license.mode === 'demo' && (
-          <nav aria-label="Demonstração" className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-xs">
+          <nav aria-label="Demonstração" className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
             <RestoreDemoItem />
           </nav>
         )}
 
-        <section className="rounded-xl border bg-card shadow-xs p-4">
-          <h2 className="mb-3 flex items-center gap-2 font-semibold">
+        <section className="rounded-xl border bg-card p-6 shadow-sm">
+          <h2 className="mb-3 flex items-center gap-2 font-semibold tracking-tight">
             <Database className="size-5 text-brand" aria-hidden /> Dados neste aparelho
           </h2>
           <dl className="grid grid-cols-2 gap-2 text-sm">

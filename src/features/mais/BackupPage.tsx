@@ -88,7 +88,7 @@ export default function BackupPage() {
         title="Backup e segurança"
         subtitle="Seus dados ficam só neste aparelho"
         actions={
-          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
+          <a href="#/mais" className="grid size-10 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }
@@ -96,7 +96,7 @@ export default function BackupPage() {
       <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
         {/* Backup em arquivo */}
         <section className={`rounded-2xl border p-4 ${reminder.due ? 'border-warning-border bg-warning-soft' : 'border-border bg-card'}`}>
-          <h2 className="mb-1 flex items-center gap-2 font-semibold">
+          <h2 className="mb-1 flex items-center gap-2 font-semibold tracking-tight">
             <Download className="size-5 text-brand" aria-hidden /> Backup em arquivo
           </h2>
           <p className="text-sm text-foreground/85">
@@ -122,8 +122,8 @@ export default function BackupPage() {
         </section>
 
         {/* Restaurar de arquivo */}
-        <section className="rounded-xl border bg-card shadow-xs p-4">
-          <h2 className="mb-1 flex items-center gap-2 font-semibold">
+        <section className="rounded-xl border bg-card p-6 shadow-sm">
+          <h2 className="mb-1 flex items-center gap-2 font-semibold tracking-tight">
             <FileUp className="size-5 text-brand" aria-hidden /> Restaurar de um arquivo
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -132,7 +132,7 @@ export default function BackupPage() {
           <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" id="backup-file" onChange={(e) => void onFile(e.target.files?.[0])} />
           <label
             htmlFor="backup-file"
-            className="mt-3 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-input bg-card px-4 font-semibold text-foreground hover:bg-accent"
+            className="mt-3 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-input bg-card px-4 font-semibold text-foreground hover:bg-accent"
           >
             <FileUp className="size-4" aria-hidden /> Escolher arquivo de backup
           </label>
@@ -140,7 +140,7 @@ export default function BackupPage() {
 
         {/* Armazenamento protegido */}
         <section className={`rounded-2xl border p-4 ${protectedOk ? 'border-success-border bg-success-soft' : 'border-warning-border bg-warning-soft'}`}>
-          <h2 className="mb-1 flex items-center gap-2 font-semibold">
+          <h2 className="mb-1 flex items-center gap-2 font-semibold tracking-tight">
             {protectedOk ? <ShieldCheck className="size-5 text-success" aria-hidden /> : <ShieldAlert className="size-5 text-warning" aria-hidden />}
             Armazenamento protegido: {status === null ? '…' : protectedOk ? 'sim' : 'não'}
           </h2>
@@ -169,8 +169,8 @@ export default function BackupPage() {
         </section>
 
         {/* Cópias internas */}
-        <section className="rounded-xl border bg-card shadow-xs p-4">
-          <h2 className="mb-1 flex items-center gap-2 font-semibold">
+        <section className="rounded-xl border bg-card p-6 shadow-sm">
+          <h2 className="mb-1 flex items-center gap-2 font-semibold tracking-tight">
             <History className="size-5 text-brand" aria-hidden /> Cópias internas automáticas
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -206,8 +206,8 @@ export default function BackupPage() {
         </section>
 
         {/* Orientação */}
-        <section className="rounded-xl border bg-card shadow-xs p-4 text-sm text-foreground/85">
-          <h2 className="mb-2 flex items-center gap-2 font-semibold text-foreground">
+        <section className="rounded-xl border bg-card p-6 shadow-sm text-sm text-foreground/85">
+          <h2 className="mb-2 flex items-center gap-2 font-semibold text-foreground tracking-tight">
             <Info className="size-5 text-brand" aria-hidden /> Para não perder dados
           </h2>
           <ul className="flex list-disc flex-col gap-2 pl-5">
@@ -270,7 +270,7 @@ export default function BackupPage() {
             <p className="text-foreground/85">
               <strong>Todos os dados atuais deste aparelho serão substituídos</strong> pelos do arquivo. Uma cópia interna do estado atual é guardada antes, e você pode desfazer logo em seguida.
             </p>
-            <label className="flex min-h-11 cursor-pointer items-center gap-2 font-medium">
+            <label className="flex min-h-10 cursor-pointer items-center gap-2 font-medium">
               <input type="checkbox" className="size-5 accent-[var(--brand-primary)]" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
               Entendo que os dados atuais serão substituídos
             </label>

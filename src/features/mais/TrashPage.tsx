@@ -45,7 +45,7 @@ export default function TrashPage() {
         title="Lixeira"
         subtitle="Itens excluídos podem ser restaurados"
         actions={
-          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
+          <a href="#/mais" className="grid size-10 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }
@@ -69,7 +69,7 @@ export default function TrashPage() {
         ) : tab === 'reservas' ? (
           <ul className="flex flex-col gap-2">
             {data.reservations.map((r) => (
-              <li key={r.id} className="flex items-center gap-3 rounded-xl border bg-card shadow-xs p-3">
+              <li key={r.id} className="flex items-center gap-3 rounded-xl border bg-card shadow-sm p-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{data.names.get(r.customerId) ?? 'Cliente'}</p>
                   <p className="text-xs text-muted-foreground">
@@ -86,7 +86,7 @@ export default function TrashPage() {
         ) : (
           <ul className="flex flex-col gap-2">
             {data.customers.map((c) => (
-              <li key={c.id} className="flex items-center gap-3 rounded-xl border bg-card shadow-xs p-3">
+              <li key={c.id} className="flex items-center gap-3 rounded-xl border bg-card shadow-sm p-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{c.name}</p>
                   <p className="text-xs text-muted-foreground/70">Excluído em {c.deletedAt ? new Date(c.deletedAt).toLocaleString('pt-BR') : ''}</p>

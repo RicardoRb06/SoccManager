@@ -51,7 +51,7 @@ export function Sheet({ open, onClose, title, children, footer, size = 'md' }: S
           className={cn('flex max-h-[88dvh] flex-col gap-0 p-0', size === 'lg' ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
         >
           <div className="flex min-h-16 items-center py-3 pl-6 pr-16">
-            <DialogTitle className="text-lg font-bold">{title}</DialogTitle>
+            <DialogTitle className="text-lg font-semibold tracking-tight">{title}</DialogTitle>
           </div>
           {body}
         </DialogContent>
@@ -63,8 +63,8 @@ export function Sheet({ open, onClose, title, children, footer, size = 'md' }: S
     <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <DrawerContent aria-describedby={undefined} onOpenAutoFocus={focusPanel}>
         <div className="flex items-center gap-2 px-4 pb-2 pt-2">
-          <DrawerTitle className="flex-1 text-lg font-bold">{title}</DrawerTitle>
-          <DrawerClose aria-label="Fechar" className="grid size-11 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground">
+          <DrawerTitle className="flex-1 text-lg font-semibold tracking-tight">{title}</DrawerTitle>
+          <DrawerClose aria-label="Fechar" className="grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground">
             <X className="size-5" aria-hidden />
           </DrawerClose>
         </div>

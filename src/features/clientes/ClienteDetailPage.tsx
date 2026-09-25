@@ -67,7 +67,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
         title={c.name}
         subtitle={c.deletedAt ? 'Na Lixeira' : s.isMensalista ? 'Mensalista' : 'Cliente'}
         actions={
-          <a href="#/clientes" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Clientes">
+          <a href="#/clientes" className="grid size-10 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Clientes">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }
@@ -82,7 +82,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
               </Button>
             </div>
           )}
-          <section className="rounded-xl border bg-card shadow-xs p-4">
+          <section className="rounded-xl border bg-card p-6 shadow-sm">
             {c.phone ? (
               <p className="flex items-center gap-2 text-foreground/85">
                 <Phone className="size-4 text-muted-foreground/70" aria-hidden />
@@ -100,27 +100,27 @@ export default function ClienteDetailPage({ id }: { id: string }) {
           </section>
 
           <dl className="grid grid-cols-2 gap-2">
-            <div className="rounded-xl border bg-card shadow-xs p-3">
+            <div className="rounded-xl border bg-card shadow-sm p-3">
               <dt className="text-xs text-muted-foreground">Jogos</dt>
-              <dd className="text-xl font-bold tabular-nums">{s.stats.games}</dd>
+              <dd className="text-xl font-semibold tabular-nums">{s.stats.games}</dd>
             </div>
-            <div className="rounded-xl border bg-card shadow-xs p-3">
+            <div className="rounded-xl border bg-card shadow-sm p-3">
               <dt className="text-xs text-muted-foreground">Total pago</dt>
-              <dd className="text-xl font-bold tabular-nums">{formatBRL(s.stats.totalPaid)}</dd>
+              <dd className="text-xl font-semibold tabular-nums">{formatBRL(s.stats.totalPaid)}</dd>
             </div>
-            <div className="rounded-xl border bg-card shadow-xs p-3">
+            <div className="rounded-xl border bg-card shadow-sm p-3">
               <dt className="text-xs text-muted-foreground">Faltas</dt>
-              <dd className={`text-xl font-bold tabular-nums ${s.stats.faltas ? 'text-danger' : ''}`}>{s.stats.faltas}</dd>
+              <dd className={`text-xl font-semibold tabular-nums ${s.stats.faltas ? 'text-danger' : ''}`}>{s.stats.faltas}</dd>
             </div>
             <div className={`rounded-2xl border p-3 ${s.debt > 0 ? 'border-warning-border bg-warning-soft' : 'border-border bg-card'}`}>
               <dt className="text-xs text-muted-foreground">Débito</dt>
-              <dd className={`text-xl font-bold tabular-nums ${s.debt > 0 ? 'text-warning-fg' : ''}`}>{formatBRL(s.debt)}</dd>
+              <dd className={`text-xl font-semibold tabular-nums ${s.debt > 0 ? 'text-warning-fg' : ''}`}>{formatBRL(s.debt)}</dd>
             </div>
           </dl>
 
           {s.debt > 0 && (
             <section className="rounded-2xl border border-warning-border bg-warning-soft p-4">
-              <h2 className="mb-2 font-semibold text-warning-fg">Em aberto</h2>
+              <h2 className="mb-2 font-semibold text-warning-fg tracking-tight">Em aberto</h2>
               <ul className="flex flex-col gap-1 text-sm text-warning-fg">
                 {pending.map((p, i) => (
                   <li key={i} className="flex justify-between">
@@ -133,8 +133,8 @@ export default function ClienteDetailPage({ id }: { id: string }) {
           )}
 
           {recs.length > 0 && (
-            <section className="rounded-xl border bg-card shadow-xs p-4">
-              <h2 className="mb-2 flex items-center gap-2 font-semibold">
+            <section className="rounded-xl border bg-card p-6 shadow-sm">
+              <h2 className="mb-2 flex items-center gap-2 font-semibold tracking-tight">
                 <Repeat className="size-4 text-brand" aria-hidden /> Mensalista
               </h2>
               <ul className="flex flex-col gap-1 text-sm text-foreground/85">
@@ -157,7 +157,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
         </div>
 
         <section>
-          <h2 className="mb-2 font-semibold text-foreground/85">Histórico de reservas</h2>
+          <h2 className="mb-2 font-semibold text-foreground/85 tracking-tight">Histórico de reservas</h2>
           {history.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-input bg-card p-6 text-center text-muted-foreground">Nenhuma reserva ainda.</p>
           ) : (
@@ -171,7 +171,7 @@ export default function ClienteDetailPage({ id }: { id: string }) {
                     <button
                       type="button"
                       onClick={() => setOverlay({ type: 'res', id: r.id })}
-                      className={`flex w-full items-center gap-3 rounded-xl border bg-card shadow-xs px-3 py-2 text-left hover:bg-accent ${r.status === 'cancelada' ? 'opacity-60' : ''}`}
+                      className={`flex w-full items-center gap-3 rounded-xl border bg-card shadow-sm px-3 py-2 text-left hover:bg-accent ${r.status === 'cancelada' ? 'opacity-60' : ''}`}
                     >
                       <span className="min-w-0 flex-1">
                         <span className="block font-medium">

@@ -227,7 +227,7 @@ export function ReservationSheet({
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">{repeat ? (billing === 'mensal' ? 'Mensalidade' : 'Por jogo') : 'Total'}</p>
-            <p className="text-lg font-bold tabular-nums">
+            <p className="text-lg font-semibold tabular-nums">
               {repeat && billing === 'mensal' ? (monthly !== null ? formatBRL(monthly) : '—') : price !== null ? formatBRL(price) : '—'}
             </p>
           </div>
@@ -274,11 +274,11 @@ export function ReservationSheet({
               </Chip>
             ))}
             <div className="flex items-center rounded-full border border-input bg-card">
-              <button type="button" aria-label="Diminuir duração" className="grid size-11 place-items-center disabled:text-muted-foreground/50" disabled={duration <= slot} onClick={() => setDuration((d) => Math.max(slot, d - slot))}>
+              <button type="button" aria-label="Diminuir duração" className="grid size-10 place-items-center disabled:text-muted-foreground/50" disabled={duration <= slot} onClick={() => setDuration((d) => Math.max(slot, d - slot))}>
                 <Minus className="size-4" aria-hidden />
               </button>
               <span className="min-w-12 text-center text-sm font-semibold tabular-nums">{formatDuration(duration)}</span>
-              <button type="button" aria-label="Aumentar duração" className="grid size-11 place-items-center disabled:text-muted-foreground/50" disabled={duration >= 8 * 60} onClick={() => setDuration((d) => d + slot)}>
+              <button type="button" aria-label="Aumentar duração" className="grid size-10 place-items-center disabled:text-muted-foreground/50" disabled={duration >= 8 * 60} onClick={() => setDuration((d) => d + slot)}>
                 <Plus className="size-4" aria-hidden />
               </button>
             </div>
@@ -341,7 +341,7 @@ export function ReservationSheet({
               className="flex-1"
             />
             {priceManual ? (
-              <button type="button" className="min-h-11 shrink-0 rounded-xl px-3 text-sm font-semibold text-brand" onClick={() => setPriceManual(false)}>
+              <button type="button" className="min-h-10 shrink-0 rounded-xl px-3 text-sm font-semibold text-brand" onClick={() => setPriceManual(false)}>
                 Usar automático
               </button>
             ) : null}
@@ -420,7 +420,7 @@ export function ReservationSheet({
                         </li>
                       ))}
                     </ul>
-                    <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 font-medium">
+                    <label className="mt-2 flex min-h-10 cursor-pointer items-center gap-2 font-medium">
                       <input type="checkbox" className="size-5 accent-[var(--brand-primary)]" checked={skipConflicts} onChange={(e) => setSkipConflicts(e.target.checked)} />
                       Pular essas datas e criar o mensalista
                     </label>

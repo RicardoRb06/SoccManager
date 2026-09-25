@@ -25,7 +25,7 @@ export default function BlocksPage() {
         title="Bloqueios"
         subtitle="Manutenção, eventos e feriados"
         actions={
-          <a href="#/mais" className="grid size-11 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
+          <a href="#/mais" className="grid size-10 place-items-center rounded-full hover:bg-accent" aria-label="Voltar para Mais">
             <ChevronLeft className="size-5" aria-hidden />
           </a>
         }

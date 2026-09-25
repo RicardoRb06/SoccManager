@@ -41,12 +41,12 @@ export function HoursSection({ onSaved, saveLabel = 'Salvar horários' }: { onSa
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="divide-y divide-border rounded-xl border bg-card shadow-xs">
+      <ul className="divide-y divide-border rounded-xl border bg-card shadow-sm">
         {order.map((i) => {
           const d = hours[i] ?? null;
           return (
             <li key={i} className="flex flex-wrap items-center gap-2 px-3 py-2">
-              <label className="flex min-h-11 w-40 cursor-pointer items-center gap-2 font-medium">
+              <label className="flex min-h-10 w-40 cursor-pointer items-center gap-2 font-medium">
                 <input
                   type="checkbox"
                   className="size-5 accent-[var(--brand-primary)]"

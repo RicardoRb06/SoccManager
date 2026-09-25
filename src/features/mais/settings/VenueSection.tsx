@@ -59,7 +59,7 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
       <Field label="Logo">
         <div className="flex items-center gap-3">
           {f.logo ? <img src={f.logo} alt="Logo atual" className="size-14 rounded-xl object-cover" /> : <CourtBadge size={56} />}
-          <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold hover:bg-accent">
+          <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-input bg-card px-4 text-sm font-semibold hover:bg-accent">
             <ImagePlus className="size-4" aria-hidden /> Escolher imagem
             <input
               type="file"
@@ -87,13 +87,13 @@ export function VenueSection({ compact, onSaved }: { compact?: boolean; onSaved?
       <div className="grid grid-cols-2 gap-3">
         <Field label="Cor principal" htmlFor="v-color1">
           <div className="flex items-center gap-2">
-            <input id="v-color1" type="color" value={f.primaryColor} onChange={(e) => set('primaryColor', e.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border border-input" />
+            <input id="v-color1" type="color" value={f.primaryColor} onChange={(e) => set('primaryColor', e.target.value)} className="h-10 w-14 cursor-pointer rounded-lg border border-input" />
             <span className="text-sm tabular-nums text-muted-foreground">{f.primaryColor}</span>
           </div>
         </Field>
         <Field label="Cor de destaque" htmlFor="v-color2">
           <div className="flex items-center gap-2">
-            <input id="v-color2" type="color" value={f.accentColor} onChange={(e) => set('accentColor', e.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border border-input" />
+            <input id="v-color2" type="color" value={f.accentColor} onChange={(e) => set('accentColor', e.target.value)} className="h-10 w-14 cursor-pointer rounded-lg border border-input" />
             <span className="text-sm tabular-nums text-muted-foreground">{f.accentColor}</span>
           </div>
         </Field>

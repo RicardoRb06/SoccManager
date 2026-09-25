@@ -74,12 +74,14 @@ O repositório já traz o workflow `.github/workflows/deploy.yml`. A cada `git p
 
 ## Design system (shadcn/ui)
 
-A interface usa os componentes do [shadcn/ui](https://ui.shadcn.com), copiados para `src/components/ui/` (o código é do projeto e pode ser ajustado). Por baixo: **Radix UI** (acessibilidade e teclado), **vaul** (painel que sobe de baixo), **Sonner** (avisos), **class-variance-authority** + **tailwind-merge** (variantes e classes).
+A interface segue o **design system do Ricardo baseado no shadcn/ui** (tema "neutral", estilo new-york-v4: tokens de cor, raio de 10px, sombras, fonte Geist). Os componentes reais do [shadcn/ui](https://ui.shadcn.com) ficam em `src/components/ui/` e obedecem aos tokens desse sistema; os componentes do kit de protótipo (classes `sc-*`) não são copiados, porque não têm o comportamento acessível do Radix.
+
+**Desvios combinados em relação ao design system:** cor principal = cor da quadra (em vez de quase preto); botões e campos com 40px (o tamanho `lg` do sistema, melhor para o toque); fundo cinza bem claro, borda de campo mais escura e foco na cor da quadra; cores de situação (pago, pendente, sinal, falta) como extensão. A fonte Geist vem empacotada (`@fontsource-variable/geist`), sem Google Fonts, para funcionar offline. Por baixo: **Radix UI** (acessibilidade e teclado), **vaul** (painel que sobe de baixo), **Sonner** (avisos), **class-variance-authority** + **tailwind-merge** (variantes e classes).
 
 - **Cores por tokens** em `src/styles.css` (`--background`, `--card`, `--primary`, `--muted-foreground`…). A cor principal (`--primary`) é a cor da quadra, definida em Configurações. As telas usam `bg-card`, `text-muted-foreground` etc., nunca cores fixas; por isso o modo escuro funciona trocando só os valores das variáveis.
 - **Cores de situação** com tokens próprios para claro e escuro: `success` (pago/em dia), `warning` (pendente/devendo), `info` (sinal), `danger` (falta). Sempre com ícone e texto junto, nunca só cor.
 - **Modo escuro**: Configurações › Estabelecimento › Aparência (Automático, Claro, Escuro). A escolha fica no banco (vai no backup) e é espelhada no `localStorage` só para o `index.html` aplicar o tema antes de desenhar a tela. A impressão sai sempre no tema claro.
-- **Ajustes para uso no celular**: botões e campos com 44px de altura (o padrão do shadcn é 36px); painéis viram Drawer no celular e Dialog no computador (`components/ui/Sheet.tsx`); seletores nativos (`NativeSelect`) para abrir a lista do próprio sistema.
+- **Ajustes para uso no celular**: botões e campos com 40px de altura (o padrão do shadcn é 36px); painéis viram Drawer no celular e Dialog no computador (`components/ui/Sheet.tsx`); seletores nativos (`NativeSelect`) para abrir a lista do próprio sistema.
 - **Adicionar componentes** com a ferramenta oficial: `pnpm dlx shadcn@latest add <componente>` (configurada em `components.json`, com o atalho de import `@/` = `src/`). Revise o diff: a ferramenta pode sobrescrever arquivos com o mesmo nome e mexer no `styles.css`.
 
 ## Demonstração (`demo: true`)

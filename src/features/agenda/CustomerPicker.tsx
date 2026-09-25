@@ -32,12 +32,12 @@ export function CustomerPicker({
   if (value.kind === 'existing') {
     const c = customers.find((x) => x.id === value.id);
     return (
-      <div className="flex min-h-11 items-center gap-3 rounded-xl border border-input bg-card px-3 py-2">
+      <div className="flex min-h-10 items-center gap-3 rounded-xl border border-input bg-card px-3 py-2">
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold">{c?.name ?? 'Cliente removido'}</p>
           {c?.phone && <p className="text-xs text-muted-foreground">{formatPhone(c.phone)}</p>}
         </div>
-        <button type="button" className="min-h-11 rounded-lg px-3 text-sm font-semibold text-brand" onClick={() => onChange({ kind: 'none' })}>
+        <button type="button" className="min-h-10 rounded-lg px-3 text-sm font-semibold text-brand" onClick={() => onChange({ kind: 'none' })}>
           Trocar
         </button>
       </div>
@@ -92,7 +92,7 @@ export function CustomerPicker({
             <li key={c.id} role="option" aria-selected={false}>
               <button
                 type="button"
-                className="flex min-h-11 w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-accent"
+                className="flex min-h-10 w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-accent"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onChange({ kind: 'existing', id: c.id });
@@ -107,7 +107,7 @@ export function CustomerPicker({
           <li role="option" aria-selected={false}>
             <button
               type="button"
-              className="flex min-h-11 w-full items-center gap-2 border-t border-border px-3 py-2 text-left font-semibold text-brand hover:bg-brand-soft"
+              className="flex min-h-10 w-full items-center gap-2 border-t border-border px-3 py-2 text-left font-semibold text-brand hover:bg-brand-soft"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 const digits = query.replace(/\D/g, '');

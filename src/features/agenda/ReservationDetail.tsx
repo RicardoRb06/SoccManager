@@ -179,16 +179,16 @@ export function ReservationDetail({
             <dl className="grid grid-cols-3 gap-2 rounded-2xl bg-muted/60 p-3 text-center">
               <div>
                 <dt className="text-xs text-muted-foreground">Valor</dt>
-                <dd className="font-bold tabular-nums">{formatBRL(r.price)}</dd>
+                <dd className="font-semibold tabular-nums">{formatBRL(r.price)}</dd>
                 <dd className="text-[11px] text-muted-foreground">{r.priceManual ? 'manual' : 'automático'}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Pago</dt>
-                <dd className="font-bold tabular-nums text-success">{formatBRL(paid)}</dd>
+                <dd className="font-semibold tabular-nums text-success">{formatBRL(paid)}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Saldo</dt>
-                <dd className={`font-bold tabular-nums ${balance > 0 ? 'text-warning' : 'text-foreground/85'}`}>{formatBRL(balance)}</dd>
+                <dd className={`font-semibold tabular-nums ${balance > 0 ? 'text-warning' : 'text-foreground/85'}`}>{formatBRL(balance)}</dd>
               </div>
             </dl>
           )}

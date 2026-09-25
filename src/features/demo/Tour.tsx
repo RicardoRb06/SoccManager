@@ -135,23 +135,23 @@ export function Tour() {
         <p className="text-xs font-semibold text-brand">
           Passo {step + 1} de {STEPS.length}
         </p>
-        <h2 id="tour-title" className="mt-1 font-bold">
+        <h2 id="tour-title" className="mt-1 font-semibold tracking-tight">
           {current.title}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">{current.text}</p>
         <div className="mt-4 flex items-center gap-2">
-          <button type="button" className="min-h-11 rounded-xl px-2 text-sm font-medium text-muted-foreground hover:bg-accent" onClick={closeTour}>
+          <button type="button" className="min-h-10 rounded-xl px-2 text-sm font-medium text-muted-foreground hover:bg-accent" onClick={closeTour}>
             Pular
           </button>
           <span className="flex-1" />
           {step > 0 && (
-            <button type="button" className="min-h-11 rounded-xl border border-input px-3 text-sm font-semibold hover:bg-accent" onClick={() => setStep((s) => s - 1)}>
+            <button type="button" className="min-h-10 rounded-xl border border-input px-3 text-sm font-semibold hover:bg-accent" onClick={() => setStep((s) => s - 1)}>
               Voltar
             </button>
           )}
           <button
             type="button"
-            className="min-h-11 rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90"
+            className="min-h-10 rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90"
             onClick={() => (last ? (closeTour(), navigate('/agenda')) : setStep((s) => s + 1))}
           >
             {last ? 'Concluir' : 'Próximo'}

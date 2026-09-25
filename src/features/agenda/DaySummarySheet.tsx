@@ -48,15 +48,15 @@ export function DaySummarySheet({ date, onClose }: { date: ISODate; onClose: () 
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="rounded-2xl bg-success-soft p-3">
                 <p className="text-xs text-success-fg">Recebido hoje</p>
-                <p className="text-lg font-bold tabular-nums text-success-fg">{formatBRL(sum.received)}</p>
+                <p className="text-lg font-semibold tabular-nums text-success-fg">{formatBRL(sum.received)}</p>
               </div>
               <div className={`rounded-2xl p-3 ${sum.pendingTotal ? 'bg-warning-soft' : 'bg-muted/60'}`}>
                 <p className="text-xs text-warning-fg">Pendente</p>
-                <p className="text-lg font-bold tabular-nums text-warning-fg">{formatBRL(sum.pendingTotal)}</p>
+                <p className="text-lg font-semibold tabular-nums text-warning-fg">{formatBRL(sum.pendingTotal)}</p>
               </div>
               <div className="rounded-2xl bg-muted/60 p-3">
                 <p className="text-xs text-muted-foreground">Jogos · faltas</p>
-                <p className="text-lg font-bold tabular-nums">
+                <p className="text-lg font-semibold tabular-nums">
                   {sum.games} · <span className={sum.faltas ? 'text-danger' : ''}>{sum.faltas}</span>
                 </p>
               </div>

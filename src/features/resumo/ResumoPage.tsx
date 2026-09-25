@@ -25,10 +25,10 @@ import { Heatmap } from './Heatmap';
 function Kpi({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: 'good' | 'warn' | 'bad' }) {
   const toneCls = tone === 'good' ? 'text-success-fg' : tone === 'warn' ? 'text-warning-fg' : tone === 'bad' ? 'text-danger' : 'text-foreground';
   return (
-    <div className="min-w-0 rounded-xl border bg-card p-4 shadow-xs">
+    <div className="min-w-0 rounded-xl border bg-card p-6 shadow-sm">
       <p className="text-sm text-muted-foreground">{label}</p>
       {/* tipografia fluida: o valor encolhe em telas estreitas para caber numa linha */}
-      <p className={`text-[clamp(1rem,4.6vw,1.5rem)] font-bold tabular-nums ${toneCls}`}>{value}</p>
+      <p className={`text-[clamp(1rem,4.2vw,1.875rem)] font-semibold tabular-nums ${toneCls}`}>{value}</p>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
@@ -130,8 +130,8 @@ export default function ResumoPage() {
             </section>
 
             <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-              <section className="rounded-xl border bg-card shadow-xs p-4">
-                <h2 className="mb-3 font-semibold">Ocupação por dia e horário</h2>
+              <section className="rounded-xl border bg-card p-6 shadow-sm">
+                <h2 className="mb-3 font-semibold tracking-tight">Ocupação por dia e horário</h2>
                 <Heatmap cells={r.heat} weekStartsOn={settings.weekStartsOn} />
                 {r.promotions.length > 0 && (
                   <div className="mt-4 rounded-2xl bg-warning-soft p-3 text-sm text-warning-fg">
@@ -154,8 +154,8 @@ export default function ResumoPage() {
                 )}
               </section>
 
-              <section className="rounded-xl border bg-card shadow-xs p-4">
-                <h2 className="mb-3 flex items-center gap-2 font-semibold">
+              <section className="rounded-xl border bg-card p-6 shadow-sm">
+                <h2 className="mb-3 flex items-center gap-2 font-semibold tracking-tight">
                   <Trophy className="size-4 text-warning" aria-hidden /> Melhores clientes
                 </h2>
                 {r.top.length === 0 ? (
@@ -187,8 +187,8 @@ export default function ResumoPage() {
               </section>
             </div>
 
-            <section className="rounded-xl border bg-card shadow-xs p-4">
-              <h2 className="mb-3 font-semibold">A receber</h2>
+            <section className="rounded-xl border bg-card p-6 shadow-sm">
+              <h2 className="mb-3 font-semibold tracking-tight">A receber</h2>
               {r.receivables.length === 0 ? (
                 <p className="rounded-xl bg-success-soft p-3 text-sm text-success-fg">Nenhuma pendência no período.</p>
               ) : (

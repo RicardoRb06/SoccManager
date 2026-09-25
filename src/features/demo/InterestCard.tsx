@@ -20,7 +20,7 @@ export function InterestCard() {
   return (
     <>
       <section className="no-print rounded-2xl border border-brand/30 bg-brand-soft p-4">
-        <h2 className="flex items-center gap-2 font-semibold text-brand-strong">
+        <h2 className="flex items-center gap-2 font-semibold text-brand-strong tracking-tight">
           <Sparkles className="size-5" aria-hidden /> Quer isso na sua quadra?
         </h2>
         <p className="mt-1 text-sm text-foreground/85">Com o nome, a logo, as quadras e os preços do seu estabelecimento.</p>
@@ -32,7 +32,7 @@ export function InterestCard() {
       {open && (
         <Sheet open onClose={() => setOpen(false)} title="Tenho interesse">
           <p className="text-sm text-muted-foreground">Fale com o responsável pelo sistema:</p>
-          <p className="my-3 flex items-center gap-2 text-2xl font-bold tabular-nums">
+          <p className="my-3 flex items-center gap-2 text-2xl font-semibold tabular-nums">
             <Phone className="size-5 text-brand" aria-hidden /> {phone}
           </p>
           <Button

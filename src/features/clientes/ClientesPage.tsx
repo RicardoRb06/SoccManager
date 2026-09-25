@@ -84,7 +84,7 @@ export default function ClientesPage() {
             <ul className="flex flex-col gap-2 lg:hidden">
               {list.map((s) => (
                 <li key={s.customer.id}>
-                  <a href={`#/clientes/${s.customer.id}`} className="flex min-h-16 items-center gap-3 rounded-xl border bg-card shadow-xs px-3 py-2 hover:bg-accent">
+                  <a href={`#/clientes/${s.customer.id}`} className="flex min-h-16 items-center gap-3 rounded-xl border bg-card shadow-sm px-3 py-2 hover:bg-accent">
                     <span className="min-w-0 flex-1">
                       <span className="flex items-baseline justify-between gap-2">
                         <span className="truncate font-semibold">{s.customer.name}</span>
@@ -102,7 +102,7 @@ export default function ClientesPage() {
               ))}
             </ul>
             {/* Desktop: tabela */}
-            <div className="hidden overflow-hidden rounded-xl border bg-card shadow-xs lg:block">
+            <div className="hidden overflow-hidden rounded-xl border bg-card shadow-sm lg:block">
               <table className="w-full text-left text-sm">
                 <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
                   <tr>
