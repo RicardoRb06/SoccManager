@@ -111,7 +111,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
           <div className="lg:hidden">
             <CourtBadge size={28} />
           </div>
-          <div className="relative min-w-0 flex-1 lg:flex-none">
+          <div className="relative min-w-0 flex-1 lg:flex-none lg:shrink-0">
             <p className="truncate text-xs text-muted-foreground lg:hidden">{settings.courtName}</p>
             <h1>
               <button
@@ -120,7 +120,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
                 aria-label={`${dayTitle(date, today, false)}. Escolher outra data`}
                 className="-mx-1 flex max-w-full items-center gap-1 rounded-md px-1 text-left text-[19px] font-semibold leading-tight tracking-tight hover:bg-accent lg:text-xl"
               >
-                <span className="truncate">{dayTitle(date, today, !isDesktop)}</span>
+                <span className="truncate lg:overflow-visible">{dayTitle(date, today, !isDesktop)}</span>
                 <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
               </button>
             </h1>
@@ -136,7 +136,8 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             />
           </div>
 
-          {isDesktop && <div className="w-[440px] shrink-0">{weekStrip}</div>}
+          {/* no desktop a faixa da semana encolhe (até 320px) antes do título ser cortado */}
+          {isDesktop && <div className="min-w-[320px] max-w-[440px] flex-1">{weekStrip}</div>}
           {isDesktop && <div className="flex-1" />}
 
           {date !== today && (
