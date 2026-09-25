@@ -66,6 +66,8 @@ export interface OccupantView {
   subtitle?: string;
   /** Valor exibido (preço ou "Mensalidade") */
   value?: string | Cents;
+  /** Quanto já foi pago (só reservas avulsas); usado para mostrar o sinal */
+  paid?: Cents;
   isRecurrence: boolean;
 }
 
@@ -95,9 +97,10 @@ export function describeOccupant(o: Occupant, data: AgendaData, courtId: string,
       const ms = monthStatus(rec, data.recurrencePayments, monthOf(date));
       return { state: ms.emDia ? 'mensal_ok' : 'mensal_devendo', title, subtitle, value: 'Mensalidade', isRecurrence: true };
     }
-    const v = reservationVisualState(r, data.paid.get(r.id) ?? 0);
+    const paid = data.paid.get(r.id) ?? 0;
+    const v = reservationVisualState(r, paid);
     const state: VisualState = v === 'livre' || v === 'mensalidade' || v === 'bloqueado' ? 'pendente' : v;
-    return { state, title, subtitle, value: r.price, isRecurrence: !!rec };
+    return { state, title, subtitle, value: r.price, paid, isRecurrence: !!rec };
   }
 
   // ocorrência virtual de mensalista
