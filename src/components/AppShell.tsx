@@ -37,6 +37,7 @@ export function CourtBadge({ size = 36 }: { size?: number }) {
 export function AppShell({ path, children, banner }: { path: string; children: ReactNode; banner?: ReactNode }) {
   const s = useSettings();
   const license = licenseService.getStatus();
+  const wide = isActive('/agenda', path);
   return (
     <div className="min-h-dvh lg:flex">
       {/* Sidebar (desktop) */}
@@ -69,7 +70,8 @@ export function AppShell({ path, children, banner }: { path: string; children: R
 
       <div className="min-w-0 flex-1">
         {banner}
-        <main className="pb-nav mx-auto w-full max-w-3xl lg:max-w-6xl" style={{ paddingLeft: 'var(--safe-left)', paddingRight: 'var(--safe-right)' }}>
+        {/* A Agenda usa a largura toda (as quadras ficam lado a lado); as outras telas têm largura máxima para ler melhor */}
+        <main className={`pb-nav w-full ${wide ? '' : 'mx-auto max-w-3xl lg:max-w-6xl'}`} style={{ paddingLeft: 'var(--safe-left)', paddingRight: 'var(--safe-right)' }}>
           {children}
         </main>
       </div>
