@@ -33,7 +33,8 @@ interface Look {
   strike?: boolean;
 }
 
-const SURFACE = 'bg-foreground/[0.045] dark:bg-foreground/[0.07]';
+// Fundo opaco (mistura fixa com o fundo da página): as linhas das horas não aparecem através do bloco
+const SURFACE = 'bg-[color-mix(in_oklab,var(--foreground)_5%,var(--background))] dark:bg-[color-mix(in_oklab,var(--foreground)_8%,var(--background))]';
 
 /**
  * Cores fortes e fixas das etiquetas de pagamento (feedback: na correria precisa bater o olho e saber quem pagou).
@@ -181,7 +182,7 @@ export function DayTimeline({
                   type="button"
                   disabled={!clickable}
                   onClick={() => onItem(row.occupant)}
-                  className={`absolute left-1 right-0 flex items-start gap-2.5 overflow-hidden rounded-lg py-2 pl-3.5 pr-2.5 text-left transition-shadow enabled:hover:ring-1 enabled:hover:ring-foreground/15 ${look.surface} ${look.faded ? 'opacity-75' : ''}`}
+                  className={`absolute left-1 right-0 flex items-center gap-2.5 overflow-hidden rounded-lg py-2 pl-3.5 pr-2.5 text-left transition-shadow enabled:hover:ring-1 enabled:hover:ring-foreground/15 ${look.surface} ${look.faded ? 'opacity-75' : ''}`}
                   style={{ top: y(row.startMin) + 3, height: h }}
                 >
                   <span className={`absolute inset-y-0 left-0 w-1 ${look.bar}`} aria-hidden />

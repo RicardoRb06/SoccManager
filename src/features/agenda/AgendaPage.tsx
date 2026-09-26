@@ -106,12 +106,26 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
     />
   );
 
+  // "↩ Hoje" só fora do dia atual. No desktop fica à direita, longe da faixa da semana, para não deslocar os dias.
+  const todayChip =
+    date !== today ? (
+      <button
+        type="button"
+        onClick={() => goTo(today)}
+        className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full bg-secondary px-2.5 text-xs font-medium text-secondary-foreground hover:bg-accent"
+      >
+        <Undo2 className="size-3.5" aria-hidden /> Hoje
+      </button>
+    ) : null;
+
   return (
     <>
       <header className="pt-safe no-print sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
         <div className="flex items-center gap-3 px-4 pt-3 lg:gap-6 lg:px-6 lg:py-3">
-          <div className="relative min-w-0 flex-1 lg:flex-none lg:shrink-0">
-            <div className="flex items-center gap-2">
+          {/* Largura fixa no desktop: a faixa da semana não anda quando o texto da data muda */}
+          <div className="relative min-w-0 flex-1 lg:w-72 lg:flex-none lg:shrink-0">
+            {/* altura fixa: o "Hoje" aparecer/sumir não empurra a faixa da semana para baixo */}
+            <div className="flex min-h-8 items-center gap-2">
               <h1 className="min-w-0">
                 <button
                   type="button"
@@ -123,15 +137,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
                   <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                 </button>
               </h1>
-              {date !== today && (
-                <button
-                  type="button"
-                  onClick={() => goTo(today)}
-                  className="inline-flex min-h-8 shrink-0 items-center gap-1 rounded-full bg-secondary px-2.5 text-xs font-medium text-secondary-foreground hover:bg-accent"
-                >
-                  <Undo2 className="size-3.5" aria-hidden /> Hoje
-                </button>
-              )}
+              {!isDesktop && todayChip}
             </div>
             {/* campo de data invisível: o título abre o calendário nativo */}
             <input
@@ -145,9 +151,9 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             />
           </div>
 
-          {/* no desktop a faixa da semana encolhe (até 320px) antes do título ser cortado */}
           {isDesktop && <div className="min-w-[320px] max-w-[440px] flex-1">{weekStrip}</div>}
           {isDesktop && <div className="flex-1" />}
+          {isDesktop && todayChip}
           {isDesktop && (
             <Button onClick={() => newReservation(selectedCourtId)} disabled={!selectedCourtId} className="pl-2.5 pr-3.5">
               <Plus className="size-[18px]" aria-hidden /> Nova reserva
