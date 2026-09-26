@@ -1,18 +1,18 @@
 /**
  * Agenda (tela inicial).
- * Cabeçalho: a data aparece uma vez só (o título abre o calendário), faixa da semana, "+ Reserva" e menu ⋯.
+ * Cabeçalho: a data aparece uma vez só (o título abre o calendário) e a faixa da semana.
  * Corpo: linha do tempo. Celular mostra uma quadra por vez (abas); desktop mostra todas lado a lado.
+ * Nova reserva: botão flutuante no celular, botão no cabeçalho no desktop.
+ * Encerrar o dia, Imprimir e Bloquear horário ficam no fim da lista.
  */
 import { useRef, useState } from 'react';
-import { ChevronDown, ClipboardCheck, Lock, MoreHorizontal, Plus, Printer } from 'lucide-react';
+import { ChevronDown, ClipboardCheck, Lock, Plus, Printer, Undo2 } from 'lucide-react';
 import { db } from '../../db/database';
 import { useSettings } from '../../db/hooks';
 import type { Block, ISODate, Minutes, Reservation } from '../../domain/types';
 import { addDays, diffDays, isISODate, MONTH_LONG, nowMinutes, parseISODate, todayISO, WEEKDAY_LONG, weekDates, weekdayOf } from '../../domain/dates';
 import type { Occupant } from '../../domain/schedule';
-import { CourtBadge } from '../../components/AppShell';
 import { Button } from '../../components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { navigate } from '../../utils/router';
 import { useIsDesktop, useNow } from '../../utils/hooks';
 import { useAgendaData } from './useAgendaData';
@@ -101,29 +101,37 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
       onSelect={goTo}
       onPrevWeek={() => goTo(addDays(date, -7))}
       onNextWeek={() => goTo(addDays(date, 7))}
+      showArrows={isDesktop}
     />
   );
 
   return (
     <>
       <header className="pt-safe no-print sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-        <div className="flex items-center gap-2.5 px-4 pt-3 lg:gap-6 lg:px-6 lg:py-3">
-          <div className="lg:hidden">
-            <CourtBadge size={28} />
-          </div>
+        <div className="flex items-center gap-3 px-4 pt-3 lg:gap-6 lg:px-6 lg:py-3">
           <div className="relative min-w-0 flex-1 lg:flex-none lg:shrink-0">
-            <p className="truncate text-xs text-muted-foreground lg:hidden">{settings.courtName}</p>
-            <h1>
-              <button
-                type="button"
-                onClick={openDatePicker}
-                aria-label={`${dayTitle(date, today, false)}. Escolher outra data`}
-                className="-mx-1 flex max-w-full items-center gap-1 rounded-md px-1 text-left text-[19px] font-semibold leading-tight tracking-tight hover:bg-accent lg:text-xl"
-              >
-                <span className="truncate lg:overflow-visible">{dayTitle(date, today, !isDesktop)}</span>
-                <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              </button>
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="min-w-0">
+                <button
+                  type="button"
+                  onClick={openDatePicker}
+                  aria-label={`${dayTitle(date, today, false)}. Escolher outra data`}
+                  className="-mx-1 flex max-w-full items-center gap-1 rounded-md px-1 text-left text-[19px] font-semibold leading-tight tracking-tight hover:bg-accent lg:text-xl"
+                >
+                  <span className="truncate lg:overflow-visible">{dayTitle(date, today, !isDesktop)}</span>
+                  <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                </button>
+              </h1>
+              {date !== today && (
+                <button
+                  type="button"
+                  onClick={() => goTo(today)}
+                  className="inline-flex min-h-8 shrink-0 items-center gap-1 rounded-full bg-secondary px-2.5 text-xs font-medium text-secondary-foreground hover:bg-accent"
+                >
+                  <Undo2 className="size-3.5" aria-hidden /> Hoje
+                </button>
+              )}
+            </div>
             {/* campo de data invisível: o título abre o calendário nativo */}
             <input
               ref={dateInput}
@@ -139,43 +147,14 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
           {/* no desktop a faixa da semana encolhe (até 320px) antes do título ser cortado */}
           {isDesktop && <div className="min-w-[320px] max-w-[440px] flex-1">{weekStrip}</div>}
           {isDesktop && <div className="flex-1" />}
-
-          {date !== today && (
-            <Button variant="ghost" onClick={() => goTo(today)} className="px-3">
-              Hoje
+          {isDesktop && (
+            <Button onClick={() => newReservation(selectedCourtId)} disabled={!selectedCourtId} className="pl-2.5 pr-3.5">
+              <Plus className="size-[18px]" aria-hidden /> Nova reserva
             </Button>
           )}
-
-          {data && courts.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Mais ações do dia" className="shadow-none">
-                  <MoreHorizontal className="size-5" aria-hidden />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {date <= today && (
-                  <DropdownMenuItem onSelect={() => setOverlay({ type: 'closeDay' })}>
-                    <ClipboardCheck aria-hidden /> Encerrar o dia
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onSelect={() => window.print()}>
-                  <Printer aria-hidden /> Imprimir agenda do dia
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setOverlay({ type: 'block', courtId: selectedCourtId })}>
-                  <Lock aria-hidden /> Bloquear horário
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          <Button onClick={() => newReservation(selectedCourtId)} disabled={!selectedCourtId} className="pl-2.5 pr-3.5">
-            <Plus className="size-[18px]" aria-hidden />
-            {isDesktop ? 'Nova reserva' : 'Reserva'}
-          </Button>
         </div>
 
-        {!isDesktop && <div className="px-2 pb-1 pt-3">{weekStrip}</div>}
+        {!isDesktop && <div className="px-2 pb-1 pt-2">{weekStrip}</div>}
 
         {!isDesktop && courts.length > 1 && (
           <div role="tablist" aria-label="Quadras" className="mt-1 flex gap-5 overflow-x-auto px-4">
@@ -200,7 +179,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
       </header>
 
       {data && <PrintDay data={data} date={date} slotMinutes={settings.slotMinutes} venue={settings.courtName} />}
-      <div className="no-print py-3 pl-2 pr-4 lg:pl-4 lg:pr-6">
+      <div className="no-print pb-24 pl-2 pr-4 pt-3 lg:pb-6 lg:pl-4 lg:pr-6">
         {!data ? (
           <p className="py-10 text-center text-muted-foreground">Carregando agenda…</p>
         ) : courts.length === 0 ? (
@@ -214,11 +193,36 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             nowMin={date === today ? nowMin : null}
             isPast={isPast}
             showHeaders={isDesktop}
-            onFree={(courtId, start) => newReservation(courtId, start)}
             onItem={openItem}
           />
         )}
+        {data && courts.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2 pl-2 lg:pl-[3.75rem]">
+            {date <= today && (
+              <Button variant="outline" onClick={() => setOverlay({ type: 'closeDay' })} className="shadow-none">
+                <ClipboardCheck aria-hidden /> Encerrar o dia
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => window.print()} className="shadow-none">
+              <Printer aria-hidden /> Imprimir agenda do dia
+            </Button>
+            <Button variant="outline" onClick={() => setOverlay({ type: 'block', courtId: selectedCourtId })} className="shadow-none">
+              <Lock aria-hidden /> Bloquear horário
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Nova reserva no celular: botão flutuante no canto inferior direito */}
+      {!isDesktop && selectedCourtId && (
+        <button
+          type="button"
+          onClick={() => newReservation(selectedCourtId)}
+          className="fab-bottom no-print fixed right-4 z-30 flex min-h-14 items-center gap-2 rounded-full bg-primary px-5 font-semibold text-primary-foreground shadow-lg hover:bg-primary/90"
+        >
+          <Plus className="size-5" aria-hidden /> Nova reserva
+        </button>
+      )}
 
       {overlay?.type === 'form' && <ReservationSheet init={overlay.init} title={overlay.title} onClose={() => setOverlay(null)} />}
       {overlay?.type === 'detail' && (

@@ -1,18 +1,18 @@
-/** Faixa fina "Versão de demonstração" no topo (só com demo: true). */
-import { Info, PlayCircle } from 'lucide-react';
+/**
+ * Faixa fina "Demonstração" no topo (só com demo: true).
+ * No celular é só texto; o "Como funciona?" fica em Mais. A partir de sm aparece também aqui.
+ */
+import { PlayCircle } from 'lucide-react';
 import { openTour } from './tourStore';
 
 export function DemoBanner() {
   return (
-    <div className="no-print pt-safe flex items-center gap-2 border-b border-brand/20 bg-brand-soft px-3 py-1 sm:px-4 text-sm text-brand-strong">
-      <Info className="hidden size-4 shrink-0 sm:block" aria-hidden />
+    <div className="no-print pt-safe flex min-h-7 items-center gap-2 border-b border-border px-4 text-xs text-muted-foreground">
       <p className="min-w-0 flex-1 truncate">
-        <span className="font-semibold sm:hidden">Versão de demonstração</span>
-        <span className="hidden font-semibold sm:inline">Versão de demonstração</span>
-        <span className="hidden sm:inline"> · dados de exemplo</span>
+        Demonstração <span className="hidden sm:inline">· dados de exemplo</span>
       </p>
-      <button type="button" onClick={openTour} className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-xl px-2 font-semibold hover:bg-card/60">
-        <PlayCircle className="size-4" aria-hidden /> Como funciona?
+      <button type="button" onClick={openTour} className="hidden min-h-8 shrink-0 items-center gap-1 rounded-md px-2 font-medium text-brand hover:bg-accent sm:inline-flex">
+        <PlayCircle className="size-3.5" aria-hidden /> Como funciona?
       </button>
     </div>
   );

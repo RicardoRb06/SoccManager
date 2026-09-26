@@ -1,3 +1,4 @@
+import { useRef, type TouchEvent } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ISODate } from '../../domain/types';
 import { parseISODate, WEEKDAY_SHORT, weekdayOf } from '../../domain/dates';
@@ -7,7 +8,8 @@ import type { PreparedSchedule } from '../../domain/schedule';
 /**
  * Faixa da semana: os 7 dias como texto, com um traço fino de ocupação embaixo do número.
  * O dia escolhido ganha fundo; hoje (quando não escolhido) fica na cor da quadra.
- * As setas trocam de semana; para trocar de dia, toca no dia.
+ * Trocar de semana: arrastar a faixa para o lado (celular) ou as setas (desktop).
+ * Para trocar de dia, toca no dia.
  */
 export function WeekStrip({
   dates,
@@ -18,6 +20,7 @@ export function WeekStrip({
   onSelect,
   onPrevWeek,
   onNextWeek,
+  showArrows,
 }: {
   dates: ISODate[];
   selected: ISODate;
@@ -27,13 +30,34 @@ export function WeekStrip({
   onSelect: (d: ISODate) => void;
   onPrevWeek: () => void;
   onNextWeek: () => void;
+  showArrows: boolean;
 }) {
+  // Gesto de arrastar: só conta se o movimento for principalmente horizontal e maior que 50px
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  function onTouchStart(e: TouchEvent) {
+    const t = e.touches[0];
+    touch.current = t ? { x: t.clientX, y: t.clientY } : null;
+  }
+  function onTouchEnd(e: TouchEvent) {
+    const start = touch.current;
+    const t = e.changedTouches[0];
+    touch.current = null;
+    if (!start || !t) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0) onNextWeek();
+    else onPrevWeek();
+  }
+
   const arrow = 'grid h-12 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground';
   return (
-    <div className="flex items-center">
-      <button type="button" aria-label="Semana anterior" onClick={onPrevWeek} className={arrow}>
-        <ChevronLeft className="size-4" aria-hidden />
-      </button>
+    <div className="flex touch-pan-y items-center" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      {showArrows && (
+        <button type="button" aria-label="Semana anterior" onClick={onPrevWeek} className={arrow}>
+          <ChevronLeft className="size-4" aria-hidden />
+        </button>
+      )}
       <div className="grid flex-1 grid-cols-7" role="tablist" aria-label="Dias da semana">
         {dates.map((d) => {
           const occ = prep ? dayOccupancy(prep, d, slotMinutes) : null;
@@ -62,9 +86,11 @@ export function WeekStrip({
           );
         })}
       </div>
-      <button type="button" aria-label="Próxima semana" onClick={onNextWeek} className={arrow}>
-        <ChevronRight className="size-4" aria-hidden />
-      </button>
+      {showArrows && (
+        <button type="button" aria-label="Próxima semana" onClick={onNextWeek} className={arrow}>
+          <ChevronRight className="size-4" aria-hidden />
+        </button>
+      )}
     </div>
   );
 }

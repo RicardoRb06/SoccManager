@@ -7,7 +7,7 @@
  * Reserva futura sem pagamento fica neutra, porque é o normal (ninguém paga antes de jogar).
  */
 import { Fragment, type ReactNode } from 'react';
-import { Check, Lock, Plus, Repeat, X } from 'lucide-react';
+import { Check, Lock, Repeat, X } from 'lucide-react';
 import type { Court, ISODate, Minutes } from '../../domain/types';
 import { buildDayRows } from '../../domain/agendaRows';
 import { formatDuration, formatTimeRange, minToHHMM } from '../../domain/time';
@@ -115,7 +115,6 @@ export function DayTimeline({
   nowMin,
   isPast,
   showHeaders,
-  onFree,
   onItem,
 }: {
   data: AgendaData;
@@ -127,7 +126,6 @@ export function DayTimeline({
   isPast: (endMin: Minutes) => boolean;
   /** mostra o nome de cada quadra no topo da coluna (desktop) */
   showHeaders: boolean;
-  onFree: (courtId: string, startMin: Minutes) => void;
   onItem: (o: Occupant) => void;
 }) {
   const cols = courts.map((court) => ({ court, rows: buildDayRows(data.prep, court.id, date, slotMinutes) }));
@@ -192,21 +190,16 @@ export function DayTimeline({
 
               if (row.type === 'livre') {
                 const price = priceFor(data.priceRules, court.id, date, row.startMin, row.endMin);
+                // Horário livre é só informação: nova reserva nasce pelo botão "Nova reserva"
                 return (
-                  <button
+                  <div
                     key={`l${row.startMin}`}
-                    type="button"
-                    onClick={() => onFree(court.id, row.startMin)}
-                    aria-label={`Livre, ${formatTimeRange(row.startMin, row.endMin)}, ${formatBRLShort(price)}. Nova reserva`}
-                    className={`group absolute inset-x-0 flex items-center justify-between rounded-lg pl-3 pr-2.5 text-left text-sm text-muted-foreground/70 transition-colors hover:bg-brand-soft hover:text-brand ${past ? 'opacity-45' : ''}`}
+                    className={`absolute inset-x-0 flex items-center pl-3 text-sm text-muted-foreground/70 ${past ? 'opacity-45' : ''}`}
                     style={{ top: y(row.startMin) + 2, height: dur * ppm - 4 }}
                   >
-                    <span>
-                      Livre
-                      {!past && <span className="ml-2 font-medium tabular-nums text-muted-foreground group-hover:text-brand">{formatBRLShort(price)}</span>}
-                    </span>
-                    {!past && <Plus className="size-4" aria-hidden />}
-                  </button>
+                    Livre
+                    {!past && <span className="ml-2 font-medium tabular-nums text-muted-foreground">{formatBRLShort(price)}</span>}
+                  </div>
                 );
               }
 

@@ -8,6 +8,7 @@ import { formatPhone } from '../../domain/phone';
 import { licenseService } from '../../license/LicenseService';
 import { InstallItem } from './InstallItem';
 import { RestoreDemoItem } from './RestoreDemoItem';
+import { TourItem } from '../demo/TourItem';
 
 function Item({ href, icon: Icon, title, subtitle, warn }: { href: string; icon: LucideIcon; title: string; subtitle: string; warn?: string }) {
   return (
@@ -48,6 +49,7 @@ export default function MaisPage() {
 
         {license.mode === 'demo' && (
           <nav aria-label="Demonstração" className="divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
+            <TourItem />
             <RestoreDemoItem />
           </nav>
         )}
