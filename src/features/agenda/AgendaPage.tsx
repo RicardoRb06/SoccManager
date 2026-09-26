@@ -1,7 +1,7 @@
 /**
  * Agenda (tela inicial).
  * Cabeçalho: a data aparece uma vez só (o título abre o calendário) e a faixa da semana.
- * Corpo: linha do tempo. Celular mostra uma quadra por vez (abas); desktop mostra todas lado a lado.
+ * Corpo: linha do tempo de uma quadra por vez (abas), no celular e no desktop.
  * Nova reserva: botão flutuante no celular, botão no cabeçalho no desktop.
  * Encerrar o dia, Imprimir e Bloquear horário ficam no fim da lista.
  */
@@ -63,7 +63,8 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
 
   const courts = data?.courts ?? [];
   const selectedCourtId = courts.find((c) => c.id === courtSel)?.id ?? courts[0]?.id;
-  const visibleCourts = isDesktop ? courts : courts.filter((c) => c.id === selectedCourtId);
+  // Uma quadra por vez (abas), no celular e no desktop
+  const visibleCourts = courts.filter((c) => c.id === selectedCourtId);
 
   const goTo = (d: ISODate) => navigate(`/agenda/${d}`, { replace: true });
   const nowMin = nowMinutes(now);
@@ -116,7 +117,7 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
                   type="button"
                   onClick={openDatePicker}
                   aria-label={`${dayTitle(date, today, false)}. Escolher outra data`}
-                  className="-mx-1 flex max-w-full items-center gap-1 rounded-md px-1 text-left text-[19px] font-semibold leading-tight tracking-tight hover:bg-accent lg:text-xl"
+                  className="flex max-w-full items-center gap-1 rounded-md text-left text-[19px] font-semibold leading-tight tracking-tight hover:bg-accent lg:text-xl"
                 >
                   <span className="truncate lg:overflow-visible">{dayTitle(date, today, !isDesktop)}</span>
                   <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
@@ -156,8 +157,8 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
 
         {!isDesktop && <div className="px-2 pb-1 pt-2">{weekStrip}</div>}
 
-        {!isDesktop && courts.length > 1 && (
-          <div role="tablist" aria-label="Quadras" className="mt-1 flex gap-5 overflow-x-auto px-4">
+        {courts.length > 1 && (
+          <div role="tablist" aria-label="Quadras" className="mt-1 flex gap-5 overflow-x-auto px-4 lg:mt-0 lg:gap-6 lg:px-6">
             {courts.map((c) => {
               const on = c.id === selectedCourtId;
               return (
@@ -192,7 +193,6 @@ export default function AgendaPage({ date: routeDate }: { date?: string }) {
             slotMinutes={settings.slotMinutes}
             nowMin={date === today ? nowMin : null}
             isPast={isPast}
-            showHeaders={isDesktop}
             onItem={openItem}
           />
         )}

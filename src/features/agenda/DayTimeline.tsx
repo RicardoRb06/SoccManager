@@ -1,10 +1,9 @@
 /**
- * Linha do tempo do dia: coluna de horas à esquerda e uma coluna por quadra
- * (no celular, só a quadra escolhida; no desktop, todas lado a lado dividindo a mesma coluna de horas).
+ * Linha do tempo do dia de uma quadra: coluna de horas à esquerda e os horários ao lado.
  *
- * Cada reserva vira um bloco com altura proporcional à duração e uma barra fina de cor na lateral,
- * que indica a situação. Cor forte só no que pede ação: "A receber", mensalidade pendente e falta.
- * Reserva futura sem pagamento fica neutra, porque é o normal (ninguém paga antes de jogar).
+ * Cada reserva vira um bloco com altura proporcional à duração, uma barra de cor na lateral
+ * e uma etiqueta forte de pagamento embaixo do valor: verde = pago, âmbar = a pagar,
+ * azul = sinal, vermelho = falta. Horário livre é só informação.
  */
 import { Fragment, type ReactNode } from 'react';
 import { Check, Lock, Repeat, X } from 'lucide-react';
@@ -25,7 +24,10 @@ interface Look {
   bar: string;
   /** fundo do bloco */
   surface: string;
-  status?: ReactNode;
+  /** etiqueta de pagamento (à direita, embaixo do valor) */
+  tag?: { label: ReactNode; className: string; icon?: ReactNode };
+  /** texto complementar (ex.: quanto falta, jogando agora) */
+  detail?: ReactNode;
   /** esmaece (já passou e não pede ação) */
   faded: boolean;
   strike?: boolean;
@@ -33,65 +35,53 @@ interface Look {
 
 const SURFACE = 'bg-foreground/[0.045] dark:bg-foreground/[0.07]';
 
-function Pill({ children }: { children: ReactNode }) {
-  return <span className="rounded-full bg-warning-muted px-1.5 py-px text-[11.5px] font-semibold text-warning-fg">{children}</span>;
-}
+/**
+ * Cores fortes e fixas das etiquetas de pagamento (feedback: na correria precisa bater o olho e saber quem pagou).
+ * Verde = pago, âmbar = não pago, azul = sinal, vermelho = falta. No escuro o fundo clareia e o texto escurece.
+ */
+const TAG = {
+  pago: 'bg-green-600 text-white dark:bg-green-500 dark:text-green-950',
+  aPagar: 'bg-amber-400 text-amber-950',
+  sinal: 'bg-blue-600 text-white dark:bg-blue-400 dark:text-blue-950',
+  falta: 'bg-red-600 text-white dark:bg-red-400 dark:text-red-950',
+};
+const BAR = {
+  pago: 'bg-green-600 dark:bg-green-500',
+  aPagar: 'bg-amber-400',
+  sinal: 'bg-blue-600 dark:bg-blue-400',
+  falta: 'bg-red-600 dark:bg-red-400',
+};
 
 function lookOf(v: OccupantView, past: boolean, playing: boolean, endMin: Minutes): Look {
+  const now = playing ? <span className="font-medium text-foreground">Jogando agora · até {minToHHMM(endMin)}</span> : undefined;
   switch (v.state) {
     case 'pago':
-      return {
-        bar: 'bg-success',
-        surface: SURFACE,
-        status: (
-          <span className="inline-flex items-center gap-1 text-success">
-            <Check className="size-3" strokeWidth={2.6} aria-hidden />
-            Pago
-          </span>
-        ),
-        faded: past,
-      };
+      return { bar: BAR.pago, surface: SURFACE, tag: { label: 'Pago', className: TAG.pago, icon: <Check strokeWidth={3} /> }, detail: now, faded: past };
     case 'sinal': {
       const price = typeof v.value === 'number' ? v.value : 0;
       const paid = v.paid ?? 0;
       return {
-        bar: 'bg-info',
+        bar: BAR.sinal,
         surface: SURFACE,
-        status: (
-          <span>
-            <span className="font-medium text-info">Sinal {formatBRLShort(paid)}</span> · faltam {formatBRLShort(Math.max(0, price - paid))}
-          </span>
-        ),
+        tag: { label: `Sinal ${formatBRLShort(paid)}`, className: TAG.sinal },
+        detail: now ?? <span>faltam {formatBRLShort(Math.max(0, price - paid))}</span>,
         faded: false,
       };
     }
     case 'pendente':
-      if (playing) return { bar: 'bg-foreground', surface: SURFACE, status: <span className="font-medium text-foreground">Jogando agora · até {minToHHMM(endMin)}</span>, faded: false };
-      if (past) return { bar: 'bg-warning', surface: SURFACE, status: <Pill>A receber</Pill>, faded: false };
-      return { bar: 'bg-muted-foreground/40', surface: SURFACE, faded: false };
+      return { bar: BAR.aPagar, surface: SURFACE, tag: { label: 'A pagar', className: TAG.aPagar }, detail: now, faded: false };
     case 'mensal_ok':
-      return { bar: 'bg-success', surface: SURFACE, status: v.subtitle ? 'mensalidade em dia' : 'Mensalidade em dia', faded: past };
+      return { bar: BAR.pago, surface: SURFACE, tag: { label: 'Em dia', className: TAG.pago, icon: <Check strokeWidth={3} /> }, detail: now, faded: past };
     case 'mensal_devendo':
-      return { bar: 'bg-warning', surface: SURFACE, status: <Pill>Mensalidade pendente</Pill>, faded: false };
+      return { bar: BAR.aPagar, surface: SURFACE, tag: { label: 'Devendo', className: TAG.aPagar }, detail: now, faded: false };
     case 'falta':
-      return {
-        bar: 'bg-danger',
-        surface: 'hatch-red',
-        status: (
-          <span className="inline-flex items-center gap-1 font-medium text-danger-fg">
-            <X className="size-3" strokeWidth={2.6} aria-hidden />
-            Não compareceu
-          </span>
-        ),
-        faded: false,
-        strike: true,
-      };
+      return { bar: BAR.falta, surface: 'hatch-red', tag: { label: 'Falta', className: TAG.falta, icon: <X strokeWidth={3} /> }, faded: false, strike: true };
     case 'bloqueado': {
       const generic = v.title === 'Bloqueado' || v.title === 'Fechado';
       return {
         bar: 'bg-muted-foreground/50',
         surface: 'hatch-gray',
-        status: generic ? undefined : (
+        detail: generic ? undefined : (
           <span className="inline-flex items-center gap-1">
             <Lock className="size-3" aria-hidden />
             Bloqueado
@@ -114,7 +104,6 @@ export function DayTimeline({
   slotMinutes,
   nowMin,
   isPast,
-  showHeaders,
   onItem,
 }: {
   data: AgendaData;
@@ -124,8 +113,6 @@ export function DayTimeline({
   /** minuto atual se a data é hoje; null nos outros dias */
   nowMin: Minutes | null;
   isPast: (endMin: Minutes) => boolean;
-  /** mostra o nome de cada quadra no topo da coluna (desktop) */
-  showHeaders: boolean;
   onItem: (o: Occupant) => void;
 }) {
   const cols = courts.map((court) => ({ court, rows: buildDayRows(data.prep, court.id, date, slotMinutes) }));
@@ -146,28 +133,6 @@ export function DayTimeline({
 
   return (
     <div>
-      {showHeaders && (
-        <div className="mb-2 grid gap-x-3" style={{ gridTemplateColumns }}>
-          <span />
-          {cols.map(({ court, rows }) => {
-            const first = rows[0]?.startMin ?? 0;
-            const last = rows[rows.length - 1]?.endMin ?? 0;
-            const total = Math.round((last - first) / slotMinutes);
-            const free = rows.filter((r) => r.type === 'livre').length;
-            return (
-              <div key={court.id} className="flex items-baseline justify-between gap-2 pl-4 pr-1">
-                <h2 className="truncate font-semibold tracking-tight">{court.name}</h2>
-                {total > 0 && (
-                  <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-                    {Math.max(0, total - free)} de {total} ocupados
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
       <div className="grid gap-x-3 pt-2" style={{ gridTemplateColumns }}>
         {/* coluna de horas */}
         <div className="relative" style={{ height }} aria-hidden>
@@ -208,7 +173,7 @@ export function DayTimeline({
               const look = lookOf(v, past, playing, row.endMin);
               const h = dur * ppm - 6;
               const clickable = row.occupant.kind !== 'fechado';
-              const statusParts = [v.subtitle, look.status].filter(Boolean);
+              const detailParts = [v.subtitle, look.detail].filter(Boolean);
               const range = dur !== slotMinutes && h >= 88 ? `${formatTimeRange(row.startMin, row.endMin)} · ${formatDuration(dur)}` : null;
               return (
                 <button
@@ -216,18 +181,18 @@ export function DayTimeline({
                   type="button"
                   disabled={!clickable}
                   onClick={() => onItem(row.occupant)}
-                  className={`absolute left-1 right-0 flex items-start gap-2.5 overflow-hidden rounded-lg py-2 pl-3.5 pr-3 text-left transition-shadow enabled:hover:ring-1 enabled:hover:ring-foreground/15 ${look.surface} ${look.faded ? 'opacity-70' : ''}`}
+                  className={`absolute left-1 right-0 flex items-start gap-2.5 overflow-hidden rounded-lg py-2 pl-3.5 pr-2.5 text-left transition-shadow enabled:hover:ring-1 enabled:hover:ring-foreground/15 ${look.surface} ${look.faded ? 'opacity-75' : ''}`}
                   style={{ top: y(row.startMin) + 3, height: h }}
                 >
-                  <span className={`absolute inset-y-0 left-0 w-[3px] ${look.bar}`} aria-hidden />
+                  <span className={`absolute inset-y-0 left-0 w-1 ${look.bar}`} aria-hidden />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5">
                       {v.isRecurrence && <Repeat className="size-3.5 shrink-0 text-muted-foreground" aria-label="Mensalista" />}
                       <span className={`truncate text-[15px] font-semibold tracking-tight ${look.strike ? 'line-through decoration-muted-foreground/60' : ''}`}>{v.title}</span>
                     </span>
-                    {h >= 44 && statusParts.length > 0 && (
+                    {h >= 44 && detailParts.length > 0 && (
                       <span className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
-                        {statusParts.map((p, k) => (
+                        {detailParts.map((p, k) => (
                           <Fragment key={k}>
                             {k > 0 && <span aria-hidden>·</span>}
                             {p}
@@ -237,7 +202,19 @@ export function DayTimeline({
                     )}
                     {range && <span className="mt-0.5 block text-xs tabular-nums text-muted-foreground">{range}</span>}
                   </span>
-                  {typeof v.value === 'number' && <span className="shrink-0 text-sm font-medium tabular-nums">{formatBRLShort(v.value)}</span>}
+                  {(typeof v.value === 'number' || look.tag) && (
+                    <span className="flex shrink-0 flex-col items-end gap-1">
+                      {typeof v.value === 'number' && <span className="text-sm font-medium leading-none tabular-nums">{formatBRLShort(v.value)}</span>}
+                      {look.tag && (
+                        <span
+                          className={`inline-flex h-5 items-center gap-1 rounded-full px-2 text-[11.5px] font-semibold leading-none [&_svg]:size-3 ${look.tag.className}`}
+                        >
+                          {look.tag.icon}
+                          {look.tag.label}
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </button>
               );
             })}
